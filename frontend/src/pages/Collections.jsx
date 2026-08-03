@@ -5,7 +5,7 @@ import CategoryCard from '../components/CategoryCard';
 
 const Collections = () => {
   return (
-    <div className="container" style={{ padding: '60px 0', minHeight: '80vh' }}>
+    <div className="container" style={{ padding: '60px var(--space-3)', minHeight: '80vh' }}>
       <SEO title="Collections" description="Explore GentFits exclusive collections" />
       
       <motion.div 
