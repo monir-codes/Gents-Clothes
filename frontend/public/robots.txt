@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# Disallow access to admin panel
+Disallow: /admin/
+Disallow: /admin/*
+Disallow: /api/
+
+Sitemap: https://www.gentfits.com/sitemap.xml
