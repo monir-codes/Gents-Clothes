@@ -5,12 +5,14 @@ import { ShoppingBag, Heart, Star, Truck, RefreshCcw, ShieldCheck } from 'lucide
 import { motion } from 'framer-motion';
 import useCartStore from '../store/useCartStore';
 import SEO from '../components/SEO';
+import ProductCard from '../components/ProductCard';
 import styles from './ProductDetails.module.css';
 
 const ProductDetails = () => {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [relatedProducts, setRelatedProducts] = useState([]);
   
   // Selections
   const [selectedColor, setSelectedColor] = useState('');
@@ -41,6 +43,15 @@ const ProductDetails = () => {
         if(data.colors?.length > 0) setSelectedColor(data.colors[0]);
         if(data.sizes?.length > 0) setSelectedSize(data.sizes[0]);
         setLoading(false);
+
+        // Fetch related products
+        if (data.category) {
+          const { data: allProducts } = await axios.get('/api/products');
+          const related = allProducts
+            .filter(p => p.category === data.category && p._id !== data._id)
+            .slice(0, 4);
+          setRelatedProducts(related);
+        }
       } catch (error) {
         console.error(error);
         setLoading(false);
@@ -216,6 +227,18 @@ const ProductDetails = () => {
           )}
         </div>
       </div>
+
+      {/* Related Products Section */}
+      {relatedProducts.length > 0 && (
+        <div style={{ marginTop: 'var(--space-8)' }}>
+          <h2 style={{ fontSize: '2rem', fontWeight: 600, textAlign: 'center', marginBottom: 'var(--space-4)' }}>You May Also Like</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: 'var(--space-3)' }}>
+            {relatedProducts.map(p => (
+              <ProductCard key={p._id} product={p} />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
     </>
   );

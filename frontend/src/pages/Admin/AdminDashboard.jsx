@@ -10,6 +10,10 @@ const AdminDashboard = () => {
         <button style={{ padding: '10px 20px', background: 'var(--color-text-primary)', color: 'white', borderRadius: '4px' }}>Download Report</button>
       </div>
 
+      <div style={{ background: 'rgba(201, 162, 101, 0.1)', border: '1px solid var(--color-accent)', padding: '16px', borderRadius: '8px', marginBottom: '24px', color: 'var(--color-text-primary)' }}>
+        <strong>System Status:</strong> Admin Panel is connected to the live MongoDB database. Products are fully synced. Revenue and Order metrics require an active Admin Session token to fetch real-time data.
+      </div>
+
       <div className={styles.statsGrid}>
         <div className={styles.statCard}>
           <span className={styles.statTitle}>Total Revenue</span>

@@ -121,14 +121,14 @@ img {
 }
 
 .container {
-  max-width: 1440px;
+  max-width: 1600px;
   margin: 0 auto;
-  padding: 0 var(--space-3);
+  padding: 0 5vw;
 }
 
 @media (max-width: 768px) {
   .container {
-    padding: 0 var(--space-2);
+    padding: 0 var(--space-3);
   }
 }
 
