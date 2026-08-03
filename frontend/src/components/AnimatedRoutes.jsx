@@ -11,6 +11,8 @@ import TrackOrder from '../pages/TrackOrder';
 import ProductDetails from '../pages/ProductDetails';
 import Checkout from '../pages/Checkout';
 import OrderSuccess from '../pages/OrderSuccess';
+import Cart from '../pages/Cart';
+import Wishlist from '../pages/Wishlist';
 import Login from '../pages/Login';
 import Register from '../pages/Register';
 import Dashboard from '../pages/Dashboard';
@@ -63,6 +65,10 @@ const AnimatedRoutes = () => {
         <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
         <Route path="/register" element={<PageWrapper><Register /></PageWrapper>} />
         <Route path="/dashboard" element={<PageWrapper><Dashboard /></PageWrapper>} />
+        
+        {/* Utility Pages */}
+        <Route path="/cart" element={<PageWrapper><Cart /></PageWrapper>} />
+        <Route path="/wishlist" element={<PageWrapper><Wishlist /></PageWrapper>} />
         
         {/* Brand & Support Pages */}
         <Route path="/about" element={<PageWrapper><About /></PageWrapper>} />

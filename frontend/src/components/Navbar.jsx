@@ -1,15 +1,34 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Heart, ShoppingBag, User, Menu, X } from 'lucide-react';
+import { Search, Heart, ShoppingBag, User, Menu, X, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import useCartStore from '../store/useCartStore';
 import SearchModal from './SearchModal';
+import { auth, signInWithGoogle, logOut } from '../config/firebase';
+import { onAuthStateChanged } from 'firebase/auth';
 import styles from './Navbar.module.css';
 
 const Navbar = () => {
-  const [isSearchOpen, setIsSearchOpen] = React.useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [user, setUser] = useState(null);
   const { cartItems, toggleCart } = useCartStore();
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const handleAuth = async () => {
+    if (user) {
+      await logOut();
+    } else {
+      await signInWithGoogle();
+    }
+  };
+
   return (
     <header className={styles.header}>
       <div className={styles.announcementBar}>
@@ -17,10 +36,6 @@ const Navbar = () => {
       </div>
       
       <div className={`container ${styles.navContainer}`}>
-        <button className={styles.mobileMenuBtn} onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
-          {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
-
         <Link to="/" className={styles.logo}>
           GentFits
         </Link>
@@ -39,7 +54,7 @@ const Navbar = () => {
             <Search size={22} strokeWidth={1.5} />
           </button>
           
-          <Link to="/profile" className={styles.iconWrapper}>
+          <Link to="/wishlist" className={styles.iconWrapper}>
             <button className={styles.iconBtn} aria-label="Wishlist">
               <Heart size={22} strokeWidth={1.5} />
             </button>
@@ -54,11 +69,16 @@ const Navbar = () => {
             )}
           </div>
           
-          <Link to="/profile" className={styles.iconWrapper}>
-            <button className={styles.iconBtn} aria-label="Profile">
-              <User size={22} strokeWidth={1.5} />
+          {/* User Icon visible only on Desktop */}
+          <div className={styles.desktopUserIcon}>
+            <button className={styles.iconBtn} aria-label="Profile" onClick={handleAuth} title={user ? "Logout" : "Login"}>
+              {user ? <LogOut size={22} strokeWidth={1.5} /> : <User size={22} strokeWidth={1.5} />}
             </button>
-          </Link>
+          </div>
+
+          <button className={styles.mobileMenuBtn} onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
         </div>
       </div>
       <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
@@ -72,6 +92,17 @@ const Navbar = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
           >
+            {/* User Login/Logout in Mobile Menu */}
+            <div className={styles.mobileAuthBox}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <User size={24} />
+                <span>{user ? user.displayName || 'User' : 'Guest'}</span>
+              </div>
+              <button className={styles.mobileAuthBtn} onClick={handleAuth}>
+                {user ? 'Logout' : 'Login / Signup'}
+              </button>
+            </div>
+
             <Link to="/shop" className={styles.mobileNavLink} onClick={() => setIsMobileMenuOpen(false)}>Shop</Link>
             <Link to="/collections" className={styles.mobileNavLink} onClick={() => setIsMobileMenuOpen(false)}>Collections</Link>
             <Link to="/new-arrival" className={styles.mobileNavLink} onClick={() => setIsMobileMenuOpen(false)}>New Arrival</Link>
