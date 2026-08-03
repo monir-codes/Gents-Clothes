@@ -1,57 +1,62 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { Link } from 'react-router-dom';
-
+import axios from 'axios';
 import CategoryCard from '../components/CategoryCard';
 import SEO from '../components/SEO';
 import styles from './Home.module.css';
 
 const Home = () => {
+  const [settings, setSettings] = useState(null);
+  const { scrollY } = useScroll();
+  const y1 = useTransform(scrollY, [0, 500], [0, 150]); // Parallax effect
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const { data } = await axios.get('/api/settings');
+        setSettings(data);
+      } catch (error) {
+        console.error("CMS Fetch error", error);
+      }
+    };
+    fetchSettings();
+  }, []);
   return (
     <div>
       <SEO 
         title="Home" 
         description="GentFits - Redefining luxury men's fashion in Bangladesh. Shop premium Panjabis, Shirts, and T-Shirts." 
       />
+      {/* Hero Section */}
       <section className={styles.hero}>
-        <img 
-          src="/images/hero-banner.png" 
-          alt="Luxury Fashion Hero" 
-          className={styles.heroImage}
+        <motion.div 
+          className={styles.heroBackground} 
+          style={{ 
+            backgroundImage: `url(${settings?.heroImage || '/images/hero-banner.png'})`,
+            y: y1 // Apply parallax
+          }} 
         />
-        <div className={styles.overlay}></div>
+        <div className={styles.heroOverlay} />
         
-        <div className={styles.heroContent}>
-          <motion.h1 
-            className={styles.heroTitle}
+        <div className={`container ${styles.heroContent}`}>
+          <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            Redefine Your Elegance
-          </motion.h1>
-          
-          <motion.p 
-            className={styles.heroSubtitle}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-          >
-            Discover the premium collection tailored for the modern gentleman.
-          </motion.p>
-          
-          <motion.div 
-            className={styles.ctaContainer}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
-          >
-            <Link to="/shop">
-              <button className={styles.btnPrimary}>Shop Now</button>
-            </Link>
-            <Link to="/collections">
-              <button className={styles.btnOutline}>Explore Collection</button>
-            </Link>
+            <h1 className={styles.heroTitle}>{settings?.heroTitle || 'Premium Luxury Menswear'}</h1>
+            <p className={styles.heroSubtitle}>
+              {settings?.heroSubtitle || 'Discover the latest collections of Panjabis, Shirts, and T-Shirts.'}
+            </p>
+            <div className={styles.ctaContainer}>
+              <Link to="/shop">
+                <button className={styles.btnPrimary}>Shop Now</button>
+              </Link>
+              <Link to="/collections">
+                <button className={styles.btnOutline}>Explore Collection</button>
+              </Link>
+            </div>
           </motion.div>
         </div>
       </section>

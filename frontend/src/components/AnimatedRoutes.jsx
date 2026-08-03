@@ -19,6 +19,7 @@ import AdminLayout from '../pages/Admin/AdminLayout';
 import AdminDashboard from '../pages/Admin/AdminDashboard';
 import AdminProducts from '../pages/Admin/AdminProducts';
 import AdminOrders, { AdminCustomers, AdminMarketing, AdminSettings } from '../pages/Admin/AdminModules';
+import AdminSecurityWrapper from './AdminSecurityWrapper';
 
 const pageVariants = {
   initial: { opacity: 0, y: 10 },
@@ -74,7 +75,7 @@ const AnimatedRoutes = () => {
         <Route path="/terms" element={<PageWrapper><LegalPage title="Terms of Service" /></PageWrapper>} />
 
         {/* Admin Panel */}
-        <Route path="/admin" element={<PageWrapper><AdminLayout /></PageWrapper>}>
+        <Route path="/admin" element={<PageWrapper><AdminSecurityWrapper><AdminLayout /></AdminSecurityWrapper></PageWrapper>}>
           <Route index element={<AdminDashboard />} />
           <Route path="products" element={<AdminProducts />} />
           <Route path="orders" element={<AdminOrders />} />

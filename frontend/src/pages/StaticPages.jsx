@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import axios from 'axios';
 import SEO from '../components/SEO';
 
 const StaticPageTemplate = ({ title, children }) => (
@@ -11,7 +12,22 @@ const StaticPageTemplate = ({ title, children }) => (
   </div>
 );
 
-export const About = () => (
+export const About = () => {
+  const [settings, setSettings] = useState(null);
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const { data } = await axios.get('/api/settings');
+        setSettings(data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchSettings();
+  }, []);
+
+  return (
   <div>
     <SEO title="About Us - Our Story" description="Discover the heritage and craftsmanship behind GentFits." />
     {/* Cinematic Hero */}
@@ -35,7 +51,7 @@ export const About = () => (
         <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
           <h2 style={{ fontSize: '2.5rem', marginBottom: '20px' }}>A Legacy of Elegance</h2>
           <p style={{ color: 'var(--color-text-secondary)', lineHeight: 1.8, fontSize: '1.1rem' }}>
-            GentFits was founded with a singular, uncompromising vision: to redefine luxury menswear in Bangladesh. We believe that true elegance lies in the details—from the meticulous selection of premium fabrics to the flawless precision of our tailoring.
+            {settings?.aboutStory || 'GentFits was founded with a singular, uncompromising vision: to redefine luxury menswear in Bangladesh. We believe that true elegance lies in the details—from the meticulous selection of premium fabrics to the flawless precision of our tailoring.'}
           </p>
         </motion.div>
         <motion.img 
@@ -66,7 +82,8 @@ export const About = () => (
       </div>
     </div>
   </div>
-);
+  );
+};
 
 export const FAQ = () => (
   <StaticPageTemplate title="Frequently Asked Questions">
