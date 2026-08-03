@@ -93,6 +93,7 @@ const Shop = ({ hideHeader }) => {
             <label className={styles.filterLabel}><input type="checkbox" /> XL</label>
             <label className={styles.filterLabel}><input type="checkbox" /> XXL</label>
           </div>
+        </div>
         </aside>
       )}
 
