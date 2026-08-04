@@ -202,8 +202,8 @@ const AdminProducts = () => {
       </div>
 
       {isModalOpen && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000 }}>
-          <div style={{ background: 'var(--color-surface)', width: '500px', padding: '30px', borderRadius: '8px', position: 'relative' }}>
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000, padding: '20px' }}>
+          <div style={{ background: 'var(--color-surface)', width: '100%', maxWidth: '600px', maxHeight: '90vh', overflowY: 'auto', padding: '30px', borderRadius: '8px', position: 'relative' }}>
             <button onClick={() => setIsModalOpen(false)} style={{ position: 'absolute', top: '20px', right: '20px' }}>
               <X size={24} />
             </button>
@@ -228,9 +228,20 @@ const AdminProducts = () => {
 
               <input type="text" name="name" placeholder="Product Name" value={formData.name} onChange={handleInputChange} required style={{ padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px' }} />
               
-              <div style={{ display: 'flex', gap: '10px' }}>
-                <input type="number" name="price" placeholder="Price (৳)" value={formData.price} onChange={handleInputChange} required style={{ padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px', flex: 1 }} />
-                <input type="number" name="countInStock" placeholder="Stock Qty" value={formData.countInStock} onChange={handleInputChange} required style={{ padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px', flex: 1 }} />
+              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                <div style={{ flex: '1 1 45%' }}>
+                  <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '5px', fontWeight: 600 }}>Price (৳)</label>
+                  <input type="number" name="price" placeholder="Price (৳)" value={formData.price} onChange={handleInputChange} required style={{ width: '100%', padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px' }} />
+                </div>
+                <div style={{ flex: '1 1 45%' }}>
+                  <label style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '5px', fontWeight: 600 }}>
+                    Stock Quantity 
+                    <span style={{ color: formData.countInStock > 0 ? 'var(--color-success, #28a745)' : 'var(--color-error)' }}>
+                      {formData.countInStock > 0 ? ' (In Stock)' : ' (Out of Stock)'}
+                    </span>
+                  </label>
+                  <input type="number" name="countInStock" placeholder="Stock Qty (0 = Out of Stock)" value={formData.countInStock} onChange={handleInputChange} required style={{ width: '100%', padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px' }} />
+                </div>
               </div>
 
               <input type="text" name="category" placeholder="Category (e.g., Summer)" value={formData.category} onChange={handleInputChange} required style={{ padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px' }} />
