@@ -377,7 +377,11 @@ export const AdminSettings = () => {
         <input type="text" name="heroVideo" value={settings.heroVideo || ''} onChange={handleChange} style={inputStyle} />
         
         <label style={labelStyle}>Hero Slideshow (Array of Image URLs) - Replaces static image</label>
-        <textarea rows="4" value={jsonInputs.heroSlideshow} onChange={(e) => handleJsonInputChange('heroSlideshow', e.target.value)} style={{...inputStyle, fontFamily: 'monospace', fontSize: '13px'}} />
+        <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginBottom: '8px' }}>
+          Format as a JSON array of strings. Example: <br/>
+          <code>[ "https://i.ibb.co/1.jpg", "https://i.ibb.co/2.jpg" ]</code>
+        </p>
+        <textarea rows="4" placeholder='[\n  "https://i.ibb.co/example1.jpg",\n  "https://i.ibb.co/example2.jpg"\n]' value={jsonInputs.heroSlideshow} onChange={(e) => handleJsonInputChange('heroSlideshow', e.target.value)} style={{...inputStyle, fontFamily: 'monospace', fontSize: '13px'}} />
       </div>
 
       <div style={sectionStyle}>
@@ -390,10 +394,20 @@ export const AdminSettings = () => {
         <input type="text" value={settings.featuredVideoSection?.videoUrl || ''} onChange={(e) => handleNestedChange('featuredVideoSection', 'videoUrl', e.target.value)} style={inputStyle} />
         
         <label style={labelStyle}>Slideshow Images (Array of URLs) - Used if no video</label>
-        <textarea rows="4" value={jsonInputs.featuredVideoSlideshow} onChange={(e) => handleJsonInputChange('featuredVideoSlideshow', e.target.value)} style={{...inputStyle, fontFamily: 'monospace', fontSize: '13px'}} />
+        <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginBottom: '8px' }}>
+          Format as a JSON array of strings. Example: <br/>
+          <code>[ "https://i.ibb.co/1.jpg", "https://i.ibb.co/2.jpg" ]</code>
+        </p>
+        <textarea rows="4" placeholder='[\n  "https://i.ibb.co/example1.jpg",\n  "https://i.ibb.co/example2.jpg"\n]' value={jsonInputs.featuredVideoSlideshow} onChange={(e) => handleJsonInputChange('featuredVideoSlideshow', e.target.value)} style={{...inputStyle, fontFamily: 'monospace', fontSize: '13px'}} />
         
         <label style={labelStyle}>Fallback Image URL</label>
-        <input type="text" value={settings.featuredVideoSection?.fallbackImage || ''} onChange={(e) => handleNestedChange('featuredVideoSection', 'fallbackImage', e.target.value)} style={inputStyle} />
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '15px' }}>
+          <input type="text" value={settings.featuredVideoSection?.fallbackImage || ''} onChange={(e) => handleNestedChange('featuredVideoSection', 'fallbackImage', e.target.value)} style={{...inputStyle, marginBottom: 0}} />
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', background: 'var(--color-surface-hover)', padding: '10px 15px', borderRadius: '4px', whiteSpace: 'nowrap', border: '1px solid var(--color-border)' }}>
+            <Upload size={16} /> {uploadingField === 'featuredVideoSection.fallbackImage' ? 'Uploading...' : 'Upload'}
+            <input type="file" style={{ display: 'none' }} accept="image/*" onChange={(e) => handleImageUpload(e, 'fallbackImage', true, 'featuredVideoSection')} />
+          </label>
+        </div>
       </div>
 
       <div style={sectionStyle}>
@@ -470,12 +484,35 @@ export const AdminSettings = () => {
         <h4 style={{marginBottom: '10px'}}>About Us Page</h4>
         <div style={{ padding: '15px', border: '1px solid var(--color-border)', borderRadius: '4px', marginBottom: '20px' }}>
           <label style={labelStyle}>Hero Image URL</label>
-          <input type="text" value={settings.staticPages?.about?.heroImage || ''} onChange={(e) => {
-            const staticPages = {...(settings.staticPages || {})};
-            if(!staticPages.about) staticPages.about = {};
-            staticPages.about.heroImage = e.target.value;
-            setSettings({...settings, staticPages});
-          }} style={inputStyle} />
+          <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '15px' }}>
+            <input type="text" value={settings.staticPages?.about?.heroImage || ''} onChange={(e) => {
+              const staticPages = {...(settings.staticPages || {})};
+              if(!staticPages.about) staticPages.about = {};
+              staticPages.about.heroImage = e.target.value;
+              setSettings({...settings, staticPages});
+            }} style={{...inputStyle, marginBottom: 0}} />
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', background: 'var(--color-surface-hover)', padding: '10px 15px', borderRadius: '4px', whiteSpace: 'nowrap', border: '1px solid var(--color-border)' }}>
+              <Upload size={16} /> {uploadingField === 'staticPages.about.heroImage' ? 'Uploading...' : 'Upload'}
+              <input type="file" style={{ display: 'none' }} accept="image/*" onChange={async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                setUploadingField('staticPages.about.heroImage');
+                const imgData = new FormData();
+                imgData.append('image', file);
+                try {
+                  const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body: imgData });
+                  const data = await res.json();
+                  if (data.success) {
+                    const staticPages = {...(settings.staticPages || {})};
+                    if(!staticPages.about) staticPages.about = {};
+                    staticPages.about.heroImage = data.data.url;
+                    setSettings({...settings, staticPages});
+                  } else Swal.fire('Error', 'ImgBB upload failed', 'error');
+                } catch (error) { Swal.fire('Error', 'Image upload failed', 'error'); }
+                setUploadingField(null);
+              }} />
+            </label>
+          </div>
           
           <label style={labelStyle}>Story Text</label>
           <textarea rows="4" value={settings.staticPages?.about?.storyText || ''} onChange={(e) => {
@@ -486,20 +523,66 @@ export const AdminSettings = () => {
           }} style={inputStyle} />
           
           <label style={labelStyle}>Materials Image 1</label>
-          <input type="text" value={settings.staticPages?.about?.materialsImage1 || ''} onChange={(e) => {
-            const staticPages = {...(settings.staticPages || {})};
-            if(!staticPages.about) staticPages.about = {};
-            staticPages.about.materialsImage1 = e.target.value;
-            setSettings({...settings, staticPages});
-          }} style={inputStyle} />
+          <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '15px' }}>
+            <input type="text" value={settings.staticPages?.about?.materialsImage1 || ''} onChange={(e) => {
+              const staticPages = {...(settings.staticPages || {})};
+              if(!staticPages.about) staticPages.about = {};
+              staticPages.about.materialsImage1 = e.target.value;
+              setSettings({...settings, staticPages});
+            }} style={{...inputStyle, marginBottom: 0}} />
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', background: 'var(--color-surface-hover)', padding: '10px 15px', borderRadius: '4px', whiteSpace: 'nowrap', border: '1px solid var(--color-border)' }}>
+              <Upload size={16} /> {uploadingField === 'staticPages.about.materialsImage1' ? 'Uploading...' : 'Upload'}
+              <input type="file" style={{ display: 'none' }} accept="image/*" onChange={async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                setUploadingField('staticPages.about.materialsImage1');
+                const imgData = new FormData();
+                imgData.append('image', file);
+                try {
+                  const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body: imgData });
+                  const data = await res.json();
+                  if (data.success) {
+                    const staticPages = {...(settings.staticPages || {})};
+                    if(!staticPages.about) staticPages.about = {};
+                    staticPages.about.materialsImage1 = data.data.url;
+                    setSettings({...settings, staticPages});
+                  } else Swal.fire('Error', 'ImgBB upload failed', 'error');
+                } catch (error) { Swal.fire('Error', 'Image upload failed', 'error'); }
+                setUploadingField(null);
+              }} />
+            </label>
+          </div>
 
           <label style={labelStyle}>Materials Image 2</label>
-          <input type="text" value={settings.staticPages?.about?.materialsImage2 || ''} onChange={(e) => {
-            const staticPages = {...(settings.staticPages || {})};
-            if(!staticPages.about) staticPages.about = {};
-            staticPages.about.materialsImage2 = e.target.value;
-            setSettings({...settings, staticPages});
-          }} style={inputStyle} />
+          <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '15px' }}>
+            <input type="text" value={settings.staticPages?.about?.materialsImage2 || ''} onChange={(e) => {
+              const staticPages = {...(settings.staticPages || {})};
+              if(!staticPages.about) staticPages.about = {};
+              staticPages.about.materialsImage2 = e.target.value;
+              setSettings({...settings, staticPages});
+            }} style={{...inputStyle, marginBottom: 0}} />
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', background: 'var(--color-surface-hover)', padding: '10px 15px', borderRadius: '4px', whiteSpace: 'nowrap', border: '1px solid var(--color-border)' }}>
+              <Upload size={16} /> {uploadingField === 'staticPages.about.materialsImage2' ? 'Uploading...' : 'Upload'}
+              <input type="file" style={{ display: 'none' }} accept="image/*" onChange={async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                setUploadingField('staticPages.about.materialsImage2');
+                const imgData = new FormData();
+                imgData.append('image', file);
+                try {
+                  const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body: imgData });
+                  const data = await res.json();
+                  if (data.success) {
+                    const staticPages = {...(settings.staticPages || {})};
+                    if(!staticPages.about) staticPages.about = {};
+                    staticPages.about.materialsImage2 = data.data.url;
+                    setSettings({...settings, staticPages});
+                  } else Swal.fire('Error', 'ImgBB upload failed', 'error');
+                } catch (error) { Swal.fire('Error', 'Image upload failed', 'error'); }
+                setUploadingField(null);
+              }} />
+            </label>
+          </div>
 
           <label style={labelStyle}>Materials Text</label>
           <textarea rows="4" value={settings.staticPages?.about?.materialsText || ''} onChange={(e) => {
