@@ -13,7 +13,6 @@ import Checkout from '../pages/Checkout';
 import OrderSuccess from '../pages/OrderSuccess';
 import Wishlist from '../pages/Wishlist';
 import Login from '../pages/Login';
-import Register from '../pages/Register';
 import Dashboard from '../pages/Dashboard';
 import { About, FAQ, Contact, LegalPage } from '../pages/StaticPages';
 import AdminLayout from '../pages/Admin/AdminLayout';
@@ -62,7 +61,6 @@ const AnimatedRoutes = () => {
         <Route path="/checkout" element={<PageWrapper><Checkout /></PageWrapper>} />
         <Route path="/order-success" element={<PageWrapper><OrderSuccess /></PageWrapper>} />
         <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
-        <Route path="/register" element={<PageWrapper><Register /></PageWrapper>} />
         <Route path="/dashboard" element={<PageWrapper><Dashboard /></PageWrapper>} />
         
         {/* Utility Pages */}

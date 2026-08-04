@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Search, Heart, ShoppingBag, User, Menu, X, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import useCartStore from '../store/useCartStore';
+import useWishlistStore from '../store/useWishlistStore';
 import SearchModal from './SearchModal';
 import { auth, signInWithGoogle, logOut } from '../config/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
@@ -15,6 +16,8 @@ const Navbar = () => {
   const [user, setUser] = useState(null);
   const [announcement, setAnnouncement] = useState('FREE SHIPPING ON ORDERS OVER ৳5000 | PREMIUM SUMMER COLLECTION 2026');
   const { cartItems, toggleCart } = useCartStore();
+  const { wishlistItems } = useWishlistStore();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -38,9 +41,9 @@ const Navbar = () => {
 
   const handleAuth = async () => {
     if (user) {
-      await logOut();
+      navigate('/dashboard');
     } else {
-      await signInWithGoogle();
+      navigate('/login');
     }
   };
 
@@ -73,6 +76,9 @@ const Navbar = () => {
             <button className={styles.iconBtn} aria-label="Wishlist">
               <Heart size={22} strokeWidth={1.5} />
             </button>
+            {wishlistItems.length > 0 && (
+              <span className={styles.badge}>{wishlistItems.length}</span>
+            )}
           </Link>
           
           <div className={styles.iconWrapper}>

@@ -16,6 +16,7 @@ const userRoutes = require('./routes/userRoutes');
 const productRoutes = require('./routes/productRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const settingsRoutes = require('./routes/settingsRoutes');
+const statsRoutes = require('./routes/statsRoutes');
 
 // Middleware
 app.use(express.json());
@@ -26,6 +27,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/settings', settingsRoutes);
+app.use('/api/stats', statsRoutes);
 
 // Basic Route
 app.get('/', (req, res) => {

@@ -3,10 +3,13 @@ import { Link } from 'react-router-dom';
 import { Heart, ShoppingBag } from 'lucide-react';
 import { motion } from 'framer-motion';
 import useCartStore from '../store/useCartStore';
+import useWishlistStore from '../store/useWishlistStore';
 import styles from './ProductCard.module.css';
 
 const ProductCard = ({ product }) => {
   const { addToCart } = useCartStore();
+  const { toggleWishlist, isInWishlist } = useWishlistStore();
+  const isWishlisted = isInWishlist(product._id);
 
   const handleQuickAdd = (e) => {
     e.preventDefault(); // Prevent navigating to product detail
@@ -50,8 +53,12 @@ const ProductCard = ({ product }) => {
         </Link>
         
         <div className={styles.actions}>
-          <button className={styles.actionBtn} aria-label="Add to Wishlist" onClick={(e) => e.preventDefault()}>
-            <Heart size={20} />
+          <button 
+            className={styles.actionBtn} 
+            aria-label="Add to Wishlist" 
+            onClick={(e) => { e.preventDefault(); toggleWishlist(product); }}
+          >
+            <Heart size={20} fill={isWishlisted ? "var(--color-text-primary)" : "none"} color={isWishlisted ? "var(--color-text-primary)" : "currentColor"} />
           </button>
           <button className={styles.actionBtn} aria-label="Quick Add" onClick={handleQuickAdd}>
             <ShoppingBag size={20} />

@@ -1,9 +1,26 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Search as SearchIcon, Sparkles } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import styles from './SearchModal.module.css';
 
 const SearchModal = ({ isOpen, onClose }) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const navigate = useNavigate();
+
+  const handleSearch = () => {
+    if (searchTerm.trim()) {
+      navigate(`/shop?search=${encodeURIComponent(searchTerm.trim())}`);
+      onClose();
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -25,9 +42,17 @@ const SearchModal = ({ isOpen, onClose }) => {
             <div className={styles.header}>
               <div className={styles.searchBar}>
                 <SearchIcon size={20} color="var(--color-text-secondary)" />
-                <input type="text" placeholder="Search products, categories..." autoFocus className={styles.input} />
-                <button className={styles.aiBtn}>
-                  <Sparkles size={16} /> AI Smart Search
+                <input 
+                  type="text" 
+                  placeholder="Search products, categories..." 
+                  autoFocus 
+                  className={styles.input}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                />
+                <button className={styles.aiBtn} onClick={handleSearch}>
+                  <Sparkles size={16} /> Search
                 </button>
               </div>
               <button className={styles.closeBtn} onClick={onClose}><X size={24} /></button>

@@ -71,8 +71,36 @@ const getUserProfile = async (req, res) => {
   }
 };
 
+// @desc    Get all users
+// @route   GET /api/users
+// @access  Private/Admin
+const getUsers = async (req, res) => {
+  const users = await User.find({});
+  res.json(users);
+};
+
+// @desc    Delete user
+// @route   DELETE /api/users/:id
+// @access  Private/Admin
+const deleteUser = async (req, res) => {
+  const user = await User.findById(req.params.id);
+
+  if (user) {
+    if (user.isAdmin) {
+      res.status(400).json({ message: 'Cannot delete admin user' });
+      return;
+    }
+    await user.deleteOne();
+    res.json({ message: 'User removed' });
+  } else {
+    res.status(404).json({ message: 'User not found' });
+  }
+};
+
 module.exports = {
   authUser,
   registerUser,
   getUserProfile,
+  getUsers,
+  deleteUser,
 };

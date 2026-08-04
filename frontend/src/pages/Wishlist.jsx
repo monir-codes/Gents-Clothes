@@ -4,12 +4,10 @@ import { Link } from 'react-router-dom';
 import { HeartCrack } from 'lucide-react';
 import SEO from '../components/SEO';
 import ProductCard from '../components/ProductCard';
-// For demo purposes, we will mock a wishlist state, or just show empty state
-// A global store (like zustand) or Firebase is ideal for actual wishlist data.
+import useWishlistStore from '../store/useWishlistStore';
 
 const Wishlist = () => {
-  // Mock wishlist data - usually comes from a Zustand store or DB
-  const wishlistItems = [];
+  const { wishlistItems } = useWishlistStore();
 
   return (
     <>

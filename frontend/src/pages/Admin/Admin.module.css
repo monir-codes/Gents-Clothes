@@ -98,7 +98,7 @@
   background-color: var(--color-background);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
-  overflow: hidden;
+  overflow-x: auto;
 }
 
 .table {
@@ -126,5 +126,21 @@
     width: 100%;
     border-right: none;
     border-bottom: 1px solid var(--color-border);
+    padding: var(--space-3);
+  }
+  .nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+  }
+  .navItem {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+  }
+  .content {
+    padding: var(--space-3);
+  }
+  .dashboardTitle {
+    font-size: 1.5rem;
   }
 }

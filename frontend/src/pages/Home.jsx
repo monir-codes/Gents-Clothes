@@ -3,6 +3,11 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { Shield, Truck, RefreshCw } from 'lucide-react';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Pagination, Autoplay } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 import CategoryCard from '../components/CategoryCard';
 import ProductCard from '../components/ProductCard';
 import SEO from '../components/SEO';
@@ -99,7 +104,7 @@ const Home = () => {
 
       {/* Featured Categories */}
       {settings.featuredCategories && settings.featuredCategories.length > 0 && (
-        <section className="container" style={{ padding: 'var(--space-8) 0' }}>
+        <section className="container" style={{ padding: 'var(--space-8) var(--space-4)' }}>
           <motion.h2 
             className={styles.sectionTitle}
             initial={{ opacity: 0, y: 30 }}
@@ -110,21 +115,35 @@ const Home = () => {
             Featured Categories
           </motion.h2>
           <motion.div 
-            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 'var(--space-4)' }}
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.6, staggerChildren: 0.2 }}
+            transition={{ duration: 0.6 }}
           >
-            {settings.featuredCategories.map((cat, i) => (
-              <CategoryCard key={i} title={cat.title} image={cat.image} link={cat.link} />
-            ))}
+            <Swiper
+              modules={[Navigation, Pagination, Autoplay]}
+              spaceBetween={24}
+              slidesPerView={1}
+              breakpoints={{
+                640: { slidesPerView: 2 },
+                768: { slidesPerView: 3 },
+                1024: { slidesPerView: 4 },
+              }}
+              autoplay={{ delay: 3000, disableOnInteraction: false }}
+              navigation
+            >
+              {settings.featuredCategories.map((cat, i) => (
+                <SwiperSlide key={i}>
+                  <CategoryCard title={cat.title} image={cat.image} link={cat.link} />
+                </SwiperSlide>
+              ))}
+            </Swiper>
           </motion.div>
         </section>
       )}
 
       {/* New Arrivals */}
-      <section className="container" style={{ padding: 'var(--space-8) 0' }}>
+      <section className="container" style={{ padding: 'var(--space-8) var(--space-4)' }}>
         <h2 className={styles.sectionTitle}>New Arrivals</h2>
         <div className={styles.productGrid}>
           {dummyProducts.map(p => <ProductCard key={p._id} product={p} />)}
@@ -133,24 +152,42 @@ const Home = () => {
 
       {/* Featured Collections */}
       {settings.featuredCollections && settings.featuredCollections.length > 0 && (
-        <section className="container" style={{ padding: 'var(--space-8) 0' }}>
+        <section className="container" style={{ padding: 'var(--space-8) var(--space-4)' }}>
           <h2 className={styles.sectionTitle}>Featured Collections</h2>
-          <div className={styles.collectionsGrid}>
-            {settings.featuredCollections.map((col, i) => (
-              <div key={i} className={styles.collectionItem}>
-                <img src={col.image} alt={col.title} />
-                <div className={styles.collectionContent}>
-                  <h3>{col.title}</h3>
-                  <Link to={col.link} style={{ color: '#fff', textDecoration: 'underline' }}>Shop Now</Link>
-                </div>
-              </div>
-            ))}
-          </div>
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.8 }}
+          >
+            <Swiper
+              modules={[Pagination]}
+              spaceBetween={24}
+              slidesPerView={1}
+              breakpoints={{
+                768: { slidesPerView: 2 }
+              }}
+              pagination={{ clickable: true }}
+              style={{ paddingBottom: '40px' }}
+            >
+              {settings.featuredCollections.map((col, i) => (
+                <SwiperSlide key={i}>
+                  <div className={styles.collectionItem}>
+                    <img src={col.image} alt={col.title} />
+                    <div className={styles.collectionContent}>
+                      <h3>{col.title}</h3>
+                      <Link to={col.link} style={{ color: '#fff', textDecoration: 'underline' }}>Shop Now</Link>
+                    </div>
+                  </div>
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          </motion.div>
         </section>
       )}
 
       {/* Best Sellers */}
-      <section className="container" style={{ padding: 'var(--space-8) 0' }}>
+      <section className="container" style={{ padding: 'var(--space-8) var(--space-4)' }}>
         <h2 className={styles.sectionTitle}>Best Sellers</h2>
         <div className={styles.productGrid}>
           {dummyProducts.map(p => <ProductCard key={p._id} product={{...p, _id: p._id+'bs'}} />)}
@@ -174,7 +211,7 @@ const Home = () => {
 
       {/* Shop the Look */}
       {settings.shopTheLook && (
-        <section className="container" style={{ padding: 'var(--space-8) 0' }}>
+        <section className="container" style={{ padding: 'var(--space-8) var(--space-4)' }}>
           <h2 className={styles.sectionTitle}>Shop the Look</h2>
           <div className={styles.shopTheLook}>
             <div className={styles.lookImage}>
@@ -208,7 +245,7 @@ const Home = () => {
       )}
 
       {/* Trending Products */}
-      <section className="container" style={{ padding: 'var(--space-8) 0' }}>
+      <section className="container" style={{ padding: 'var(--space-8) var(--space-4)' }}>
         <h2 className={styles.sectionTitle}>Trending Now</h2>
         <div className={styles.productGrid}>
           {dummyProducts.map(p => <ProductCard key={p._id+'tp'} product={{...p, _id: p._id+'tp'}} />)}
@@ -217,7 +254,7 @@ const Home = () => {
 
       {/* Why Choose Us */}
       {settings.features && settings.features.length > 0 && (
-        <section className="container" style={{ padding: 'var(--space-8) 0' }}>
+        <section className="container" style={{ padding: 'var(--space-8) var(--space-4)' }}>
           <div className={styles.featuresGrid}>
             {settings.features.map((feature, i) => (
               <div key={i} className={styles.featureItem}>
@@ -235,7 +272,7 @@ const Home = () => {
 
       {/* Brand Story */}
       {settings.brandStory && (
-        <section className="container" style={{ padding: 'var(--space-8) 0' }}>
+        <section className="container" style={{ padding: 'var(--space-8) var(--space-4)' }}>
           <div className={styles.storySection}>
             <div className={styles.storyContent}>
               <h2 className={styles.sectionTitle} style={{ textAlign: 'left' }}>{settings.brandStory.title}</h2>

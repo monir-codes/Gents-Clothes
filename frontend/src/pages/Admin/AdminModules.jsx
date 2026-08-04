@@ -2,8 +2,30 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import styles from './Admin.module.css';
+import { Upload } from 'lucide-react';
+
+const IMGBB_API_KEY = "affe71bc1ff1277c7d83bc8e9dfe4c3c";
 
 const AdminOrders = () => {
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const { data } = await axios.get('/api/orders');
+        setOrders(data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchOrders();
+  }, []);
+
+  if (loading) return <div>Loading orders...</div>;
+
   return (
     <div>
       <div className={styles.dashboardHeader}>
@@ -22,14 +44,27 @@ const AdminOrders = () => {
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>#ORD-001</td>
-              <td>Rumman Amin</td>
-              <td>2</td>
-              <td>৳3,500</td>
-              <td><span style={{ color: 'var(--color-success)', fontWeight: 600 }}>Delivered</span></td>
-              <td><button>Update Status</button></td>
-            </tr>
+            {orders.length === 0 ? (
+              <tr><td colSpan="6" style={{textAlign: 'center'}}>No orders found</td></tr>
+            ) : (
+              orders.map(order => (
+                <tr key={order._id}>
+                  <td>#{order._id.substring(0, 8).toUpperCase()}</td>
+                  <td>{order.user?.name || 'Unknown'}</td>
+                  <td>{order.orderItems?.length || 0}</td>
+                  <td>৳{order.totalPrice}</td>
+                  <td>
+                    <span style={{ 
+                      color: order.status === 'Delivered' ? 'var(--color-success)' : 'var(--color-text-secondary)', 
+                      fontWeight: 600 
+                    }}>
+                      {order.status || (order.isPaid ? 'Paid' : 'Pending')}
+                    </span>
+                  </td>
+                  <td><button>Update Status</button></td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
@@ -37,33 +72,60 @@ const AdminOrders = () => {
   );
 };
 
-export const AdminCustomers = () => (
-  <div>
-    <div className={styles.dashboardHeader}>
-      <h1 className={styles.dashboardTitle}>Customers</h1>
-    </div>
-    <div className={styles.tableContainer}>
+export const AdminCustomers = () => {
+  const [customers, setCustomers] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCustomers = async () => {
+      try {
+        const { data } = await axios.get('/api/users');
+        setCustomers(data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCustomers();
+  }, []);
+
+  if (loading) return <div>Loading customers...</div>;
+
+  return (
+    <div>
+      <div className={styles.dashboardHeader}>
+        <h1 className={styles.dashboardTitle}>Customers</h1>
+      </div>
+      <div className={styles.tableContainer}>
         <table className={styles.table}>
           <thead>
             <tr>
               <th>Name</th>
               <th>Email</th>
-              <th>Total Orders</th>
+              <th>Role</th>
               <th>Action</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>Rumman Amin</td>
-              <td>rumman@example.com</td>
-              <td>5</td>
-              <td><button>View Profile</button></td>
-            </tr>
+            {customers.length === 0 ? (
+              <tr><td colSpan="4" style={{textAlign: 'center'}}>No customers found</td></tr>
+            ) : (
+              customers.map(customer => (
+                <tr key={customer._id}>
+                  <td>{customer.name}</td>
+                  <td>{customer.email}</td>
+                  <td>{customer.isAdmin ? 'Admin' : 'Customer'}</td>
+                  <td><button>View Profile</button></td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
-  </div>
-);
+    </div>
+  );
+};
 
 export const AdminMarketing = () => (
   <div>
@@ -88,6 +150,7 @@ export const AdminSettings = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [jsonInputs, setJsonInputs] = useState({});
+  const [uploadingField, setUploadingField] = useState(null);
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -128,6 +191,36 @@ export const AdminSettings = () => {
 
   const handleJsonInputChange = (field, value) => {
     setJsonInputs(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleImageUpload = async (e, field, isNested = false, parent = null) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploadingField(isNested ? `${parent}.${field}` : field);
+    const imgData = new FormData();
+    imgData.append('image', file);
+
+    try {
+      const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+        method: 'POST',
+        body: imgData,
+      });
+      const data = await response.json();
+      
+      if (data.success) {
+        if (isNested) {
+          handleNestedChange(parent, field, data.data.url);
+        } else {
+          setSettings(prev => ({ ...prev, [field]: data.data.url }));
+        }
+      } else {
+        Swal.fire('Error', 'ImgBB upload failed', 'error');
+      }
+    } catch (error) {
+      Swal.fire('Error', 'Image upload failed', 'error');
+    }
+    setUploadingField(null);
   };
 
   const handleSave = async () => {
@@ -186,7 +279,13 @@ export const AdminSettings = () => {
         <input type="text" name="heroSubtitle" value={settings.heroSubtitle || ''} onChange={handleChange} style={inputStyle} />
         
         <label style={labelStyle}>Background Image URL</label>
-        <input type="text" name="heroImage" value={settings.heroImage || ''} onChange={handleChange} style={inputStyle} />
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '15px' }}>
+          <input type="text" name="heroImage" value={settings.heroImage || ''} onChange={handleChange} style={{...inputStyle, marginBottom: 0}} />
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', background: 'var(--color-surface-hover)', padding: '10px 15px', borderRadius: '4px', whiteSpace: 'nowrap', border: '1px solid var(--color-border)' }}>
+            <Upload size={16} /> {uploadingField === 'heroImage' ? 'Uploading...' : 'Upload'}
+            <input type="file" style={{ display: 'none' }} accept="image/*" onChange={(e) => handleImageUpload(e, 'heroImage')} />
+          </label>
+        </div>
         
         <label style={labelStyle}>Background Video URL (Optional MP4)</label>
         <input type="text" name="heroVideo" value={settings.heroVideo || ''} onChange={handleChange} style={inputStyle} />
@@ -209,7 +308,13 @@ export const AdminSettings = () => {
         <label style={labelStyle}>Title</label>
         <input type="text" value={settings.brandStory?.title || ''} onChange={(e) => handleNestedChange('brandStory', 'title', e.target.value)} style={inputStyle} />
         <label style={labelStyle}>Image URL</label>
-        <input type="text" value={settings.brandStory?.image || ''} onChange={(e) => handleNestedChange('brandStory', 'image', e.target.value)} style={inputStyle} />
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '15px' }}>
+          <input type="text" value={settings.brandStory?.image || ''} onChange={(e) => handleNestedChange('brandStory', 'image', e.target.value)} style={{...inputStyle, marginBottom: 0}} />
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', background: 'var(--color-surface-hover)', padding: '10px 15px', borderRadius: '4px', whiteSpace: 'nowrap', border: '1px solid var(--color-border)' }}>
+            <Upload size={16} /> {uploadingField === 'brandStory.image' ? 'Uploading...' : 'Upload'}
+            <input type="file" style={{ display: 'none' }} accept="image/*" onChange={(e) => handleImageUpload(e, 'image', true, 'brandStory')} />
+          </label>
+        </div>
         <label style={labelStyle}>Story Text</label>
         <textarea rows="4" value={settings.brandStory?.text || ''} onChange={(e) => handleNestedChange('brandStory', 'text', e.target.value)} style={{...inputStyle, fontFamily: 'inherit'}} />
       </div>
@@ -220,19 +325,31 @@ export const AdminSettings = () => {
         <h4 style={{marginTop: '10px', marginBottom: '10px'}}>Limited Edition Banner</h4>
         <div style={{display: 'flex', gap: '10px'}}>
           <input type="text" placeholder="Title" value={settings.limitedEdition?.title || ''} onChange={(e) => handleNestedChange('limitedEdition', 'title', e.target.value)} style={inputStyle} />
-          <input type="text" placeholder="Image URL" value={settings.limitedEdition?.image || ''} onChange={(e) => handleNestedChange('limitedEdition', 'image', e.target.value)} style={inputStyle} />
+          <input type="text" placeholder="Image URL" value={settings.limitedEdition?.image || ''} onChange={(e) => handleNestedChange('limitedEdition', 'image', e.target.value)} style={{...inputStyle, flex: 2}} />
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', background: 'var(--color-surface-hover)', padding: '10px 15px', borderRadius: '4px', whiteSpace: 'nowrap', border: '1px solid var(--color-border)', height: '42px' }}>
+            <Upload size={16} />
+            <input type="file" style={{ display: 'none' }} accept="image/*" onChange={(e) => handleImageUpload(e, 'image', true, 'limitedEdition')} />
+          </label>
         </div>
 
         <h4 style={{marginTop: '10px', marginBottom: '10px'}}>Shop The Look</h4>
         <div style={{display: 'flex', gap: '10px'}}>
           <input type="text" placeholder="Title" value={settings.shopTheLook?.title || ''} onChange={(e) => handleNestedChange('shopTheLook', 'title', e.target.value)} style={inputStyle} />
-          <input type="text" placeholder="Image URL" value={settings.shopTheLook?.image || ''} onChange={(e) => handleNestedChange('shopTheLook', 'image', e.target.value)} style={inputStyle} />
+          <input type="text" placeholder="Image URL" value={settings.shopTheLook?.image || ''} onChange={(e) => handleNestedChange('shopTheLook', 'image', e.target.value)} style={{...inputStyle, flex: 2}} />
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', background: 'var(--color-surface-hover)', padding: '10px 15px', borderRadius: '4px', whiteSpace: 'nowrap', border: '1px solid var(--color-border)', height: '42px' }}>
+            <Upload size={16} />
+            <input type="file" style={{ display: 'none' }} accept="image/*" onChange={(e) => handleImageUpload(e, 'image', true, 'shopTheLook')} />
+          </label>
         </div>
 
         <h4 style={{marginTop: '10px', marginBottom: '10px'}}>Premium Collection</h4>
         <div style={{display: 'flex', gap: '10px'}}>
           <input type="text" placeholder="Title" value={settings.premiumCollection?.title || ''} onChange={(e) => handleNestedChange('premiumCollection', 'title', e.target.value)} style={inputStyle} />
-          <input type="text" placeholder="Image URL" value={settings.premiumCollection?.image || ''} onChange={(e) => handleNestedChange('premiumCollection', 'image', e.target.value)} style={inputStyle} />
+          <input type="text" placeholder="Image URL" value={settings.premiumCollection?.image || ''} onChange={(e) => handleNestedChange('premiumCollection', 'image', e.target.value)} style={{...inputStyle, flex: 2}} />
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', background: 'var(--color-surface-hover)', padding: '10px 15px', borderRadius: '4px', whiteSpace: 'nowrap', border: '1px solid var(--color-border)', height: '42px' }}>
+            <Upload size={16} />
+            <input type="file" style={{ display: 'none' }} accept="image/*" onChange={(e) => handleImageUpload(e, 'image', true, 'premiumCollection')} />
+          </label>
         </div>
       </div>
 
