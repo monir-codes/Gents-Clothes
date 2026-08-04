@@ -300,6 +300,40 @@ export const AdminSettings = () => {
     setUploadingField(null);
   };
 
+  const handleArrayImageUpload = async (e, jsonField) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploadingField(jsonField);
+    const imgData = new FormData();
+    imgData.append('image', file);
+
+    try {
+      const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+        method: 'POST',
+        body: imgData,
+      });
+      const data = await response.json();
+      
+      if (data.success) {
+        let currentArray = [];
+        try {
+          currentArray = JSON.parse(jsonInputs[jsonField]);
+          if (!Array.isArray(currentArray)) currentArray = [];
+        } catch(err) {
+          currentArray = [];
+        }
+        currentArray.push(data.data.url);
+        setJsonInputs(prev => ({ ...prev, [jsonField]: JSON.stringify(currentArray, null, 2) }));
+      } else {
+        Swal.fire('Error', 'ImgBB upload failed', 'error');
+      }
+    } catch (error) {
+      Swal.fire('Error', 'Image upload failed', 'error');
+    }
+    setUploadingField(null);
+  };
+
   const handleSave = async () => {
     setSaving(true);
     try {
@@ -378,10 +412,15 @@ export const AdminSettings = () => {
         
         <label style={labelStyle}>Hero Slideshow (Array of Image URLs) - Replaces static image</label>
         <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginBottom: '8px' }}>
-          Format as a JSON array of strings. Example: <br/>
-          <code>[ "https://i.ibb.co/1.jpg", "https://i.ibb.co/2.jpg" ]</code>
+          Upload an image directly to add it to the slideshow, or edit the JSON array manually.
         </p>
-        <textarea rows="4" placeholder='[\n  "https://i.ibb.co/example1.jpg",\n  "https://i.ibb.co/example2.jpg"\n]' value={jsonInputs.heroSlideshow} onChange={(e) => handleJsonInputChange('heroSlideshow', e.target.value)} style={{...inputStyle, fontFamily: 'monospace', fontSize: '13px'}} />
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', marginBottom: '15px' }}>
+          <textarea rows="4" placeholder='[\n  "https://i.ibb.co/example1.jpg",\n  "https://i.ibb.co/example2.jpg"\n]' value={jsonInputs.heroSlideshow} onChange={(e) => handleJsonInputChange('heroSlideshow', e.target.value)} style={{...inputStyle, fontFamily: 'monospace', fontSize: '13px', marginBottom: 0}} />
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', background: 'var(--color-surface-hover)', padding: '10px 15px', borderRadius: '4px', whiteSpace: 'nowrap', border: '1px solid var(--color-border)', height: '42px' }}>
+            <Upload size={16} /> {uploadingField === 'heroSlideshow' ? 'Uploading...' : 'Add Image'}
+            <input type="file" style={{ display: 'none' }} accept="image/*" onChange={(e) => handleArrayImageUpload(e, 'heroSlideshow')} />
+          </label>
+        </div>
       </div>
 
       <div style={sectionStyle}>
@@ -395,10 +434,15 @@ export const AdminSettings = () => {
         
         <label style={labelStyle}>Slideshow Images (Array of URLs) - Used if no video</label>
         <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginBottom: '8px' }}>
-          Format as a JSON array of strings. Example: <br/>
-          <code>[ "https://i.ibb.co/1.jpg", "https://i.ibb.co/2.jpg" ]</code>
+          Upload an image directly to add it to the slideshow, or edit the JSON array manually.
         </p>
-        <textarea rows="4" placeholder='[\n  "https://i.ibb.co/example1.jpg",\n  "https://i.ibb.co/example2.jpg"\n]' value={jsonInputs.featuredVideoSlideshow} onChange={(e) => handleJsonInputChange('featuredVideoSlideshow', e.target.value)} style={{...inputStyle, fontFamily: 'monospace', fontSize: '13px'}} />
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', marginBottom: '15px' }}>
+          <textarea rows="4" placeholder='[\n  "https://i.ibb.co/example1.jpg",\n  "https://i.ibb.co/example2.jpg"\n]' value={jsonInputs.featuredVideoSlideshow} onChange={(e) => handleJsonInputChange('featuredVideoSlideshow', e.target.value)} style={{...inputStyle, fontFamily: 'monospace', fontSize: '13px', marginBottom: 0}} />
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', background: 'var(--color-surface-hover)', padding: '10px 15px', borderRadius: '4px', whiteSpace: 'nowrap', border: '1px solid var(--color-border)', height: '42px' }}>
+            <Upload size={16} /> {uploadingField === 'featuredVideoSlideshow' ? 'Uploading...' : 'Add Image'}
+            <input type="file" style={{ display: 'none' }} accept="image/*" onChange={(e) => handleArrayImageUpload(e, 'featuredVideoSlideshow')} />
+          </label>
+        </div>
         
         <label style={labelStyle}>Fallback Image URL</label>
         <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '15px' }}>
