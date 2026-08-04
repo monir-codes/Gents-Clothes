@@ -93,11 +93,11 @@
 
 .mobileMenu {
   display: none;
-  position: fixed;
-  top: 80px; /* Below navbar */
+  position: absolute;
+  top: 100%;
   left: 0;
   width: 100%;
-  height: calc(100vh - 80px);
+  height: 100vh;
   background-color: var(--color-background);
   z-index: 999;
   flex-direction: column;

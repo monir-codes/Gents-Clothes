@@ -260,7 +260,7 @@ const ProductDetails = () => {
               <ProductCard key={p._id} product={p} />
             ))}
           </div>
-        </div>
+        </motion.div>
       )}
     </div>
     </>

@@ -11,6 +11,7 @@ const Shop = ({ hideHeader }) => {
   const [loading, setLoading] = useState(true);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [sortOption, setSortOption] = useState('Featured');
+  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -60,11 +61,15 @@ const Shop = ({ hideHeader }) => {
       {/* Sidebar Filters */}
       {!hideHeader && (
         <motion.aside 
-          className={styles.sidebar}
+          className={`${styles.sidebar} ${isMobileFilterOpen ? styles.sidebarOpen : ''}`}
           initial={{ opacity: 0, x: -30 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6 }}
         >
+          <div className={styles.mobileFilterHeader}>
+            <h3 style={{ fontSize: '1.2rem', fontWeight: 600 }}>Filters</h3>
+            <button onClick={() => setIsMobileFilterOpen(false)} style={{ fontSize: '1.5rem' }}>&times;</button>
+          </div>
           <div className={styles.filterGroup}>
             <h3 className={styles.filterTitle}>Categories</h3>
             <div className={styles.filterList}>
@@ -112,7 +117,15 @@ const Shop = ({ hideHeader }) => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            <h1 className={styles.title}>All Products</h1>
+            <div className={styles.headerTitleGroup}>
+              <h1 className={styles.title}>All Products</h1>
+              <button 
+                className={styles.mobileFilterBtn} 
+                onClick={() => setIsMobileFilterOpen(true)}
+              >
+                Filters
+              </button>
+            </div>
             <select className={styles.sortSelect} value={sortOption} onChange={(e) => setSortOption(e.target.value)}>
               <option>Featured</option>
               <option>New Arrivals</option>
