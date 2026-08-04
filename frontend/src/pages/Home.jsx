@@ -15,13 +15,9 @@ import Loader from '../components/Loader';
 import StyleQuizModal from '../components/StyleQuizModal';
 import FlashSaleBanner from '../components/FlashSaleBanner';
 import Lookbook from '../components/Lookbook';
-import DeliveryCoverage from '../components/DeliveryCoverage';
 import FAQSection from '../components/FAQSection';
-import UGCSection from '../components/UGCSection';
 import OurProcess from '../components/OurProcess';
 import PressMentions from '../components/PressMentions';
-import BlogPreview from '../components/BlogPreview';
-import LoyaltyBanner from '../components/LoyaltyBanner';
 import styles from './Home.module.css';
 
 const Home = () => {
@@ -393,8 +389,6 @@ const Home = () => {
         </div>
       </motion.section>
 
-      {/* Delivery Coverage */}
-      <DeliveryCoverage />
 
       {/* Why Choose Us */}
       {settings.features && settings.features.length > 0 && (
@@ -493,8 +487,6 @@ const Home = () => {
         </motion.section>
       )}
 
-      {/* UGC Section */}
-      <UGCSection />
 
       {/* Customer Reviews */}
       {settings.reviews && settings.reviews.length > 0 && (
@@ -538,11 +530,6 @@ const Home = () => {
       {/* Press Mentions */}
       <PressMentions />
 
-      {/* Blog Preview */}
-      <BlogPreview />
-
-      {/* Loyalty Banner */}
-      <LoyaltyBanner />
 
       {/* Newsletter */}
       {settings.newsletter && (
