@@ -128,23 +128,97 @@ export const AdminCustomers = () => {
   );
 };
 
-export const AdminMarketing = () => (
-  <div>
-    <div className={styles.dashboardHeader}>
-      <h1 className={styles.dashboardTitle}>Marketing & AI Generation</h1>
-    </div>
-    <div className={styles.statsGrid}>
-      <div className={styles.statCard}>
-        <span className={styles.statTitle}>Generate Product Description</span>
-        <button style={{ padding: '8px', background: 'var(--color-text-primary)', color: 'white', borderRadius: '4px' }}>Generate with AI</button>
+export const AdminMarketing = () => {
+  const [context, setContext] = useState('');
+  const [result, setResult] = useState('');
+  const [loadingType, setLoadingType] = useState(null);
+
+  const handleGenerate = async (type) => {
+    if (!context) {
+      Swal.fire('Error', 'Please enter a product name or context first', 'warning');
+      return;
+    }
+    
+    setLoadingType(type);
+    try {
+      const { data } = await axios.post('/api/ai/generate', { type, context });
+      setResult(data.result);
+      Swal.fire('Success', 'Content generated successfully!', 'success');
+    } catch (error) {
+      Swal.fire('Error', error.response?.data?.message || 'Failed to generate content', 'error');
+    } finally {
+      setLoadingType(null);
+    }
+  };
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(result);
+    Swal.fire('Copied', 'Content copied to clipboard', 'success');
+  };
+
+  return (
+    <div>
+      <div className={styles.dashboardHeader}>
+        <h1 className={styles.dashboardTitle}>Marketing & AI Generation</h1>
       </div>
-      <div className={styles.statCard}>
-        <span className={styles.statTitle}>Generate SEO Tags</span>
-        <button style={{ padding: '8px', background: 'var(--color-text-primary)', color: 'white', borderRadius: '4px' }}>Generate with AI</button>
+      
+      <div style={{ background: 'var(--color-surface)', padding: '24px', borderRadius: '8px', marginBottom: '20px' }}>
+        <h3 style={{ marginBottom: '10px' }}>Product Context</h3>
+        <p style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)', marginBottom: '10px' }}>Enter the product name, materials, or basic details you want the AI to write about.</p>
+        <textarea 
+          rows="3" 
+          value={context}
+          onChange={(e) => setContext(e.target.value)}
+          placeholder='e.g., "Premium Black Silk Panjabi with intricate golden embroidery on the collar"'
+          style={{ width: '100%', padding: '12px', border: '1px solid var(--color-border)', borderRadius: '4px', marginBottom: '20px', fontFamily: 'inherit', resize: 'vertical' }}
+        />
+        
+        <div className={styles.statsGrid} style={{ marginBottom: '0' }}>
+          <div className={styles.statCard}>
+            <span className={styles.statTitle}>Generate Product Description</span>
+            <button 
+              onClick={() => handleGenerate('description')} 
+              disabled={loadingType !== null}
+              style={{ padding: '10px', background: 'var(--color-text-primary)', color: 'white', borderRadius: '4px', border: 'none', cursor: 'pointer', fontWeight: 600, opacity: loadingType !== null ? 0.7 : 1 }}
+            >
+              {loadingType === 'description' ? 'Generating...' : 'Generate with AI'}
+            </button>
+          </div>
+          <div className={styles.statCard}>
+            <span className={styles.statTitle}>Generate SEO Tags</span>
+            <button 
+              onClick={() => handleGenerate('seo')} 
+              disabled={loadingType !== null}
+              style={{ padding: '10px', background: 'var(--color-text-primary)', color: 'white', borderRadius: '4px', border: 'none', cursor: 'pointer', fontWeight: 600, opacity: loadingType !== null ? 0.7 : 1 }}
+            >
+              {loadingType === 'seo' ? 'Generating...' : 'Generate with AI'}
+            </button>
+          </div>
+        </div>
       </div>
+
+      {result && (
+        <div style={{ background: 'var(--color-surface)', padding: '24px', borderRadius: '8px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+            <h3 style={{ margin: 0 }}>Generated Output</h3>
+            <button 
+              onClick={handleCopy}
+              style={{ padding: '6px 12px', background: 'transparent', border: '1px solid var(--color-border)', borderRadius: '4px', cursor: 'pointer', fontWeight: 500 }}
+            >
+              Copy to Clipboard
+            </button>
+          </div>
+          <textarea 
+            rows="8" 
+            value={result}
+            readOnly
+            style={{ width: '100%', padding: '15px', border: '1px solid var(--color-border)', borderRadius: '4px', fontFamily: 'inherit', resize: 'vertical', lineHeight: '1.6', backgroundColor: 'var(--color-background)' }}
+          />
+        </div>
+      )}
     </div>
-  </div>
-);
+  );
+};
 
 export const AdminSettings = () => {
   const [settings, setSettings] = useState({});
