@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
-import { ShoppingBag, Heart, Star, Truck, RefreshCcw, ShieldCheck } from 'lucide-react';
+import { ShoppingBag, Heart, Star, Truck, RefreshCcw, ShieldCheck, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 import useCartStore from '../store/useCartStore';
 import Loader from '../components/Loader';
 import SEO from '../components/SEO';
 import ProductCard from '../components/ProductCard';
+import RecentlyViewed from '../components/RecentlyViewed';
+import AISizeRecommender from '../components/AISizeRecommender';
 import styles from './ProductDetails.module.css';
 
 const ProductDetails = () => {
@@ -20,6 +22,7 @@ const ProductDetails = () => {
   const [selectedSize, setSelectedSize] = useState('');
   const [qty, setQty] = useState(1);
   const [activeTab, setActiveTab] = useState('description');
+  const [isSizeRecommenderOpen, setIsSizeRecommenderOpen] = useState(false);
   
   const { addToCart } = useCartStore();
 
@@ -52,6 +55,19 @@ const ProductDetails = () => {
             .filter(p => p.category === data.category && p._id !== data._id)
             .slice(0, 4);
           setRelatedProducts(related);
+        }
+
+        // Add to Recently Viewed in localStorage
+        try {
+          const stored = localStorage.getItem('recentlyViewed');
+          let viewed = stored ? JSON.parse(stored) : [];
+          // Remove if exists to push to front
+          viewed = viewed.filter(p => p._id !== data._id);
+          viewed.unshift(data);
+          if (viewed.length > 10) viewed.pop(); // Keep only last 10
+          localStorage.setItem('recentlyViewed', JSON.stringify(viewed));
+        } catch(e) {
+          console.error("Local storage error", e);
         }
       } catch (error) {
         console.error(error);
@@ -142,9 +158,14 @@ const ProductDetails = () => {
 
             {product.sizes && product.sizes.length > 0 && (
               <div className={styles.optionGroup}>
-                <div style={{ display: 'flex', justifyContent: 'space-between'}}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <span className={styles.optionLabel}>Size: <strong>{selectedSize}</strong></span>
-                  <span style={{ fontSize: '0.85rem', textDecoration: 'underline', cursor: 'pointer' }}>Size Guide</span>
+                  <button 
+                    onClick={() => setIsSizeRecommenderOpen(true)}
+                    style={{ fontSize: '0.85rem', color: 'var(--color-accent)', background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 600 }}
+                  >
+                    <Sparkles size={14} /> AI Size Match
+                  </button>
                 </div>
                 <div className={styles.sizeSelector}>
                   {product.sizes.map(size => (
@@ -262,6 +283,15 @@ const ProductDetails = () => {
           </div>
         </motion.div>
       )}
+
+      {/* Recently Viewed Section */}
+      <RecentlyViewed currentProductId={product._id} />
+
+      <AISizeRecommender 
+        isOpen={isSizeRecommenderOpen} 
+        onClose={() => setIsSizeRecommenderOpen(false)} 
+        onSelectSize={(size) => setSelectedSize(size)} 
+      />
     </div>
     </>
   );

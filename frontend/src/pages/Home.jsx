@@ -12,12 +12,14 @@ import CategoryCard from '../components/CategoryCard';
 import ProductCard from '../components/ProductCard';
 import SEO from '../components/SEO';
 import Loader from '../components/Loader';
+import StyleQuizModal from '../components/StyleQuizModal';
 import styles from './Home.module.css';
 
 const Home = () => {
   const [settings, setSettings] = useState(null);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isQuizOpen, setIsQuizOpen] = useState(false);
   const { scrollY } = useScroll();
   const y1 = useTransform(scrollY, [0, 500], [0, 150]); // Parallax effect
 
@@ -89,6 +91,41 @@ const Home = () => {
                 <button className={styles.btnOutline}>Explore Collection</button>
               </Link>
             </div>
+          </motion.div>
+        </div>
+      </section>
+
+      <StyleQuizModal isOpen={isQuizOpen} onClose={() => setIsQuizOpen(false)} />
+
+      {/* AI Style Quiz Banner */}
+      <section className={styles.quizBanner}>
+        <div className="container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: 'var(--space-4) 0' }}>
+          <motion.div 
+            className={styles.quizBannerContent}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            style={{ 
+              background: 'var(--color-surface)', 
+              padding: 'var(--space-4) var(--space-6)', 
+              borderRadius: 'var(--radius-full)', 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: 'var(--space-4)',
+              boxShadow: 'var(--shadow-md)',
+              cursor: 'pointer'
+            }}
+            onClick={() => setIsQuizOpen(true)}
+            whileHover={{ scale: 1.02 }}
+          >
+            <div style={{ background: 'var(--color-accent)', padding: '10px', borderRadius: '50%', color: '#fff', display: 'flex' }}>
+              <Shield size={24} /> {/* Placeholder icon, could use Sparkles */}
+            </div>
+            <div>
+              <h3 style={{ fontSize: '1.2rem', fontWeight: 600, margin: 0 }}>Not sure what to buy?</h3>
+              <p style={{ margin: 0, color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>Take our AI Style Quiz to find your perfect match.</p>
+            </div>
+            <button className={styles.btnPrimary} style={{ padding: '8px 20px', marginLeft: 'auto' }}>Take Quiz</button>
           </motion.div>
         </div>
       </section>

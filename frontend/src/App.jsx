@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import CartDrawer from './components/CartDrawer';
+import FloatingWidgets from './components/FloatingWidgets';
 import Footer from './components/Footer';
 import AnimatedRoutes from './components/AnimatedRoutes';
 
@@ -14,6 +15,7 @@ function App() {
         <main style={{ flex: 1 }}>
           <AnimatedRoutes />
         </main>
+        <FloatingWidgets />
         <Footer />
       </div>
     </Router>

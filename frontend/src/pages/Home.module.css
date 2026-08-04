@@ -131,6 +131,19 @@
   100% { transform: translateX(-50%); }
 }
 
+/* Quiz Banner */
+@media (max-width: 768px) {
+  .quizBannerContent {
+    flex-direction: column;
+    text-align: center;
+    border-radius: var(--radius-lg) !important;
+  }
+  .quizBannerContent button {
+    margin-left: 0 !important;
+    width: 100%;
+  }
+}
+
 /* Instagram Grid */
 .instaGrid {
   display: grid;
