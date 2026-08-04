@@ -1,5 +1,8 @@
 const express = require('express');
+const dotenv = require('dotenv');
 const router = express.Router();
+
+dotenv.config(); // Force env reload
 
 // Generate Content with Gemini AI
 router.post('/generate', async (req, res) => {
