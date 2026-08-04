@@ -28,10 +28,10 @@ const updateSettings = async (req, res) => {
 
     // List of allowed fields to update
     const allowedFields = [
-      'announcementText', 'heroTitle', 'heroSubtitle', 'heroImage', 'heroVideo',
+      'announcementText', 'announcementList', 'whatsappNumber', 'heroTitle', 'heroSubtitle', 'heroImage', 'heroVideo', 'heroSlideshow',
       'marqueeText', 'featuredCategories', 'featuredCollections', 'limitedEdition',
       'shopTheLook', 'premiumCollection', 'features', 'brandStory',
-      'featuredVideoSection', 'reviews', 'instagramImages', 'newsletter'
+      'featuredVideoSection', 'reviews', 'instagramImages', 'newsletter', 'staticPages'
     ];
 
     allowedFields.forEach(field => {
