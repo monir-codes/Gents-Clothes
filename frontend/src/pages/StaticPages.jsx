@@ -5,7 +5,7 @@ import SEO from '../components/SEO';
 
 const StaticPageTemplate = ({ title, children }) => (
   <div className="container" style={{ padding: '60px 0', minHeight: '60vh', maxWidth: '800px' }}>
-    <h1 style={{ fontSize: '2.5rem', marginBottom: '32px', textAlign: 'center' }}>{title}</h1>
+    <h1 style={{ fontSize: 'clamp(1.8rem, 5vw, 2.5rem)', marginBottom: '32px', textAlign: 'center' }}>{title}</h1>
     <div style={{ lineHeight: 1.8, color: 'var(--color-text-secondary)', fontSize: '1.05rem' }}>
       {children}
     </div>
@@ -38,7 +38,7 @@ export const About = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          style={{ color: '#fff', fontSize: '4rem', fontWeight: 700, letterSpacing: '4px', textTransform: 'uppercase' }}
+          style={{ color: '#fff', fontSize: 'clamp(2.5rem, 8vw, 4rem)', fontWeight: 700, letterSpacing: '4px', textTransform: 'uppercase' }}
         >
           Our Story
         </motion.h1>
@@ -49,7 +49,7 @@ export const About = () => {
     <div className="container" style={{ padding: '80px 24px' }}>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '60px', alignItems: 'center', marginBottom: '80px' }}>
         <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
-          <h2 style={{ fontSize: '2.5rem', marginBottom: '20px' }}>A Legacy of Elegance</h2>
+          <h2 style={{ fontSize: 'clamp(1.8rem, 5vw, 2.5rem)', marginBottom: '20px' }}>A Legacy of Elegance</h2>
           <p style={{ color: 'var(--color-text-secondary)', lineHeight: 1.8, fontSize: '1.1rem' }}>
             {settings?.aboutStory || 'GentFits was founded with a singular, uncompromising vision: to redefine luxury menswear in Bangladesh. We believe that true elegance lies in the details—from the meticulous selection of premium fabrics to the flawless precision of our tailoring.'}
           </p>
@@ -74,7 +74,7 @@ export const About = () => {
           style={{ width: '100%', aspectRatio: '4/5', objectFit: 'cover', borderRadius: '4px' }} 
         />
         <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
-          <h2 style={{ fontSize: '2.5rem', marginBottom: '20px' }}>The Finest Materials</h2>
+          <h2 style={{ fontSize: 'clamp(1.8rem, 5vw, 2.5rem)', marginBottom: '20px' }}>The Finest Materials</h2>
           <p style={{ color: 'var(--color-text-secondary)', lineHeight: 1.8, fontSize: '1.1rem' }}>
             We source only the highest grade Egyptian cottons, pure silks, and rich wools. Every garment is constructed to not only look breathtaking but to stand the test of time, adapting to the modern gentleman's lifestyle.
           </p>

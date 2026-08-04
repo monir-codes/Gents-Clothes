@@ -13,12 +13,12 @@ const Collections = () => {
         animate={{ opacity: 1, y: 0 }}
         style={{ textAlign: 'center', marginBottom: '40px' }}
       >
-        <h1 style={{ fontSize: '3rem', fontWeight: 600, textTransform: 'uppercase' }}>Our Collections</h1>
+        <h1 style={{ fontSize: 'clamp(2rem, 6vw, 3rem)', fontWeight: 600, textTransform: 'uppercase' }}>Our Collections</h1>
         <p style={{ color: 'var(--color-text-secondary)', marginTop: '8px' }}>Curated selections for every season</p>
       </motion.div>
 
       <motion.div 
-        style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}
+        style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--space-4)' }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ staggerChildren: 0.2 }}
