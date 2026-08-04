@@ -28,16 +28,16 @@ const DeliveryCoverage = () => {
         <h2 style={{ fontSize: '1.8rem', fontWeight: 600, marginBottom: 'var(--space-2)' }}>Check Delivery Time</h2>
         <p style={{ color: 'var(--color-text-secondary)', marginBottom: 'var(--space-4)' }}>Enter your ZIP or PIN code to check estimated delivery.</p>
         
-        <form onSubmit={checkDelivery} style={{ display: 'flex', gap: '10px', width: '100%', maxWidth: '400px' }}>
+        <form onSubmit={checkDelivery} style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', width: '100%', maxWidth: '400px' }}>
           <input 
             type="text" 
             placeholder="Enter ZIP / PIN" 
             value={zip}
             onChange={(e) => setZip(e.target.value)}
-            style={{ flex: 1, padding: '12px 16px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)' }}
+            style={{ flex: '1 1 200px', padding: '12px 16px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)' }}
             required
           />
-          <button type="submit" style={{ padding: '12px 24px', background: 'var(--color-text-primary)', color: 'var(--color-background)', border: 'none', borderRadius: 'var(--radius-sm)', fontWeight: 600, cursor: 'pointer' }}>
+          <button type="submit" style={{ flex: '1 1 auto', padding: '12px 24px', background: 'var(--color-text-primary)', color: 'var(--color-background)', border: 'none', borderRadius: 'var(--radius-sm)', fontWeight: 600, cursor: 'pointer' }}>
             Check
           </button>
         </form>

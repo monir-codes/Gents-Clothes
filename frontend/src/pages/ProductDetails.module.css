@@ -300,4 +300,17 @@
   .mainSection {
     flex-direction: column;
   }
+  .actionContainer {
+    flex-wrap: wrap;
+  }
+  .addToCartBtn {
+    flex: 1 1 100%;
+    order: 3;
+  }
+  .trustBadges {
+    flex-wrap: wrap;
+  }
+  .tabHeaders {
+    flex-wrap: wrap;
+  }
 }

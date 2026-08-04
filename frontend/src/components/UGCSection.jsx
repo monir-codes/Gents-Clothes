@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Instagram } from 'lucide-react';
+import { Camera } from 'lucide-react';
 
 const UGCSection = () => {
   return (
@@ -13,7 +13,7 @@ const UGCSection = () => {
           style={{ textAlign: 'center', marginBottom: 'var(--space-6)' }}
         >
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-            <Instagram size={24} />
+            <Camera size={24} />
             <span style={{ fontWeight: 600, letterSpacing: '1px' }}>@GENTFITS</span>
           </div>
           <h2 style={{ fontSize: '2rem', fontWeight: 600, textTransform: 'uppercase' }}>Spotted in GentFits</h2>

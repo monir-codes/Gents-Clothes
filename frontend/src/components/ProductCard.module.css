@@ -153,4 +153,23 @@
     width: 16px;
     height: 16px;
   }
+  
+  .details {
+    padding: var(--space-2);
+  }
+  
+  .name {
+    font-size: 0.85rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .price {
+    font-size: 0.9rem;
+  }
+  
+  .oldPrice {
+    font-size: 0.8rem;
+  }
 }

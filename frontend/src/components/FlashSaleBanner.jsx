@@ -41,8 +41,8 @@ const FlashSaleBanner = () => {
       }}
     >
       <div className="container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-3)' }}>
-        <h2 style={{ fontSize: '2.5rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2px' }}>Midnight Flash Sale</h2>
-        <p style={{ fontSize: '1.2rem', color: 'rgba(255,255,255,0.8)' }}>Up to 50% Off Selected Premium Pieces.</p>
+        <h2 style={{ fontSize: 'clamp(1.8rem, 6vw, 2.5rem)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2px' }}>Midnight Flash Sale</h2>
+        <p style={{ fontSize: 'clamp(1rem, 3vw, 1.2rem)', color: 'rgba(255,255,255,0.8)' }}>Up to 50% Off Selected Premium Pieces.</p>
         
         <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center', margin: 'var(--space-3) 0' }}>
           <Clock size={28} color="var(--color-accent)" />

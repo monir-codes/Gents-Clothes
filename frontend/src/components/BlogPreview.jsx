@@ -18,7 +18,7 @@ const BlogPreview = () => {
         <button style={{ background: 'transparent', border: 'none', textDecoration: 'underline', fontWeight: 600, cursor: 'pointer', color: 'var(--color-text-primary)' }}>View All</button>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 'var(--space-4)' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: 'var(--space-4)' }}>
         {articles.map((article, i) => (
           <motion.article 
             key={i}

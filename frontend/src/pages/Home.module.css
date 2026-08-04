@@ -95,10 +95,19 @@
 
 @media (max-width: 768px) {
   .heroTitle {
-    font-size: 3rem;
+    font-size: 2.5rem;
+  }
+  .heroSubtitle {
+    font-size: 1rem;
+    margin-bottom: var(--space-3);
   }
   .ctaContainer {
     flex-direction: column;
+    width: 100%;
+  }
+  .btnPrimary, .btnOutline {
+    width: 100%;
+    padding: 14px 20px;
   }
 }
 
@@ -198,10 +207,24 @@
   margin-bottom: var(--space-6);
   text-transform: uppercase;
 }
+
+@media (max-width: 768px) {
+  .sectionTitle {
+    font-size: 1.8rem;
+    margin-bottom: var(--space-4);
+  }
+}
 .productGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: var(--space-4);
+}
+
+@media (max-width: 768px) {
+  .productGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-2);
+  }
 }
 
 /* Featured Collections */
@@ -264,6 +287,15 @@
   font-size: 3rem;
   font-weight: 700;
   margin-bottom: var(--space-2);
+}
+
+@media (max-width: 768px) {
+  .banner {
+    height: 40vh;
+  }
+  .bannerContent h2 {
+    font-size: 2rem;
+  }
 }
 
 /* Shop The Look */
@@ -371,6 +403,13 @@
   .collectionsGrid, .shopTheLook, .storySection {
     grid-template-columns: 1fr;
     flex-direction: column;
+  }
+  .newsletterInputGroup {
+    flex-direction: column;
+    width: 100%;
+  }
+  .newsletterInputGroup button {
+    width: 100%;
   }
 }
 
