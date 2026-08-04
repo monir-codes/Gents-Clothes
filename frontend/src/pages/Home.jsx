@@ -13,6 +13,15 @@ import ProductCard from '../components/ProductCard';
 import SEO from '../components/SEO';
 import Loader from '../components/Loader';
 import StyleQuizModal from '../components/StyleQuizModal';
+import FlashSaleBanner from '../components/FlashSaleBanner';
+import Lookbook from '../components/Lookbook';
+import DeliveryCoverage from '../components/DeliveryCoverage';
+import FAQSection from '../components/FAQSection';
+import UGCSection from '../components/UGCSection';
+import OurProcess from '../components/OurProcess';
+import PressMentions from '../components/PressMentions';
+import BlogPreview from '../components/BlogPreview';
+import LoyaltyBanner from '../components/LoyaltyBanner';
 import styles from './Home.module.css';
 
 const Home = () => {
@@ -140,6 +149,9 @@ const Home = () => {
           </div>
         </div>
       )}
+
+      {/* Flash Sale Banner */}
+      <FlashSaleBanner />
 
       {/* Featured Categories */}
       {settings.featuredCategories && settings.featuredCategories.length > 0 && (
@@ -328,6 +340,9 @@ const Home = () => {
         </section>
       )}
 
+      {/* Interactive Lookbook */}
+      <Lookbook />
+
       {/* Premium Collection Banner */}
       {settings.premiumCollection && (
         <motion.section 
@@ -377,6 +392,9 @@ const Home = () => {
           ))}
         </div>
       </motion.section>
+
+      {/* Delivery Coverage */}
+      <DeliveryCoverage />
 
       {/* Why Choose Us */}
       {settings.features && settings.features.length > 0 && (
@@ -436,6 +454,9 @@ const Home = () => {
         </section>
       )}
 
+      {/* Our Process */}
+      <OurProcess />
+
       {/* Featured Video */}
       {settings.featuredVideoSection && (
         <motion.section 
@@ -472,6 +493,9 @@ const Home = () => {
         </motion.section>
       )}
 
+      {/* UGC Section */}
+      <UGCSection />
+
       {/* Customer Reviews */}
       {settings.reviews && settings.reviews.length > 0 && (
         <section className="container" style={{ padding: 'var(--space-8) 0' }}>
@@ -507,6 +531,18 @@ const Home = () => {
       )}
 
 
+
+      {/* FAQ Section */}
+      <FAQSection />
+
+      {/* Press Mentions */}
+      <PressMentions />
+
+      {/* Blog Preview */}
+      <BlogPreview />
+
+      {/* Loyalty Banner */}
+      <LoyaltyBanner />
 
       {/* Newsletter */}
       {settings.newsletter && (
