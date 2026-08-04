@@ -186,13 +186,7 @@ const Home = () => {
         </section>
       )}
 
-      {/* Best Sellers */}
-      <section className="container" style={{ padding: 'var(--space-8) var(--space-4)' }}>
-        <h2 className={styles.sectionTitle}>Best Sellers</h2>
-        <div className={styles.productGrid}>
-          {dummyProducts.map(p => <ProductCard key={p._id} product={{...p, _id: p._id+'bs'}} />)}
-        </div>
-      </section>
+
 
       {/* Limited Edition Banner */}
       {settings.limitedEdition && (
