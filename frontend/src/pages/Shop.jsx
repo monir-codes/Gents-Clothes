@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import ProductCard from '../components/ProductCard';
 import SEO from '../components/SEO';
+import Loader from '../components/Loader';
 import styles from './Shop.module.css';
 
 const Shop = ({ hideHeader }) => {
@@ -112,12 +113,7 @@ const Shop = ({ hideHeader }) => {
         )}
 
         {loading ? (
-          <div className={styles.productGrid}>
-             {/* Skeleton Loading */}
-             {[1,2,3,4,5,6].map(i => (
-               <div key={i} style={{ aspectRatio: '3/4', borderRadius: '8px' }} className="skeleton"></div>
-             ))}
-          </div>
+          <Loader />
         ) : filteredProducts.length > 0 ? (
           <motion.div 
             className={styles.productGrid}

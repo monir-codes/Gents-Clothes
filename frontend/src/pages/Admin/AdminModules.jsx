@@ -3,6 +3,7 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 import styles from './Admin.module.css';
 import { Upload } from 'lucide-react';
+import Loader from '../../components/Loader';
 
 const IMGBB_API_KEY = "affe71bc1ff1277c7d83bc8e9dfe4c3c";
 
@@ -24,7 +25,7 @@ const AdminOrders = () => {
     fetchOrders();
   }, []);
 
-  if (loading) return <div>Loading orders...</div>;
+  if (loading) return <Loader />;
 
   return (
     <div>
@@ -90,7 +91,7 @@ export const AdminCustomers = () => {
     fetchCustomers();
   }, []);
 
-  if (loading) return <div>Loading customers...</div>;
+  if (loading) return <Loader />;
 
   return (
     <div>
@@ -249,7 +250,7 @@ export const AdminSettings = () => {
     setSaving(false);
   };
 
-  if (loading) return <div>Loading CMS...</div>;
+  if (loading) return <Loader />;
 
   const inputStyle = { width: '100%', padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px', marginBottom: '15px' };
   const labelStyle = { display: 'block', marginBottom: '5px', fontWeight: 600, fontSize: '0.9rem' };

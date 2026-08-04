@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import Loader from '../../components/Loader';
 import styles from './Admin.module.css';
 import { TrendingUp, Users, Package, DollarSign } from 'lucide-react';
 
@@ -27,7 +28,7 @@ const AdminDashboard = () => {
     fetchStats();
   }, []);
 
-  if (loading) return <div>Loading Dashboard Stats...</div>;
+  if (loading) return <Loader />;
 
   return (
     <div>

@@ -4,6 +4,7 @@ import axios from 'axios';
 import { ShoppingBag, Heart, Star, Truck, RefreshCcw, ShieldCheck } from 'lucide-react';
 import { motion } from 'framer-motion';
 import useCartStore from '../store/useCartStore';
+import Loader from '../components/Loader';
 import SEO from '../components/SEO';
 import ProductCard from '../components/ProductCard';
 import styles from './ProductDetails.module.css';
@@ -60,7 +61,7 @@ const ProductDetails = () => {
     fetchProduct();
   }, [id]);
 
-  if (loading) return <div className="container" style={{padding: '50px 0'}}>Loading...</div>;
+  if (loading) return <Loader fullScreen />;
   if (!product) return <div className="container" style={{padding: '50px 0'}}>Product not found</div>;
 
   return (
