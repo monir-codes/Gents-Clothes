@@ -16,17 +16,27 @@ const importData = async () => {
     await Product.deleteMany();
     await User.deleteMany();
 
+    try {
+      await User.collection.dropIndex('clerkId_1');
+      console.log('Dropped clerkId_1 index');
+    } catch (err) {
+      // Ignore error if index does not exist
+      console.log('clerkId_1 index not found or already dropped');
+    }
+
     const createdUsers = await User.create([
       {
         name: 'Admin User',
         email: 'admin@gentfits.com',
         password: 'password', // will be hashed by pre-save
-        isAdmin: true
+        isAdmin: true,
+        clerkId: 'admin_123'
       },
       {
         name: 'Regular Customer',
         email: 'customer@gentfits.com',
-        password: 'password'
+        password: 'password',
+        clerkId: 'cust_123'
       }
     ]);
 
