@@ -58,7 +58,7 @@ const Footer = () => {
       </div>
 
       <div className={styles.bottomBar}>
-        <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', flexWrap: 'wrap', gap: '16px' }}>
+        <div className={`container ${styles.bottomBarInner}`}>
           <p>&copy; {new Date().getFullYear()} GentFits. All Rights Reserved.</p>
           <div className={styles.paymentIcons}>
             <span>VISA</span>
@@ -66,9 +66,9 @@ const Footer = () => {
             <span>bKash</span>
             <span>Nagad</span>
           </div>
-          <div style={{ display: 'flex', gap: '16px' }}>
-            <Link to="/privacy" style={{ color: 'inherit', textDecoration: 'none' }}>Privacy Policy</Link>
-            <Link to="/terms" style={{ color: 'inherit', textDecoration: 'none' }}>Terms of Service</Link>
+          <div className={styles.legalLinks}>
+            <Link to="/privacy">Privacy Policy</Link>
+            <Link to="/terms">Terms of Service</Link>
           </div>
         </div>
       </div>
