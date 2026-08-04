@@ -68,31 +68,41 @@ const Home = () => {
           >
             <source src={settings.heroVideo} type="video/mp4" />
           </video>
-        ) : settings.heroSlideshow && settings.heroSlideshow.length > 1 ? (
-          <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: -2 }}>
-            <Swiper
-              modules={[Autoplay, EffectFade]}
-              effect="fade"
-              speed={1500}
-              autoplay={{ delay: 4000, disableOnInteraction: false }}
-              allowTouchMove={false}
-              style={{ width: '100%', height: '100%' }}
-            >
-              {settings.heroSlideshow.map((imgUrl, idx) => (
-                <SwiperSlide key={idx}>
-                  <motion.div 
-                    className={styles.heroBackground} 
-                    style={{ 
-                      backgroundImage: `url(${imgUrl})`,
-                      y: y1,
-                      width: '100%',
-                      height: '100%'
-                    }} 
-                  />
-                </SwiperSlide>
-              ))}
-            </Swiper>
-          </div>
+        ) : settings.heroSlideshow && settings.heroSlideshow.length > 0 ? (
+          settings.heroSlideshow.length > 1 ? (
+            <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: -2 }}>
+              <Swiper
+                modules={[Autoplay, EffectFade]}
+                effect="fade"
+                speed={1500}
+                autoplay={{ delay: 4000, disableOnInteraction: false }}
+                allowTouchMove={false}
+                style={{ width: '100%', height: '100%' }}
+              >
+                {settings.heroSlideshow.map((imgUrl, idx) => (
+                  <SwiperSlide key={idx}>
+                    <motion.div 
+                      className={styles.heroBackground} 
+                      style={{ 
+                        backgroundImage: `url(${imgUrl})`,
+                        y: y1,
+                        width: '100%',
+                        height: '100%'
+                      }} 
+                    />
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            </div>
+          ) : (
+            <motion.div 
+              className={styles.heroBackground} 
+              style={{ 
+                backgroundImage: `url(${settings.heroSlideshow[0]})`,
+                y: y1 
+              }} 
+            />
+          )
         ) : (
           <motion.div 
             className={styles.heroBackground} 
@@ -501,10 +511,10 @@ const Home = () => {
               <Swiper
                 modules={[Autoplay, EffectFade]}
                 effect="fade"
-                speed={1500}
+                speed={2000}
                 autoplay={{ delay: 3500, disableOnInteraction: false }}
                 allowTouchMove={false}
-                style={{ width: '100%', height: '100%' }}
+                style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 1 }}
               >
                 {settings.featuredVideoSection.slideshow.map((imgUrl, idx) => (
                   <SwiperSlide key={idx}>
@@ -512,7 +522,9 @@ const Home = () => {
                   </SwiperSlide>
                 ))}
               </Swiper>
-            </div>
+            ) : (
+              <img src={settings.featuredVideoSection.slideshow[0]} alt="Video fallback" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 1 }} />
+            )
           ) : (
             <img src={settings.featuredVideoSection.fallbackImage} alt="Video fallback" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 1 }} />
           )}
