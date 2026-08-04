@@ -57,23 +57,47 @@
 .header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-end;
   margin-bottom: var(--space-4);
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .title {
-  font-size: 2rem;
+  font-size: 2.2rem;
   font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.5px;
+}
+
+.resultCount {
+  font-size: 0.95rem;
+  color: var(--color-text-secondary);
+  margin-top: 4px;
+}
+
+.toolbarActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
 }
 
 .sortSelect {
-  padding: 8px 16px;
+  padding: 10px 16px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   background-color: var(--color-background);
   font-family: inherit;
   font-size: 0.95rem;
+  font-weight: 500;
   cursor: pointer;
+  outline: none;
+}
+
+.sortSelect:hover {
+  border-color: var(--color-text-primary);
 }
 
 .productGrid {
@@ -131,21 +155,43 @@
 
 .headerTitleGroup {
   display: flex;
-  align-items: center;
-  gap: var(--space-3);
+  flex-direction: column;
 }
 
 .mobileFilterBtn {
   display: none;
-  padding: 6px 12px;
+  padding: 10px 16px;
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   font-weight: 600;
+  font-size: 0.95rem;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
 }
 
 @media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+  .title {
+    font-size: 1.8rem;
+  }
+  .toolbarActions {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
   .mobileFilterBtn {
-    display: block;
+    display: flex;
+    flex: 1;
+  }
+  .sortSelect {
+    flex: 1;
   }
 }

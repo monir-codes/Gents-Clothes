@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import axios from 'axios';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, SlidersHorizontal } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ProductCard from '../components/ProductCard';
 import SEO from '../components/SEO';
@@ -131,28 +131,34 @@ const Shop = ({ hideHeader }) => {
             <div className={styles.headerTitleGroup}>
               {isAiRecommended ? (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Sparkles color="var(--color-accent)" size={32} />
+                  <Sparkles color="var(--color-accent)" size={24} />
                   <div>
-                    <h1 className={styles.title} style={{ color: 'var(--color-accent)' }}>AI Curated For You</h1>
-                    <p style={{ margin: 0, color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>Based on your style profile</p>
+                    <h1 className={styles.title} style={{ color: 'var(--color-accent)' }}>AI Curated</h1>
+                    <p style={{ margin: 0, color: 'var(--color-text-secondary)', fontSize: '0.85rem' }}>For your style profile</p>
                   </div>
                 </div>
               ) : (
-                <h1 className={styles.title}>All Products</h1>
+                <div>
+                  <h1 className={styles.title}>All Products</h1>
+                  <p className={styles.resultCount}>{filteredProducts.length} Results</p>
+                </div>
               )}
+            </div>
+
+            <div className={styles.toolbarActions}>
               <button 
                 className={styles.mobileFilterBtn} 
                 onClick={() => setIsMobileFilterOpen(true)}
               >
-                Filters
+                <SlidersHorizontal size={16} /> Filters
               </button>
+              <select className={styles.sortSelect} value={sortOption} onChange={(e) => setSortOption(e.target.value)}>
+                <option>Featured</option>
+                <option>New Arrivals</option>
+                <option>Price: Low to High</option>
+                <option>Price: High to Low</option>
+              </select>
             </div>
-            <select className={styles.sortSelect} value={sortOption} onChange={(e) => setSortOption(e.target.value)}>
-              <option>Featured</option>
-              <option>New Arrivals</option>
-              <option>Price: Low to High</option>
-              <option>Price: High to Low</option>
-            </select>
           </motion.div>
         )}
 

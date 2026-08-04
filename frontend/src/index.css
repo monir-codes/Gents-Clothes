@@ -134,6 +134,9 @@ img {
 }
 
 @media (max-width: 768px) {
+  html {
+    font-size: 14px;
+  }
   :root {
     --space-8: 40px;
     --space-6: 32px;
