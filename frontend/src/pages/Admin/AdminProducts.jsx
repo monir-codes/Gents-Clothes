@@ -4,8 +4,8 @@ import styles from './Admin.module.css';
 import { Plus, Edit, Trash2, X, Upload } from 'lucide-react';
 import Swal from 'sweetalert2';
 
-// ⚠️ Replace with your actual ImgBB API key
-const IMGBB_API_KEY = "c90bf66fc58826725dd78d2b77af65db"; 
+// User's official ImgBB API key
+const IMGBB_API_KEY = "affe71bc1ff1277c7d83bc8e9dfe4c3c"; 
 
 const AdminProducts = () => {
   const [products, setProducts] = useState([]);

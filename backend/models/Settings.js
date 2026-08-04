@@ -14,6 +14,14 @@ const settingsSchema = mongoose.Schema(
       type: String,
       default: '/images/hero-banner.png',
     },
+    heroVideo: {
+      type: String,
+      default: '',
+    },
+    heroSlideshow: {
+      type: [String],
+      default: [],
+    },
     aboutStory: {
       type: String,
       default: 'GentFits was founded with a singular, uncompromising vision: to redefine luxury menswear in Bangladesh.',

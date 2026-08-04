@@ -26,10 +26,12 @@ const updateSettings = async (req, res) => {
       settings = new Settings();
     }
 
-    settings.heroTitle = req.body.heroTitle || settings.heroTitle;
-    settings.heroSubtitle = req.body.heroSubtitle || settings.heroSubtitle;
-    settings.heroImage = req.body.heroImage || settings.heroImage;
-    settings.aboutStory = req.body.aboutStory || settings.aboutStory;
+    settings.heroTitle = req.body.heroTitle !== undefined ? req.body.heroTitle : settings.heroTitle;
+    settings.heroSubtitle = req.body.heroSubtitle !== undefined ? req.body.heroSubtitle : settings.heroSubtitle;
+    settings.heroImage = req.body.heroImage !== undefined ? req.body.heroImage : settings.heroImage;
+    settings.heroVideo = req.body.heroVideo !== undefined ? req.body.heroVideo : settings.heroVideo;
+    settings.heroSlideshow = req.body.heroSlideshow !== undefined ? req.body.heroSlideshow : settings.heroSlideshow;
+    settings.aboutStory = req.body.aboutStory !== undefined ? req.body.aboutStory : settings.aboutStory;
 
     const updatedSettings = await settings.save();
     res.json(updatedSettings);

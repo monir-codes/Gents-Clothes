@@ -30,14 +30,27 @@ const Home = () => {
       />
       {/* Hero Section */}
       <section className={styles.hero}>
-        <motion.div 
-          className={styles.heroBackground} 
-          style={{ 
-            backgroundImage: `url(${settings?.heroImage || '/images/hero-banner.png'})`,
-            y: y1 // Apply parallax
-          }} 
-        />
-        <div className={styles.heroOverlay} />
+        {settings?.heroVideo ? (
+          <video 
+            autoPlay 
+            loop 
+            muted 
+            playsInline
+            className={styles.heroVideo}
+            style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: -2 }}
+          >
+            <source src={settings.heroVideo} type="video/mp4" />
+          </video>
+        ) : (
+          <motion.div 
+            className={styles.heroBackground} 
+            style={{ 
+              backgroundImage: `url(${settings?.heroImage || '/images/hero-banner.png'})`,
+              y: y1 // Apply parallax
+            }} 
+          />
+        )}
+        <div className={styles.heroOverlay} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.4)', zIndex: -1 }} />
         
         <div className={`container ${styles.heroContent}`}>
           <motion.div

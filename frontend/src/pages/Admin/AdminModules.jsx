@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 import styles from './Admin.module.css';
 
 const AdminOrders = () => {
@@ -87,6 +88,8 @@ export const AdminSettings = () => {
     heroTitle: '',
     heroSubtitle: '',
     heroImage: '',
+    heroVideo: '',
+    heroSlideshow: [],
     aboutStory: ''
   });
   const [loading, setLoading] = useState(true);
@@ -114,10 +117,10 @@ export const AdminSettings = () => {
     setSaving(true);
     try {
       await axios.put('/api/settings', settings);
-      alert('Settings saved successfully!');
+      Swal.fire('Success', 'Store Settings saved successfully!', 'success');
     } catch (error) {
       console.error(error);
-      alert('Error saving settings');
+      Swal.fire('Error', 'Error saving settings', 'error');
     }
     setSaving(false);
   };
@@ -159,11 +162,22 @@ export const AdminSettings = () => {
           />
         </div>
         <div>
-          <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600 }}>Hero Image URL</label>
+          <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600 }}>Hero Background Image URL (Fallback)</label>
           <input 
             type="text" 
             name="heroImage"
             value={settings.heroImage} 
+            onChange={handleChange}
+            style={{ width: '100%', padding: '12px', border: '1px solid var(--color-border)', borderRadius: '4px' }}
+          />
+        </div>
+        <div>
+          <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600 }}>Hero Background Video URL (MP4)</label>
+          <input 
+            type="text" 
+            name="heroVideo"
+            placeholder="e.g., https://example.com/video.mp4"
+            value={settings.heroVideo || ''} 
             onChange={handleChange}
             style={{ width: '100%', padding: '12px', border: '1px solid var(--color-border)', borderRadius: '4px' }}
           />
