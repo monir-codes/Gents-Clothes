@@ -11,33 +11,35 @@ import 'swiper/css/pagination';
 import CategoryCard from '../components/CategoryCard';
 import ProductCard from '../components/ProductCard';
 import SEO from '../components/SEO';
+import Loader from '../components/Loader';
 import styles from './Home.module.css';
-
-const dummyProducts = [
-  { _id: '1', name: 'Premium Panjabi', price: 3500, images: ['/images/category-tshirt.png'], category: 'Panjabis' },
-  { _id: '2', name: 'Signature Polo', price: 1200, images: ['/images/category-tshirt.png'], category: 'Polos' },
-  { _id: '3', name: 'Classic T-Shirt', price: 800, images: ['/images/category-tshirt.png'], category: 'T-Shirts' },
-  { _id: '4', name: 'Winter Hoodie', price: 2500, images: ['/images/category-tshirt.png'], category: 'Hoodies' }
-];
 
 const Home = () => {
   const [settings, setSettings] = useState(null);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const { scrollY } = useScroll();
   const y1 = useTransform(scrollY, [0, 500], [0, 150]); // Parallax effect
 
   useEffect(() => {
-    const fetchSettings = async () => {
+    const fetchSettingsAndProducts = async () => {
       try {
-        const { data } = await axios.get('/api/settings');
-        setSettings(data);
+        const [settingsRes, productsRes] = await Promise.all([
+          axios.get('/api/settings'),
+          axios.get('/api/products')
+        ]);
+        setSettings(settingsRes.data);
+        setProducts(productsRes.data);
       } catch (error) {
-        console.error("CMS Fetch error", error);
+        console.error("Fetch error", error);
+      } finally {
+        setLoading(false);
       }
     };
-    fetchSettings();
+    fetchSettingsAndProducts();
   }, []);
 
-  if (!settings) return null; // or a loading spinner
+  if (loading || !settings) return <Loader fullScreen />;
 
   return (
     <div style={{ overflowX: 'hidden' }}>
@@ -146,7 +148,7 @@ const Home = () => {
       <section className="container" style={{ padding: 'var(--space-8) var(--space-4)' }}>
         <h2 className={styles.sectionTitle}>New Arrivals</h2>
         <div className={styles.productGrid}>
-          {dummyProducts.map(p => <ProductCard key={p._id} product={p} />)}
+          {products.slice(0, 4).map(p => <ProductCard key={p._id} product={p} />)}
         </div>
       </section>
 
@@ -217,7 +219,7 @@ const Home = () => {
                 {settings.shopTheLook.subtitle}
               </p>
               <div className={styles.productGrid} style={{ gridTemplateColumns: '1fr 1fr' }}>
-                {dummyProducts.slice(0, 2).map(p => <ProductCard key={p._id+'stl'} product={p} />)}
+                {products.slice(0, 2).map(p => <ProductCard key={p._id+'stl'} product={p} />)}
               </div>
             </div>
           </div>
@@ -242,7 +244,7 @@ const Home = () => {
       <section className="container" style={{ padding: 'var(--space-8) var(--space-4)' }}>
         <h2 className={styles.sectionTitle}>Trending Now</h2>
         <div className={styles.productGrid}>
-          {dummyProducts.map(p => <ProductCard key={p._id+'tp'} product={{...p, _id: p._id+'tp'}} />)}
+          {products.slice(0, 4).map(p => <ProductCard key={p._id+'tp'} product={p} />)}
         </div>
       </section>
 
