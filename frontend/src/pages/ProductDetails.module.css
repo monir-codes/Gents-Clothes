@@ -300,12 +300,28 @@
   .mainSection {
     flex-direction: column;
   }
+  .gallery, .info {
+    width: 100%;
+  }
+  .title {
+    font-size: 1.5rem;
+  }
   .actionContainer {
     flex-wrap: wrap;
+    gap: 10px;
   }
   .addToCartBtn {
     flex: 1 1 100%;
     order: 3;
+    width: 100%;
+  }
+  .qtyBox {
+    flex: 1;
+    min-width: 120px;
+    justify-content: space-between;
+  }
+  .wishlistBtn {
+    flex: 1;
   }
   .trustBadges {
     flex-wrap: wrap;
