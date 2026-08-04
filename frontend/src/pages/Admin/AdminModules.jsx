@@ -235,6 +235,7 @@ export const AdminSettings = () => {
         // Initialize JSON strings for array fields
         setJsonInputs({
           marqueeText: JSON.stringify(data.marqueeText || [], null, 2),
+          announcementList: JSON.stringify(data.announcementList || [], null, 2),
           featuredCategories: JSON.stringify(data.featuredCategories || [], null, 2),
           featuredCollections: JSON.stringify(data.featuredCollections || [], null, 2),
           features: JSON.stringify(data.features || [], null, 2),
@@ -339,7 +340,7 @@ export const AdminSettings = () => {
     try {
       // Parse JSON fields before saving
       let dataToSave = { ...settings };
-      const arrayFields = ['marqueeText', 'featuredCategories', 'featuredCollections', 'features', 'reviews', 'instagramImages', 'heroSlideshow'];
+      const arrayFields = ['marqueeText', 'announcementList', 'featuredCategories', 'featuredCollections', 'features', 'reviews', 'instagramImages', 'heroSlideshow'];
       
       for (const field of arrayFields) {
         try {
@@ -385,9 +386,18 @@ export const AdminSettings = () => {
       </div>
       
       <div style={sectionStyle}>
-        <h3>Global & Announcement</h3>
-        <label style={labelStyle}>Announcement Text</label>
-        <input type="text" name="announcementText" value={settings.announcementText || ''} onChange={handleChange} style={inputStyle} />
+        <h3>Global & Announcements</h3>
+        
+        <label style={labelStyle}>WhatsApp Number</label>
+        <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginBottom: '8px' }}>Enter the number with country code, e.g., 8801700000000</p>
+        <input type="text" name="whatsappNumber" value={settings.whatsappNumber || ''} onChange={handleChange} style={inputStyle} />
+        
+        <label style={labelStyle}>Announcements (Array of strings)</label>
+        <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginBottom: '8px' }}>
+          Format as a JSON array. If you add multiple, they will automatically swipe in the header. If one, it will stay fixed.<br/>
+          <code>[ "FREE SHIPPING ON ORDERS OVER ৳5000", "PREMIUM SUMMER COLLECTION 2026" ]</code>
+        </p>
+        <textarea rows="4" value={jsonInputs.announcementList} onChange={(e) => handleJsonInputChange('announcementList', e.target.value)} style={{...inputStyle, fontFamily: 'monospace', fontSize: '13px'}} />
       </div>
 
       <div style={sectionStyle}>

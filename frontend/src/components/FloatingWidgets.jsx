@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowUp } from 'lucide-react';
 
 const FloatingWidgets = () => {
   const [showBackToTop, setShowBackToTop] = useState(false);
+  const [whatsappNumber, setWhatsappNumber] = useState('8801700000000');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -14,6 +16,18 @@ const FloatingWidgets = () => {
       }
     };
 
+    const fetchSettings = async () => {
+      try {
+        const { data } = await axios.get('/api/settings');
+        if (data && data.whatsappNumber) {
+          setWhatsappNumber(data.whatsappNumber);
+        }
+      } catch (error) {
+        console.error("CMS Fetch error", error);
+      }
+    };
+    fetchSettings();
+
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -23,9 +37,8 @@ const FloatingWidgets = () => {
   };
 
   const openWhatsApp = () => {
-    // Standard WhatsApp API link. Replace number with actual number if needed.
     const message = "Hi GentFits! I'm interested in your premium collection.";
-    window.open(`https://wa.me/8801700000000?text=${encodeURIComponent(message)}`, '_blank');
+    window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
   };
 
   return (

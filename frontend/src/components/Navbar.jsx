@@ -8,13 +8,16 @@ import SearchModal from './SearchModal';
 import { auth, signInWithGoogle, logOut } from '../config/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import axios from 'axios';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Autoplay } from 'swiper/modules';
+import 'swiper/css';
 import styles from './Navbar.module.css';
 
 const Navbar = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [user, setUser] = useState(null);
-  const [announcement, setAnnouncement] = useState('FREE SHIPPING ON ORDERS OVER ৳5000 | PREMIUM SUMMER COLLECTION 2026');
+  const [announcements, setAnnouncements] = useState(['FREE SHIPPING ON ORDERS OVER ৳5000 | PREMIUM SUMMER COLLECTION 2026']);
   const { cartItems, toggleCart } = useCartStore();
   const { wishlistItems } = useWishlistStore();
   const navigate = useNavigate();
@@ -27,8 +30,10 @@ const Navbar = () => {
     const fetchSettings = async () => {
       try {
         const { data } = await axios.get('/api/settings');
-        if (data && data.announcementText) {
-          setAnnouncement(data.announcementText);
+        if (data && data.announcementList && data.announcementList.length > 0) {
+          setAnnouncements(data.announcementList);
+        } else if (data && data.announcementText) {
+          setAnnouncements([data.announcementText]);
         }
       } catch (error) {
         console.error("CMS Fetch error", error);
@@ -50,7 +55,24 @@ const Navbar = () => {
   return (
     <header className={styles.header}>
       <div className={styles.announcementBar}>
-        {announcement}
+        {announcements.length > 1 ? (
+          <Swiper
+            modules={[Autoplay]}
+            autoplay={{ delay: 3000, disableOnInteraction: false }}
+            loop={true}
+            allowTouchMove={false}
+            speed={800}
+            style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center' }}
+          >
+            {announcements.map((text, idx) => (
+              <SwiperSlide key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                {text}
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        ) : (
+          announcements[0]
+        )}
       </div>
       
       <div className={`container ${styles.navContainer}`}>

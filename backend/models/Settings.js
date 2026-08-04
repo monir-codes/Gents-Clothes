@@ -6,6 +6,14 @@ const settingsSchema = mongoose.Schema(
       type: String,
       default: 'FREE SHIPPING ON ORDERS OVER ৳5000 | PREMIUM SUMMER COLLECTION 2026',
     },
+    announcementList: {
+      type: [String],
+      default: ['FREE SHIPPING ON ORDERS OVER ৳5000', 'PREMIUM SUMMER COLLECTION 2026'],
+    },
+    whatsappNumber: {
+      type: String,
+      default: '8801700000000',
+    },
     heroTitle: {
       type: String,
       default: 'Premium Luxury Menswear',
