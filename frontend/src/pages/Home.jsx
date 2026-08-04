@@ -145,20 +145,44 @@ const Home = () => {
       )}
 
       {/* New Arrivals */}
-      <section className="container" style={{ padding: 'var(--space-8) var(--space-4)' }}>
+      <motion.section 
+        className="container" style={{ padding: 'var(--space-8) var(--space-4)' }}
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.6 }}
+      >
         <h2 className={styles.sectionTitle}>New Arrivals</h2>
         <div className={styles.productGrid}>
-          {products.slice(0, 4).map(p => <ProductCard key={p._id} product={p} />)}
+          {products.slice(0, 4).map((p, i) => (
+            <motion.div 
+              key={p._id} 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1, duration: 0.5 }}
+            >
+              <ProductCard product={p} />
+            </motion.div>
+          ))}
         </div>
-      </section>
+      </motion.section>
 
       {/* Featured Collections */}
       {settings.featuredCollections && settings.featuredCollections.length > 0 && (
         <section className="container" style={{ padding: 'var(--space-8) var(--space-4)' }}>
-          <h2 className={styles.sectionTitle}>Featured Collections</h2>
-          <motion.div
+          <motion.h2 
+            className={styles.sectionTitle}
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.6 }}
+          >
+            Featured Collections
+          </motion.h2>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.8 }}
           >
@@ -192,75 +216,152 @@ const Home = () => {
 
       {/* Limited Edition Banner */}
       {settings.limitedEdition && (
-        <section className={styles.banner}>
+        <motion.section 
+          className={styles.banner}
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+        >
           <img src={settings.limitedEdition.image} alt={settings.limitedEdition.title} />
           <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.5)', zIndex: 2 }} />
-          <div className={styles.bannerContent}>
+          <motion.div 
+            className={styles.bannerContent}
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2, duration: 0.6 }}
+          >
             <h2>{settings.limitedEdition.title}</h2>
             <p style={{ marginBottom: 'var(--space-4)', fontSize: '1.2rem' }}>{settings.limitedEdition.subtitle}</p>
             <Link to={settings.limitedEdition.link}>
               <button className={styles.btnPrimary}>Discover Now</button>
             </Link>
-          </div>
-        </section>
+          </motion.div>
+        </motion.section>
       )}
 
       {/* Shop the Look */}
       {settings.shopTheLook && (
         <section className="container" style={{ padding: 'var(--space-8) var(--space-4)' }}>
-          <h2 className={styles.sectionTitle}>Shop the Look</h2>
+          <motion.h2 
+            className={styles.sectionTitle}
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            Shop the Look
+          </motion.h2>
           <div className={styles.shopTheLook}>
-            <div className={styles.lookImage}>
+            <motion.div 
+              className={styles.lookImage}
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
               <img src={settings.shopTheLook.image} alt={settings.shopTheLook.title} style={{ width: '100%', borderRadius: 'var(--radius-lg)' }} />
-            </div>
-            <div>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
               <h3 style={{ fontSize: '2rem', marginBottom: 'var(--space-4)' }}>{settings.shopTheLook.title}</h3>
               <p style={{ color: 'var(--color-text-secondary)', marginBottom: 'var(--space-4)' }}>
                 {settings.shopTheLook.subtitle}
               </p>
               <div className={styles.productGrid} style={{ gridTemplateColumns: '1fr 1fr' }}>
-                {products.slice(0, 2).map(p => <ProductCard key={p._id+'stl'} product={p} />)}
+                {products.slice(0, 2).map((p, i) => (
+                  <motion.div 
+                    key={p._id+'stl'}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.1, duration: 0.5 }}
+                  >
+                    <ProductCard product={p} />
+                  </motion.div>
+                ))}
               </div>
-            </div>
+            </motion.div>
           </div>
         </section>
       )}
 
       {/* Premium Collection Banner */}
       {settings.premiumCollection && (
-        <section className={styles.banner} style={{ height: '40vh', marginTop: 'var(--space-8)' }}>
+        <motion.section 
+          className={styles.banner} style={{ height: '40vh', marginTop: 'var(--space-8)' }}
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+        >
           <img src={settings.premiumCollection.image} alt={settings.premiumCollection.title} />
           <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.6)', zIndex: 2 }} />
-          <div className={styles.bannerContent}>
+          <motion.div 
+            className={styles.bannerContent}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2, duration: 0.6 }}
+          >
             <h2>{settings.premiumCollection.title}</h2>
             <Link to={settings.premiumCollection.link}>
               <button className={styles.btnOutline}>View Collection</button>
             </Link>
-          </div>
-        </section>
+          </motion.div>
+        </motion.section>
       )}
 
       {/* Trending Products */}
-      <section className="container" style={{ padding: 'var(--space-8) var(--space-4)' }}>
+      <motion.section 
+        className="container" style={{ padding: 'var(--space-8) var(--space-4)' }}
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.6 }}
+      >
         <h2 className={styles.sectionTitle}>Trending Now</h2>
         <div className={styles.productGrid}>
-          {products.slice(0, 4).map(p => <ProductCard key={p._id+'tp'} product={p} />)}
+          {products.slice(0, 4).map((p, i) => (
+            <motion.div 
+              key={p._id+'tp'}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1, duration: 0.5 }}
+            >
+              <ProductCard product={p} />
+            </motion.div>
+          ))}
         </div>
-      </section>
+      </motion.section>
 
       {/* Why Choose Us */}
       {settings.features && settings.features.length > 0 && (
         <section className="container" style={{ padding: 'var(--space-8) var(--space-4)' }}>
           <div className={styles.featuresGrid}>
             {settings.features.map((feature, i) => (
-              <div key={i} className={styles.featureItem}>
+              <motion.div 
+                key={i} 
+                className={styles.featureItem}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.15, duration: 0.5 }}
+                whileHover={{ y: -5 }}
+              >
                 {feature.icon === 'Truck' && <Truck size={40} className={styles.featureIcon} />}
                 {feature.icon === 'Shield' && <Shield size={40} className={styles.featureIcon} />}
                 {feature.icon === 'RefreshCw' && <RefreshCw size={40} className={styles.featureIcon} />}
                 {!['Truck', 'Shield', 'RefreshCw'].includes(feature.icon) && <Shield size={40} className={styles.featureIcon} />}
                 <h3 style={{ marginBottom: '8px' }}>{feature.title}</h3>
                 <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>{feature.subtitle}</p>
-              </div>
+              </motion.div>
             ))}
           </div>
         </section>
@@ -270,7 +371,13 @@ const Home = () => {
       {settings.brandStory && (
         <section className="container" style={{ padding: 'var(--space-8) var(--space-4)' }}>
           <div className={styles.storySection}>
-            <div className={styles.storyContent}>
+            <motion.div 
+              className={styles.storyContent}
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
               <h2 className={styles.sectionTitle} style={{ textAlign: 'left' }}>{settings.brandStory.title}</h2>
               <p style={{ color: 'var(--color-text-secondary)', lineHeight: 1.6, marginBottom: 'var(--space-4)' }}>
                 {settings.brandStory.text}
@@ -278,17 +385,29 @@ const Home = () => {
               <Link to="/about">
                 <button className={styles.btnPrimary} style={{ background: 'var(--color-text-primary)', color: 'var(--color-background)' }}>Read Our Story</button>
               </Link>
-            </div>
-            <div className={styles.storyImage}>
+            </motion.div>
+            <motion.div 
+              className={styles.storyImage}
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
               <img src={settings.brandStory.image} alt={settings.brandStory.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-            </div>
+            </motion.div>
           </div>
         </section>
       )}
 
       {/* Featured Video */}
       {settings.featuredVideoSection && (
-        <section className={styles.banner} style={{ height: '70vh' }}>
+        <motion.section 
+          className={styles.banner} style={{ height: '70vh' }}
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+        >
           {settings.featuredVideoSection.videoUrl ? (
             <video 
               autoPlay 
@@ -303,26 +422,48 @@ const Home = () => {
             <img src={settings.featuredVideoSection.fallbackImage} alt="Video fallback" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 1 }} />
           )}
           <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.4)', zIndex: 2 }} />
-          <div className={styles.bannerContent}>
+          <motion.div 
+            className={styles.bannerContent}
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3, duration: 0.5 }}
+          >
             <h2>{settings.featuredVideoSection.title}</h2>
             <p>{settings.featuredVideoSection.subtitle}</p>
-          </div>
-        </section>
+          </motion.div>
+        </motion.section>
       )}
 
       {/* Customer Reviews */}
       {settings.reviews && settings.reviews.length > 0 && (
         <section className="container" style={{ padding: 'var(--space-8) 0' }}>
-          <h2 className={styles.sectionTitle}>What Our Customers Say</h2>
+          <motion.h2 
+            className={styles.sectionTitle}
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            What Our Customers Say
+          </motion.h2>
           <div className={styles.reviewsGrid}>
             {settings.reviews.map((review, i) => (
-              <div key={i} className={styles.reviewCard}>
+              <motion.div 
+                key={i} 
+                className={styles.reviewCard}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1, duration: 0.5 }}
+                whileHover={{ y: -5, boxShadow: "0 10px 30px rgba(0,0,0,0.08)" }}
+              >
                 <div className={styles.reviewStars}>
                   {'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}
                 </div>
                 <p className={styles.reviewText}>"{review.text}"</p>
                 <h4 style={{ fontWeight: 600 }}>- {review.author}</h4>
-              </div>
+              </motion.div>
             ))}
           </div>
         </section>
@@ -332,7 +473,13 @@ const Home = () => {
 
       {/* Newsletter */}
       {settings.newsletter && (
-        <section className={styles.newsletterSection}>
+        <motion.section 
+          className={styles.newsletterSection}
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.6 }}
+        >
           <div className="container">
             <h2 style={{ fontSize: '2rem', marginBottom: 'var(--space-2)' }}>{settings.newsletter.title}</h2>
             <p style={{ marginBottom: 'var(--space-6)', color: 'rgba(255,255,255,0.8)' }}>{settings.newsletter.subtitle}</p>
@@ -341,7 +488,7 @@ const Home = () => {
               <button type="submit">Subscribe</button>
             </form>
           </div>
-        </section>
+        </motion.section>
       )}
     </div>
   );

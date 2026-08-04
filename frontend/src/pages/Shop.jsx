@@ -59,7 +59,12 @@ const Shop = ({ hideHeader }) => {
     <div className={`container ${styles.shopContainer}`}>
       {/* Sidebar Filters */}
       {!hideHeader && (
-        <aside className={styles.sidebar}>
+        <motion.aside 
+          className={styles.sidebar}
+          initial={{ opacity: 0, x: -30 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6 }}
+        >
           <div className={styles.filterGroup}>
             <h3 className={styles.filterTitle}>Categories</h3>
             <div className={styles.filterList}>
@@ -95,13 +100,18 @@ const Shop = ({ hideHeader }) => {
             <label className={styles.filterLabel}><input type="checkbox" /> XXL</label>
           </div>
         </div>
-        </aside>
+        </motion.aside>
       )}
 
       {/* Main Content */}
       <main className={styles.mainContent} style={hideHeader ? { width: '100%', paddingLeft: 0 } : {}}>
         {!hideHeader && (
-          <div className={styles.header}>
+          <motion.div 
+            className={styles.header}
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
             <h1 className={styles.title}>All Products</h1>
             <select className={styles.sortSelect} value={sortOption} onChange={(e) => setSortOption(e.target.value)}>
               <option>Featured</option>
@@ -109,7 +119,7 @@ const Shop = ({ hideHeader }) => {
               <option>Price: Low to High</option>
               <option>Price: High to Low</option>
             </select>
-          </div>
+          </motion.div>
         )}
 
         {loading ? (
@@ -120,6 +130,7 @@ const Shop = ({ hideHeader }) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, staggerChildren: 0.1 }}
+            viewport={{ once: true, margin: "-50px" }}
           >
             {filteredProducts.map(product => (
               <ProductCard key={product._id} product={product} />

@@ -79,7 +79,12 @@ const ProductDetails = () => {
 
       <div className={styles.mainSection}>
         {/* Image Gallery */}
-        <div className={styles.gallery}>
+        <motion.div 
+          className={styles.gallery}
+          initial={{ opacity: 0, x: -30 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6 }}
+        >
           <div className={styles.mainImageContainer}>
             <img src={product.image} alt={product.name} className={styles.mainImage} />
           </div>
@@ -89,10 +94,15 @@ const ProductDetails = () => {
               <img src={product.hoverImage} alt="Thumb 2" className={styles.thumbnail} />
             )}
           </div>
-        </div>
+        </motion.div>
 
         {/* Product Info */}
-        <div className={styles.info}>
+        <motion.div 
+          className={styles.info}
+          initial={{ opacity: 0, x: 30 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+        >
           <h1 className={styles.title}>{product.name}</h1>
           <div className={styles.ratingBox}>
             <div className={styles.stars}>
@@ -186,11 +196,17 @@ const ProductDetails = () => {
               <span>Secure Payment</span>
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
 
       {/* Tabs */}
-      <div className={styles.tabsContainer}>
+      <motion.div 
+        className={styles.tabsContainer}
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+      >
         <div className={styles.tabHeaders}>
           <button 
             className={`${styles.tabHeader} ${activeTab === 'description' ? styles.activeTab : ''}`}
@@ -227,11 +243,17 @@ const ProductDetails = () => {
             <p>No reviews yet.</p>
           )}
         </div>
-      </div>
+      </motion.div>
 
       {/* Related Products Section */}
       {relatedProducts.length > 0 && (
-        <div style={{ marginTop: 'var(--space-8)' }}>
+        <motion.div 
+          style={{ marginTop: 'var(--space-8)' }}
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
           <h2 style={{ fontSize: '2rem', fontWeight: 600, textAlign: 'center', marginBottom: 'var(--space-4)' }}>You May Also Like</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: 'var(--space-3)' }}>
             {relatedProducts.map(p => (

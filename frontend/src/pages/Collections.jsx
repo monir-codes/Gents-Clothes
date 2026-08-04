@@ -17,12 +17,17 @@ const Collections = () => {
         <p style={{ color: 'var(--color-text-secondary)', marginTop: '8px' }}>Curated selections for every season</p>
       </motion.div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
-        <CategoryCard title="Summer Edition 2026" image="/images/hero-banner.png" link="/shop?collection=summer" />
-        <CategoryCard title="Eid Exclusive" image="/images/hero-banner.png" link="/shop?collection=eid" />
-        <CategoryCard title="Winter Essentials" image="/images/hero-banner.png" link="/shop?collection=winter" />
-        <CategoryCard title="Premium Minimal" image="/images/hero-banner.png" link="/shop?collection=minimal" />
-      </div>
+      <motion.div 
+        style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ staggerChildren: 0.2 }}
+      >
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}><CategoryCard title="Summer Edition 2026" image="/images/hero-banner.png" link="/shop?collection=summer" /></motion.div>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}><CategoryCard title="Eid Exclusive" image="/images/hero-banner.png" link="/shop?collection=eid" /></motion.div>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}><CategoryCard title="Winter Essentials" image="/images/hero-banner.png" link="/shop?collection=winter" /></motion.div>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}><CategoryCard title="Premium Minimal" image="/images/hero-banner.png" link="/shop?collection=minimal" /></motion.div>
+      </motion.div>
     </div>
   );
 };
