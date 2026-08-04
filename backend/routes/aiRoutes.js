@@ -21,7 +21,7 @@ router.post('/generate', async (req, res) => {
     let prompt = '';
     
     if (type === 'description') {
-      prompt = `Act as an expert luxury fashion copywriter. Write a highly engaging, premium product description for the following product: "${context}". The tone should be elegant, professional, and persuasive, suited for a high-end menswear brand named GentFits. Do not include markdown formatting or asterisks, just plain text in paragraphs.`;
+      prompt = `Act as an expert luxury fashion copywriter. I will provide you with either a product name, details, or an existing product description. Your task is to generate or rewrite it into a highly engaging, premium product description. The tone MUST ALWAYS be elegant, professional, and persuasive, suited for a high-end menswear brand named GentFits. Maintain this exact tone regardless of the input. Do not include markdown formatting or asterisks, just plain text in paragraphs.\n\nInput: "${context}"`;
     } else if (type === 'seo') {
       prompt = `Act as an SEO expert. Generate a comma-separated list of 10-15 highly relevant, high-traffic SEO keywords and a compelling meta description (under 160 characters) for the following product: "${context}". Format the response clearly as: "Keywords: [your keywords]\n\nMeta Description: [your description]".`;
     } else {

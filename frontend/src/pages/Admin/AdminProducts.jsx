@@ -11,6 +11,7 @@ const AdminProducts = () => {
   const [products, setProducts] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [editingId, setEditingId] = useState(null);
 
   const [formData, setFormData] = useState({
@@ -65,6 +66,33 @@ const AdminProducts = () => {
       Swal.fire('Error', 'Image upload failed', 'error');
     }
     setIsUploading(false);
+  };
+
+  const generateDescription = async () => {
+    const context = formData.description || formData.name;
+    if (!context) {
+      Swal.fire('Error', 'Please enter a product name or basic description first', 'warning');
+      return;
+    }
+    
+    setIsGenerating(true);
+    try {
+      const { data } = await axios.post('/api/ai/generate', { type: 'description', context });
+      setFormData(prev => ({ ...prev, description: data.result }));
+      Swal.fire({
+        title: 'Success',
+        text: 'Description generated successfully!',
+        icon: 'success',
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000
+      });
+    } catch (error) {
+      Swal.fire('Error', error.response?.data?.message || 'Failed to generate description', 'error');
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -207,7 +235,29 @@ const AdminProducts = () => {
 
               <input type="text" name="category" placeholder="Category (e.g., Summer)" value={formData.category} onChange={handleInputChange} required style={{ padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px' }} />
               
-              <textarea name="description" placeholder="Product Description" value={formData.description} onChange={handleInputChange} required style={{ padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px', minHeight: '80px' }}></textarea>
+              <div style={{ position: 'relative' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                  <label style={{ fontWeight: 600, fontSize: '0.9rem' }}>Product Description</label>
+                  <button 
+                    type="button" 
+                    onClick={generateDescription}
+                    disabled={isGenerating}
+                    style={{ 
+                      background: 'var(--color-accent)', 
+                      color: 'white', 
+                      border: 'none', 
+                      padding: '5px 12px', 
+                      borderRadius: '4px', 
+                      fontSize: '0.8rem', 
+                      cursor: 'pointer',
+                      opacity: isGenerating ? 0.7 : 1
+                    }}
+                  >
+                    {isGenerating ? 'Generating...' : '✨ Rewrite/Generate with AI'}
+                  </button>
+                </div>
+                <textarea name="description" placeholder="Enter basic details and click 'Generate with AI', or write full description here..." value={formData.description} onChange={handleInputChange} required style={{ padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px', minHeight: '120px', width: '100%', fontFamily: 'inherit', resize: 'vertical' }}></textarea>
+              </div>
 
               <button type="submit" style={{ padding: '12px', background: 'var(--color-text-primary)', color: 'white', borderRadius: '4px', fontWeight: 600, marginTop: '10px' }}>
                 {editingId ? 'Update Product' : 'Publish Product'}
