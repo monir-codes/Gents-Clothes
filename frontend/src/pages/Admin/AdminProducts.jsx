@@ -1,28 +1,136 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import styles from './Admin.module.css';
-import { Plus } from 'lucide-react';
+import { Plus, Edit, Trash2, X, Upload } from 'lucide-react';
+import Swal from 'sweetalert2';
+
+// ⚠️ Replace with your actual ImgBB API key
+const IMGBB_API_KEY = "c90bf66fc58826725dd78d2b77af65db"; 
 
 const AdminProducts = () => {
   const [products, setProducts] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+
+  const [formData, setFormData] = useState({
+    name: '',
+    price: 0,
+    category: '',
+    brand: 'GentFits',
+    countInStock: 0,
+    description: '',
+    image: ''
+  });
+
+  const fetchProducts = async () => {
+    try {
+      const { data } = await axios.get('/api/products');
+      setProducts(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const { data } = await axios.get('/api/products');
-        setProducts(data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
     fetchProducts();
   }, []);
 
+  const handleInputChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    const imgData = new FormData();
+    imgData.append('image', file);
+
+    try {
+      const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+        method: 'POST',
+        body: imgData,
+      });
+      const data = await response.json();
+      
+      if (data.success) {
+        setFormData({ ...formData, image: data.data.url });
+        Swal.fire('Success', 'Image uploaded to ImgBB successfully!', 'success');
+      } else {
+        Swal.fire('Error', 'ImgBB upload failed. Check API Key.', 'error');
+      }
+    } catch (error) {
+      Swal.fire('Error', 'Image upload failed', 'error');
+    }
+    setIsUploading(false);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if (editingId) {
+        await axios.put(`/api/products/${editingId}`, formData);
+        Swal.fire('Updated!', 'Product updated successfully.', 'success');
+      } else {
+        await axios.post('/api/products', formData);
+        Swal.fire('Added!', 'Product added successfully.', 'success');
+      }
+      setIsModalOpen(false);
+      fetchProducts();
+    } catch (error) {
+      Swal.fire('Error', 'Failed to save product', 'error');
+    }
+  };
+
+  const openAddModal = () => {
+    setEditingId(null);
+    setFormData({ name: '', price: 0, category: '', brand: 'GentFits', countInStock: 0, description: '', image: '' });
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = (product) => {
+    setEditingId(product._id);
+    setFormData({
+      name: product.name,
+      price: product.price,
+      category: product.category,
+      brand: product.brand,
+      countInStock: product.countInStock,
+      description: product.description,
+      image: product.image
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = async (id) => {
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!'
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await axios.delete(`/api/products/${id}`);
+        Swal.fire('Deleted!', 'Product has been deleted.', 'success');
+        fetchProducts();
+      } catch (error) {
+        Swal.fire('Error', 'Failed to delete product', 'error');
+      }
+    }
+  };
+
   return (
-    <div>
+    <div style={{ position: 'relative' }}>
       <div className={styles.dashboardHeader}>
-        <h1 className={styles.dashboardTitle}>Products</h1>
-        <button style={{ padding: '10px 20px', background: 'var(--color-text-primary)', color: 'white', borderRadius: '4px', display: 'flex', gap: '8px', alignItems: 'center' }}>
+        <h1 className={styles.dashboardTitle}>Products Database</h1>
+        <button onClick={openAddModal} style={{ padding: '10px 20px', background: 'var(--color-text-primary)', color: 'white', borderRadius: '4px', display: 'flex', gap: '8px', alignItems: 'center' }}>
           <Plus size={18} /> Add Product
         </button>
       </div>
@@ -52,14 +160,62 @@ const AdminProducts = () => {
                   </span>
                 </td>
                 <td>
-                  <button style={{ marginRight: '8px', padding: '4px 8px' }}>Edit</button>
-                  <button style={{ color: 'var(--color-error)', padding: '4px 8px' }}>Delete</button>
+                  <button onClick={() => openEditModal(product)} style={{ marginRight: '16px', color: 'var(--color-accent)' }}>
+                    <Edit size={18} />
+                  </button>
+                  <button onClick={() => handleDelete(product._id)} style={{ color: 'var(--color-error)' }}>
+                    <Trash2 size={18} />
+                  </button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
+      {isModalOpen && (
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000 }}>
+          <div style={{ background: 'var(--color-surface)', width: '500px', padding: '30px', borderRadius: '8px', position: 'relative' }}>
+            <button onClick={() => setIsModalOpen(false)} style={{ position: 'absolute', top: '20px', right: '20px' }}>
+              <X size={24} />
+            </button>
+            <h2 style={{ marginBottom: '20px' }}>{editingId ? 'Edit Product' : 'Add New Product'}</h2>
+            
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+              
+              {/* ImgBB Image Upload */}
+              <div style={{ border: '2px dashed var(--color-border)', padding: '20px', textAlign: 'center', borderRadius: '8px' }}>
+                {formData.image ? (
+                  <img src={formData.image} alt="Preview" style={{ height: '100px', marginBottom: '10px' }} />
+                ) : (
+                  <Upload size={32} style={{ marginBottom: '10px', color: 'var(--color-text-secondary)' }} />
+                )}
+                <div>
+                  <label style={{ cursor: 'pointer', color: 'var(--color-accent)', fontWeight: 600 }}>
+                    {isUploading ? 'Uploading to ImgBB...' : 'Upload Image'}
+                    <input type="file" style={{ display: 'none' }} accept="image/*" onChange={handleImageUpload} />
+                  </label>
+                </div>
+              </div>
+
+              <input type="text" name="name" placeholder="Product Name" value={formData.name} onChange={handleInputChange} required style={{ padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px' }} />
+              
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <input type="number" name="price" placeholder="Price (৳)" value={formData.price} onChange={handleInputChange} required style={{ padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px', flex: 1 }} />
+                <input type="number" name="countInStock" placeholder="Stock Qty" value={formData.countInStock} onChange={handleInputChange} required style={{ padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px', flex: 1 }} />
+              </div>
+
+              <input type="text" name="category" placeholder="Category (e.g., Summer)" value={formData.category} onChange={handleInputChange} required style={{ padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px' }} />
+              
+              <textarea name="description" placeholder="Product Description" value={formData.description} onChange={handleInputChange} required style={{ padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px', minHeight: '80px' }}></textarea>
+
+              <button type="submit" style={{ padding: '12px', background: 'var(--color-text-primary)', color: 'white', borderRadius: '4px', fontWeight: 600, marginTop: '10px' }}>
+                {editingId ? 'Update Product' : 'Publish Product'}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

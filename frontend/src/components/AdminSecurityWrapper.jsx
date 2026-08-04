@@ -1,32 +1,84 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate, useLocation } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
 const AdminSecurityWrapper = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [isChecking, setIsChecking] = useState(true);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
-    const chamberKey = sessionStorage.getItem('adminChamberKey');
-    
-    if (chamberKey === 'Mondal King') {
-      setIsAuthenticated(true);
-    } else {
-      const answer = window.prompt("The Chamber: Who is here?");
-      if (answer === 'Mondal King') {
-        sessionStorage.setItem('adminChamberKey', 'Mondal King');
-        setIsAuthenticated(true);
+    const checkSecurity = async () => {
+      const isAuth = sessionStorage.getItem('adminAuthorized');
+      
+      if (isAuth === 'true') {
+        setIsAuthorized(true);
+        setIsChecking(false);
+        return;
+      }
+
+      const { value: password, isDismissed } = await Swal.fire({
+        title: 'RESTRICTED AREA',
+        text: 'who is here?',
+        input: 'password',
+        inputPlaceholder: 'Enter your identity',
+        icon: 'warning',
+        background: '#1a1a1a',
+        color: '#ffffff',
+        confirmButtonColor: '#c9a265',
+        cancelButtonColor: '#d33',
+        showCancelButton: true,
+        confirmButtonText: 'Access Vault',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        customClass: {
+          popup: 'luxury-alert',
+          title: 'luxury-alert-title',
+          input: 'luxury-alert-input'
+        }
+      });
+
+      if (isDismissed || !password) {
+        navigate('/');
+        return;
+      }
+
+      if (password === 'Mondal King') {
+        Swal.fire({
+          title: 'Access Granted',
+          text: 'Welcome to the Chamber.',
+          icon: 'success',
+          background: '#1a1a1a',
+          color: '#ffffff',
+          confirmButtonColor: '#c9a265',
+          timer: 1500,
+          showConfirmButton: false
+        });
+        sessionStorage.setItem('adminAuthorized', 'true');
+        setIsAuthorized(true);
       } else {
-        alert("Access Denied.");
+        await Swal.fire({
+          title: 'Access Denied',
+          text: 'Intruder detected. Connection terminated.',
+          icon: 'error',
+          background: '#1a1a1a',
+          color: '#ffffff',
+          confirmButtonColor: '#d33',
+        });
         navigate('/');
       }
-    }
+      setIsChecking(false);
+    };
+
+    checkSecurity();
   }, [navigate]);
 
-  if (!isAuthenticated) {
-    return <div style={{ height: '100vh', background: 'black', color: 'red', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>ACCESS DENIED</div>;
+  if (isChecking) {
+    return <div style={{ height: '100vh', backgroundColor: '#1a1a1a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><h2 style={{color: 'var(--color-accent)'}}>Authenticating...</h2></div>;
   }
 
-  return <>{children}</>;
+  return isAuthorized ? children : null;
 };
 
 export default AdminSecurityWrapper;
