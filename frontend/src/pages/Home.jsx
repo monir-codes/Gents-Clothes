@@ -506,22 +506,24 @@ const Home = () => {
             >
               <source src={settings.featuredVideoSection.videoUrl} type="video/mp4" />
             </video>
-          ) : settings.featuredVideoSection.slideshow && settings.featuredVideoSection.slideshow.length > 1 ? (
-            <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 1 }}>
-              <Swiper
-                modules={[Autoplay, EffectFade]}
-                effect="fade"
-                speed={2000}
-                autoplay={{ delay: 3500, disableOnInteraction: false }}
-                allowTouchMove={false}
-                style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 1 }}
-              >
-                {settings.featuredVideoSection.slideshow.map((imgUrl, idx) => (
-                  <SwiperSlide key={idx}>
-                    <img src={imgUrl} alt={`Slideshow ${idx}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  </SwiperSlide>
-                ))}
-              </Swiper>
+          ) : settings.featuredVideoSection.slideshow && settings.featuredVideoSection.slideshow.length > 0 ? (
+            settings.featuredVideoSection.slideshow.length > 1 ? (
+              <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 1 }}>
+                <Swiper
+                  modules={[Autoplay, EffectFade]}
+                  effect="fade"
+                  speed={2000}
+                  autoplay={{ delay: 3500, disableOnInteraction: false }}
+                  allowTouchMove={false}
+                  style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 1 }}
+                >
+                  {settings.featuredVideoSection.slideshow.map((imgUrl, idx) => (
+                    <SwiperSlide key={idx}>
+                      <img src={imgUrl} alt={`Slideshow ${idx}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
+              </div>
             ) : (
               <img src={settings.featuredVideoSection.slideshow[0]} alt="Video fallback" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 1 }} />
             )
