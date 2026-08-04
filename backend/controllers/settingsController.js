@@ -12,7 +12,7 @@ const getSettings = async (req, res) => {
     }
     res.json(settings);
   } catch (error) {
-    res.status(500).json({ message: 'Server Error' });
+    res.status(500).json({ message: 'Server Error', error: error.message });
   }
 };
 
@@ -26,17 +26,24 @@ const updateSettings = async (req, res) => {
       settings = new Settings();
     }
 
-    settings.heroTitle = req.body.heroTitle !== undefined ? req.body.heroTitle : settings.heroTitle;
-    settings.heroSubtitle = req.body.heroSubtitle !== undefined ? req.body.heroSubtitle : settings.heroSubtitle;
-    settings.heroImage = req.body.heroImage !== undefined ? req.body.heroImage : settings.heroImage;
-    settings.heroVideo = req.body.heroVideo !== undefined ? req.body.heroVideo : settings.heroVideo;
-    settings.heroSlideshow = req.body.heroSlideshow !== undefined ? req.body.heroSlideshow : settings.heroSlideshow;
-    settings.aboutStory = req.body.aboutStory !== undefined ? req.body.aboutStory : settings.aboutStory;
+    // List of allowed fields to update
+    const allowedFields = [
+      'announcementText', 'heroTitle', 'heroSubtitle', 'heroImage', 'heroVideo',
+      'marqueeText', 'featuredCategories', 'featuredCollections', 'limitedEdition',
+      'shopTheLook', 'premiumCollection', 'features', 'brandStory',
+      'featuredVideoSection', 'reviews', 'instagramImages', 'newsletter'
+    ];
+
+    allowedFields.forEach(field => {
+      if (req.body[field] !== undefined) {
+        settings[field] = req.body[field];
+      }
+    });
 
     const updatedSettings = await settings.save();
     res.json(updatedSettings);
   } catch (error) {
-    res.status(500).json({ message: 'Server Error' });
+    res.status(500).json({ message: 'Server Error', error: error.message });
   }
 };
 

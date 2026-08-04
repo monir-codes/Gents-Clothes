@@ -6,12 +6,17 @@
   transition: all 0.3s ease;
 }
 
+.imageWrapper {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  background-color: var(--color-surface);
+}
+
 .imageContainer {
   position: relative;
   aspect-ratio: 3/4;
-  overflow: hidden;
-  background-color: var(--color-surface);
-  border-radius: var(--radius-sm);
+  display: block;
 }
 
 .image {
@@ -125,4 +130,27 @@
   color: var(--color-text-secondary);
   text-decoration: line-through;
   font-size: 0.9rem;
+}
+
+/* Mobile Fallback for Actions */
+@media (max-width: 768px) {
+  .actions {
+    transform: none; /* Always in place */
+    flex-direction: row; /* Horizontal on bottom maybe? Or keep vertical top right */
+    top: auto;
+    bottom: var(--space-2);
+    right: var(--space-2);
+    opacity: 0.9;
+  }
+  
+  .actionBtn {
+    width: 32px;
+    height: 32px;
+    background-color: rgba(255, 255, 255, 0.95);
+  }
+  
+  .actionBtn svg {
+    width: 16px;
+    height: 16px;
+  }
 }

@@ -33,28 +33,30 @@ const ProductCard = ({ product }) => {
       variants={itemVariants}
       whileHover={{ y: -5, boxShadow: "0 10px 25px rgba(0,0,0,0.1)" }}
     >
-      <Link to={`/product/${product._id}`} className={styles.imageContainer}>
-        <img src={product.image} alt={product.name} className={styles.image} />
-        {product.hoverImage && (
-          <img src={product.hoverImage} alt={product.name} className={styles.hoverImage} />
-        )}
+      <div className={styles.imageWrapper}>
+        <Link to={`/product/${product._id}`} className={styles.imageContainer}>
+          <img src={product.image} alt={product.name} className={styles.image} />
+          {product.hoverImage && (
+            <img src={product.hoverImage} alt={product.name} className={styles.hoverImage} />
+          )}
+          
+          {/* Badges */}
+          {product.oldPrice && (
+            <div className={styles.discountBadge}>Sale</div>
+          )}
+          {product.countInStock < 5 && product.countInStock > 0 && (
+            <div className={styles.stockBadge}>Only {product.countInStock} Left</div>
+          )}
+        </Link>
         
-        {/* Badges */}
-        {product.oldPrice && (
-          <div className={styles.discountBadge}>Sale</div>
-        )}
-        {product.countInStock < 5 && product.countInStock > 0 && (
-          <div className={styles.stockBadge}>Only {product.countInStock} Left</div>
-        )}
-      </Link>
-      
-      <div className={styles.actions}>
-        <button className={styles.actionBtn} aria-label="Add to Wishlist" onClick={(e) => e.preventDefault()}>
-          <Heart size={20} />
-        </button>
-        <button className={styles.actionBtn} aria-label="Quick Add" onClick={handleQuickAdd}>
-          <ShoppingBag size={20} />
-        </button>
+        <div className={styles.actions}>
+          <button className={styles.actionBtn} aria-label="Add to Wishlist" onClick={(e) => e.preventDefault()}>
+            <Heart size={20} />
+          </button>
+          <button className={styles.actionBtn} aria-label="Quick Add" onClick={handleQuickAdd}>
+            <ShoppingBag size={20} />
+          </button>
+        </div>
       </div>
 
       <div className={styles.details}>

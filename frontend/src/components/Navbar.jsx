@@ -6,18 +6,33 @@ import useCartStore from '../store/useCartStore';
 import SearchModal from './SearchModal';
 import { auth, signInWithGoogle, logOut } from '../config/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
+import axios from 'axios';
 import styles from './Navbar.module.css';
 
 const Navbar = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [user, setUser] = useState(null);
+  const [announcement, setAnnouncement] = useState('FREE SHIPPING ON ORDERS OVER ৳5000 | PREMIUM SUMMER COLLECTION 2026');
   const { cartItems, toggleCart } = useCartStore();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
     });
+
+    const fetchSettings = async () => {
+      try {
+        const { data } = await axios.get('/api/settings');
+        if (data && data.announcementText) {
+          setAnnouncement(data.announcementText);
+        }
+      } catch (error) {
+        console.error("CMS Fetch error", error);
+      }
+    };
+    fetchSettings();
+
     return () => unsubscribe();
   }, []);
 
@@ -32,7 +47,7 @@ const Navbar = () => {
   return (
     <header className={styles.header}>
       <div className={styles.announcementBar}>
-        FREE SHIPPING ON ORDERS OVER ৳5000 | PREMIUM SUMMER COLLECTION 2026
+        {announcement}
       </div>
       
       <div className={`container ${styles.navContainer}`}>

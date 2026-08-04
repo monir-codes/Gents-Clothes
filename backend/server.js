@@ -7,10 +7,8 @@ const seedData = require('./utils/seedData');
 // Load env vars
 dotenv.config();
 
-// Connect to database and seed data
-connectDB().then(() => {
-  seedData();
-});
+// Connect to database
+connectDB();
 
 const app = express();
 
