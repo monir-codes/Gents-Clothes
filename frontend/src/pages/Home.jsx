@@ -4,10 +4,11 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { Shield, Truck, RefreshCw } from 'lucide-react';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Pagination, Autoplay } from 'swiper/modules';
+import { Navigation, Pagination, Autoplay, EffectFade } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
+import 'swiper/css/effect-fade';
 import CategoryCard from '../components/CategoryCard';
 import ProductCard from '../components/ProductCard';
 import SEO from '../components/SEO';
@@ -67,12 +68,37 @@ const Home = () => {
           >
             <source src={settings.heroVideo} type="video/mp4" />
           </video>
+        ) : settings.heroSlideshow && settings.heroSlideshow.length > 1 ? (
+          <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: -2 }}>
+            <Swiper
+              modules={[Autoplay, EffectFade]}
+              effect="fade"
+              speed={1500}
+              autoplay={{ delay: 4000, disableOnInteraction: false }}
+              allowTouchMove={false}
+              style={{ width: '100%', height: '100%' }}
+            >
+              {settings.heroSlideshow.map((imgUrl, idx) => (
+                <SwiperSlide key={idx}>
+                  <motion.div 
+                    className={styles.heroBackground} 
+                    style={{ 
+                      backgroundImage: `url(${imgUrl})`,
+                      y: y1,
+                      width: '100%',
+                      height: '100%'
+                    }} 
+                  />
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          </div>
         ) : (
           <motion.div 
             className={styles.heroBackground} 
             style={{ 
               backgroundImage: `url(${settings.heroImage || '/images/hero-banner.jpg'})`,
-              y: y1 // Apply parallax
+              y: y1 
             }} 
           />
         )}
@@ -470,6 +496,23 @@ const Home = () => {
             >
               <source src={settings.featuredVideoSection.videoUrl} type="video/mp4" />
             </video>
+          ) : settings.featuredVideoSection.slideshow && settings.featuredVideoSection.slideshow.length > 1 ? (
+            <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 1 }}>
+              <Swiper
+                modules={[Autoplay, EffectFade]}
+                effect="fade"
+                speed={1500}
+                autoplay={{ delay: 3500, disableOnInteraction: false }}
+                allowTouchMove={false}
+                style={{ width: '100%', height: '100%' }}
+              >
+                {settings.featuredVideoSection.slideshow.map((imgUrl, idx) => (
+                  <SwiperSlide key={idx}>
+                    <img src={imgUrl} alt={`Slideshow ${idx}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            </div>
           ) : (
             <img src={settings.featuredVideoSection.fallbackImage} alt="Video fallback" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 1 }} />
           )}

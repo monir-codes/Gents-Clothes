@@ -1,18 +1,21 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useCartStore from '../store/useCartStore';
+import useAuthStore from '../store/useAuthStore';
 import styles from './Checkout.module.css';
+import Swal from 'sweetalert2';
 
 const Checkout = () => {
   const { cartItems, clearCart } = useCartStore();
+  const { user } = useAuthStore();
   const navigate = useNavigate();
 
   const [address, setAddress] = useState({
-    fullName: '',
-    phone: '',
-    street: '',
-    district: '',
-    city: ''
+    fullName: user?.name || '',
+    phone: user?.phone || '',
+    street: user?.addresses?.[0]?.street || '',
+    district: user?.addresses?.[0]?.district || '',
+    city: user?.addresses?.[0]?.city || ''
   });
 
   const [paymentMethod, setPaymentMethod] = useState('COD');
@@ -21,13 +24,36 @@ const Checkout = () => {
   const shippingPrice = itemsPrice > 5000 ? 0 : 100;
   const totalPrice = itemsPrice + shippingPrice;
 
+  // Auth Guard
+  React.useEffect(() => {
+    if (!user) {
+      navigate('/login?redirect=/checkout');
+    }
+  }, [user, navigate]);
+
   const handlePlaceOrder = (e) => {
     e.preventDefault();
-    // In a real app, we would send this to the backend API here.
-    // For now, we simulate success.
-    clearCart();
-    navigate('/order-success');
+    
+    Swal.fire({
+      title: 'Confirm Order?',
+      text: "Are you sure you want to place this order?",
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#000',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, confirm it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Generate a pseudo-random Order ID for the success page
+        const orderId = 'ORD-' + Math.floor(100000 + Math.random() * 900000);
+        
+        clearCart();
+        navigate('/order-success', { state: { orderId, totalPrice, paymentMethod } });
+      }
+    });
   };
+
+  if (!user) return null;
 
   if (cartItems.length === 0) {
     return (

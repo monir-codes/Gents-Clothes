@@ -240,6 +240,8 @@ export const AdminSettings = () => {
           features: JSON.stringify(data.features || [], null, 2),
           reviews: JSON.stringify(data.reviews || [], null, 2),
           instagramImages: JSON.stringify(data.instagramImages || [], null, 2),
+          heroSlideshow: JSON.stringify(data.heroSlideshow || [], null, 2),
+          featuredVideoSlideshow: JSON.stringify(data.featuredVideoSection?.slideshow || [], null, 2),
         });
         setLoading(false);
       } catch (error) {
@@ -303,7 +305,7 @@ export const AdminSettings = () => {
     try {
       // Parse JSON fields before saving
       let dataToSave = { ...settings };
-      const arrayFields = ['marqueeText', 'featuredCategories', 'featuredCollections', 'features', 'reviews', 'instagramImages'];
+      const arrayFields = ['marqueeText', 'featuredCategories', 'featuredCollections', 'features', 'reviews', 'instagramImages', 'heroSlideshow'];
       
       for (const field of arrayFields) {
         try {
@@ -313,6 +315,15 @@ export const AdminSettings = () => {
           setSaving(false);
           return;
         }
+      }
+
+      try {
+        if (!dataToSave.featuredVideoSection) dataToSave.featuredVideoSection = {};
+        dataToSave.featuredVideoSection.slideshow = JSON.parse(jsonInputs.featuredVideoSlideshow);
+      } catch (e) {
+        Swal.fire('Error', `Invalid JSON formatting in Featured Video Slideshow`, 'error');
+        setSaving(false);
+        return;
       }
 
       await axios.put('/api/settings', dataToSave);
@@ -364,6 +375,9 @@ export const AdminSettings = () => {
         
         <label style={labelStyle}>Background Video URL (Optional MP4)</label>
         <input type="text" name="heroVideo" value={settings.heroVideo || ''} onChange={handleChange} style={inputStyle} />
+        
+        <label style={labelStyle}>Hero Slideshow (Array of Image URLs) - Replaces static image</label>
+        <textarea rows="4" value={jsonInputs.heroSlideshow} onChange={(e) => handleJsonInputChange('heroSlideshow', e.target.value)} style={{...inputStyle, fontFamily: 'monospace', fontSize: '13px'}} />
       </div>
 
       <div style={sectionStyle}>
@@ -372,8 +386,12 @@ export const AdminSettings = () => {
         <input type="text" value={settings.featuredVideoSection?.title || ''} onChange={(e) => handleNestedChange('featuredVideoSection', 'title', e.target.value)} style={inputStyle} />
         <label style={labelStyle}>Subtitle</label>
         <input type="text" value={settings.featuredVideoSection?.subtitle || ''} onChange={(e) => handleNestedChange('featuredVideoSection', 'subtitle', e.target.value)} style={inputStyle} />
-        <label style={labelStyle}>Video URL</label>
+        <label style={labelStyle}>Video URL (MP4)</label>
         <input type="text" value={settings.featuredVideoSection?.videoUrl || ''} onChange={(e) => handleNestedChange('featuredVideoSection', 'videoUrl', e.target.value)} style={inputStyle} />
+        
+        <label style={labelStyle}>Slideshow Images (Array of URLs) - Used if no video</label>
+        <textarea rows="4" value={jsonInputs.featuredVideoSlideshow} onChange={(e) => handleJsonInputChange('featuredVideoSlideshow', e.target.value)} style={{...inputStyle, fontFamily: 'monospace', fontSize: '13px'}} />
+        
         <label style={labelStyle}>Fallback Image URL</label>
         <input type="text" value={settings.featuredVideoSection?.fallbackImage || ''} onChange={(e) => handleNestedChange('featuredVideoSection', 'fallbackImage', e.target.value)} style={inputStyle} />
       </div>
@@ -443,6 +461,70 @@ export const AdminSettings = () => {
         
         <label style={labelStyle}>Instagram Gallery Images (Array of strings)</label>
         <textarea rows="4" value={jsonInputs.instagramImages} onChange={(e) => handleJsonInputChange('instagramImages', e.target.value)} style={{...inputStyle, fontFamily: 'monospace', fontSize: '13px'}} />
+      </div>
+
+      <div style={sectionStyle}>
+        <h3>Static Pages Content (HTML/Text)</h3>
+        <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginBottom: '15px' }}>Use HTML tags like &lt;p&gt;, &lt;strong&gt;, &lt;h3&gt; for formatting.</p>
+        
+        <h4 style={{marginBottom: '10px'}}>About Us Page</h4>
+        <div style={{ padding: '15px', border: '1px solid var(--color-border)', borderRadius: '4px', marginBottom: '20px' }}>
+          <label style={labelStyle}>Hero Image URL</label>
+          <input type="text" value={settings.staticPages?.about?.heroImage || ''} onChange={(e) => {
+            const staticPages = {...(settings.staticPages || {})};
+            if(!staticPages.about) staticPages.about = {};
+            staticPages.about.heroImage = e.target.value;
+            setSettings({...settings, staticPages});
+          }} style={inputStyle} />
+          
+          <label style={labelStyle}>Story Text</label>
+          <textarea rows="4" value={settings.staticPages?.about?.storyText || ''} onChange={(e) => {
+            const staticPages = {...(settings.staticPages || {})};
+            if(!staticPages.about) staticPages.about = {};
+            staticPages.about.storyText = e.target.value;
+            setSettings({...settings, staticPages});
+          }} style={inputStyle} />
+          
+          <label style={labelStyle}>Materials Image 1</label>
+          <input type="text" value={settings.staticPages?.about?.materialsImage1 || ''} onChange={(e) => {
+            const staticPages = {...(settings.staticPages || {})};
+            if(!staticPages.about) staticPages.about = {};
+            staticPages.about.materialsImage1 = e.target.value;
+            setSettings({...settings, staticPages});
+          }} style={inputStyle} />
+
+          <label style={labelStyle}>Materials Image 2</label>
+          <input type="text" value={settings.staticPages?.about?.materialsImage2 || ''} onChange={(e) => {
+            const staticPages = {...(settings.staticPages || {})};
+            if(!staticPages.about) staticPages.about = {};
+            staticPages.about.materialsImage2 = e.target.value;
+            setSettings({...settings, staticPages});
+          }} style={inputStyle} />
+
+          <label style={labelStyle}>Materials Text</label>
+          <textarea rows="4" value={settings.staticPages?.about?.materialsText || ''} onChange={(e) => {
+            const staticPages = {...(settings.staticPages || {})};
+            if(!staticPages.about) staticPages.about = {};
+            staticPages.about.materialsText = e.target.value;
+            setSettings({...settings, staticPages});
+          }} style={inputStyle} />
+        </div>
+
+        {['faq', 'contact', 'shipping', 'returns', 'sizeGuide', 'privacy', 'terms'].map(page => (
+          <div key={page} style={{ marginBottom: '15px' }}>
+            <label style={{...labelStyle, textTransform: 'capitalize'}}>{page.replace(/([A-Z])/g, ' $1').trim()} Page (HTML)</label>
+            <textarea 
+              rows="6" 
+              value={settings.staticPages?.[page] || ''} 
+              onChange={(e) => {
+                const staticPages = {...(settings.staticPages || {})};
+                staticPages[page] = e.target.value;
+                setSettings({...settings, staticPages});
+              }} 
+              style={{...inputStyle, fontFamily: 'monospace', fontSize: '14px'}} 
+            />
+          </div>
+        ))}
       </div>
 
     </div>
