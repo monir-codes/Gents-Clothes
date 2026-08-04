@@ -149,13 +149,6 @@
 }
 
 @media (max-width: 768px) {
-  .footerContent {
-    text-align: center;
-    align-items: center;
-  }
-  .socialLinks {
-    justify-content: center;
-  }
   .bottomBarInner {
     flex-direction: column;
     text-align: center;
