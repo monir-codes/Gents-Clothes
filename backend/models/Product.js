@@ -4,6 +4,8 @@ const reviewSchema = new mongoose.Schema({
   name: { type: String, required: true },
   rating: { type: Number, required: true },
   comment: { type: String, required: true },
+  isApproved: { type: Boolean, default: false },
+  adminReply: { type: String, default: '' },
   user: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,

@@ -11,9 +11,17 @@ import styles from './Shop.module.css';
 const Shop = ({ hideHeader }) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  // Filter States
   const [selectedCategories, setSelectedCategories] = useState([]);
+  const [selectedSizes, setSelectedSizes] = useState([]);
+  const [priceRange, setPriceRange] = useState(''); // 'under1000', '1000-2000', '2000-5000', 'over5000'
   const [sortOption, setSortOption] = useState('Featured');
+  
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalProducts, setTotalProducts] = useState(0);
   const location = useLocation();
   
   const queryParams = new URLSearchParams(location.search);
@@ -21,9 +29,37 @@ const Shop = ({ hideHeader }) => {
 
   useEffect(() => {
     const fetchProducts = async () => {
+      setLoading(true);
       try {
-        const { data } = await axios.get('/api/products');
-        setProducts(data);
+        let query = `/api/products?page=${page}&limit=12`;
+        
+        if (selectedCategories.length > 0) {
+          query += `&category=${selectedCategories.join(',')}`;
+        }
+        if (selectedSizes.length > 0) {
+          query += `&sizes=${selectedSizes.join(',')}`;
+        }
+        
+        if (priceRange === 'under1000') {
+          query += `&maxPrice=1000`;
+        } else if (priceRange === '1000-2000') {
+          query += `&minPrice=1000&maxPrice=2000`;
+        } else if (priceRange === '2000-5000') {
+          query += `&minPrice=2000&maxPrice=5000`;
+        } else if (priceRange === 'over5000') {
+          query += `&minPrice=5000`;
+        }
+
+        if (sortOption === 'Price: Low to High') {
+          query += `&sort=priceAsc`;
+        } else if (sortOption === 'Price: High to Low') {
+          query += `&sort=priceDesc`;
+        }
+
+        const { data } = await axios.get(query);
+        setProducts(data.products || data);
+        setTotalPages(data.pages || 1);
+        setTotalProducts(data.total || data.length || 0);
         setLoading(false);
       } catch (error) {
         console.error(error);
@@ -32,38 +68,35 @@ const Shop = ({ hideHeader }) => {
     };
 
     fetchProducts();
-  }, []);
+  }, [page, selectedCategories, selectedSizes, priceRange, sortOption]);
 
   const handleCategoryChange = (category) => {
     setSelectedCategories(prev => 
-      prev.includes(category) 
-        ? prev.filter(c => c !== category)
-        : [...prev, category]
+      prev.includes(category) ? prev.filter(c => c !== category) : [...prev, category]
     );
+    setPage(1);
   };
 
-  const getFilteredProducts = () => {
-    let filtered = products;
-
-    if (selectedCategories.length > 0) {
-      filtered = filtered.filter(p => selectedCategories.includes(p.category));
-    }
-
-    if (sortOption === 'Price: Low to High') {
-      filtered.sort((a, b) => a.price - b.price);
-    } else if (sortOption === 'Price: High to Low') {
-      filtered.sort((a, b) => b.price - a.price);
-    }
-
-    if (isAiRecommended) {
-      // Mock AI filtering - just shuffling and picking 4-6 products for demo
-      filtered = filtered.sort(() => 0.5 - Math.random()).slice(0, 6);
-    }
-
-    return filtered;
+  const handleSizeChange = (size) => {
+    setSelectedSizes(prev => 
+      prev.includes(size) ? prev.filter(s => s !== size) : [...prev, size]
+    );
+    setPage(1);
   };
 
-  const filteredProducts = getFilteredProducts();
+  const handlePriceChange = (range) => {
+    setPriceRange(range);
+    setPage(1);
+  };
+
+  const handleSortChange = (e) => {
+    setSortOption(e.target.value);
+    setPage(1);
+  };
+
+  const filteredProducts = isAiRecommended 
+    ? products.sort(() => 0.5 - Math.random()).slice(0, 6) 
+    : products;
 
   return (
     <>
@@ -71,12 +104,20 @@ const Shop = ({ hideHeader }) => {
     <div className={`container ${styles.shopContainer}`}>
       {/* Sidebar Filters */}
       {!hideHeader && (
-        <motion.aside 
-          className={`${styles.sidebar} ${isMobileFilterOpen ? styles.sidebarOpen : ''}`}
-          initial={{ opacity: 0, x: -30 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6 }}
-        >
+        <>
+          {/* Backdrop for mobile */}
+          {isMobileFilterOpen && (
+             <div 
+               style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.5)', zIndex: 990 }}
+               onClick={() => setIsMobileFilterOpen(false)}
+             />
+          )}
+          <motion.aside 
+            className={`${styles.sidebar} ${isMobileFilterOpen ? styles.sidebarOpen : ''}`}
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6 }}
+          >
           <div className={styles.mobileFilterHeader}>
             <h3 style={{ fontSize: '1.2rem', fontWeight: 600 }}>Filters</h3>
             <button onClick={() => setIsMobileFilterOpen(false)} style={{ fontSize: '1.5rem' }}>&times;</button>
@@ -99,24 +140,30 @@ const Shop = ({ hideHeader }) => {
         <div className={styles.filterGroup}>
           <h3 className={styles.filterTitle}>Price</h3>
           <div className={styles.filterList}>
-            <label className={styles.filterLabel}><input type="radio" name="price" /> Under ৳1000</label>
-            <label className={styles.filterLabel}><input type="radio" name="price" /> ৳1000 - ৳2000</label>
-            <label className={styles.filterLabel}><input type="radio" name="price" /> ৳2000 - ৳5000</label>
-            <label className={styles.filterLabel}><input type="radio" name="price" /> Over ৳5000</label>
+            <label className={styles.filterLabel}><input type="radio" name="price" checked={priceRange === ''} onChange={() => handlePriceChange('')} /> All Prices</label>
+            <label className={styles.filterLabel}><input type="radio" name="price" checked={priceRange === 'under1000'} onChange={() => handlePriceChange('under1000')} /> Under ৳1000</label>
+            <label className={styles.filterLabel}><input type="radio" name="price" checked={priceRange === '1000-2000'} onChange={() => handlePriceChange('1000-2000')} /> ৳1000 - ৳2000</label>
+            <label className={styles.filterLabel}><input type="radio" name="price" checked={priceRange === '2000-5000'} onChange={() => handlePriceChange('2000-5000')} /> ৳2000 - ৳5000</label>
+            <label className={styles.filterLabel}><input type="radio" name="price" checked={priceRange === 'over5000'} onChange={() => handlePriceChange('over5000')} /> Over ৳5000</label>
           </div>
         </div>
 
         <div className={styles.filterGroup}>
           <h3 className={styles.filterTitle}>Size</h3>
           <div className={styles.filterList}>
-            <label className={styles.filterLabel}><input type="checkbox" /> S</label>
-            <label className={styles.filterLabel}><input type="checkbox" /> M</label>
-            <label className={styles.filterLabel}><input type="checkbox" /> L</label>
-            <label className={styles.filterLabel}><input type="checkbox" /> XL</label>
-            <label className={styles.filterLabel}><input type="checkbox" /> XXL</label>
+            {['S', 'M', 'L', 'XL', 'XXL'].map(size => (
+              <label key={size} className={styles.filterLabel}>
+                <input 
+                  type="checkbox" 
+                  checked={selectedSizes.includes(size)}
+                  onChange={() => handleSizeChange(size)}
+                /> {size}
+              </label>
+            ))}
           </div>
         </div>
         </motion.aside>
+        </>
       )}
 
       {/* Main Content */}
@@ -152,7 +199,7 @@ const Shop = ({ hideHeader }) => {
               >
                 <SlidersHorizontal size={16} /> Filters
               </button>
-              <select className={styles.sortSelect} value={sortOption} onChange={(e) => setSortOption(e.target.value)}>
+              <select className={styles.sortSelect} value={sortOption} onChange={handleSortChange}>
                 <option>Featured</option>
                 <option>New Arrivals</option>
                 <option>Price: Low to High</option>
@@ -165,17 +212,42 @@ const Shop = ({ hideHeader }) => {
         {loading ? (
           <Loader />
         ) : filteredProducts.length > 0 ? (
-          <motion.div 
-            className={styles.productGrid}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, staggerChildren: 0.1 }}
-            viewport={{ once: true, margin: "-50px" }}
-          >
-            {filteredProducts.map(product => (
-              <ProductCard key={product._id} product={product} />
-            ))}
-          </motion.div>
+          <>
+            <motion.div 
+              className={styles.productGrid}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, staggerChildren: 0.1 }}
+              viewport={{ once: true, margin: "-50px" }}
+            >
+              {filteredProducts.map(product => (
+                <ProductCard key={product._id} product={product} />
+              ))}
+            </motion.div>
+            
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginTop: '40px' }}>
+                <button 
+                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                  style={{ padding: '8px 16px', background: page === 1 ? 'var(--color-border)' : 'var(--color-text-primary)', color: page === 1 ? 'var(--color-text-secondary)' : '#fff', borderRadius: '4px' }}
+                >
+                  Prev
+                </button>
+                <span style={{ display: 'flex', alignItems: 'center', fontWeight: 600 }}>
+                  Page {page} of {totalPages}
+                </span>
+                <button 
+                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                  disabled={page === totalPages}
+                  style={{ padding: '8px 16px', background: page === totalPages ? 'var(--color-border)' : 'var(--color-text-primary)', color: page === totalPages ? 'var(--color-text-secondary)' : '#fff', borderRadius: '4px' }}
+                >
+                  Next
+                </button>
+              </div>
+            )}
+          </>
         ) : (
           <p>No products found matching your criteria.</p>
         )}

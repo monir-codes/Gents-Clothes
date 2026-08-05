@@ -14,6 +14,12 @@ const settingsSchema = mongoose.Schema(
       type: String,
       default: '8801700000000',
     },
+    socialLinks: {
+      facebook: { type: String, default: 'https://facebook.com/gentfits' },
+      instagram: { type: String, default: 'https://instagram.com/gentfits' },
+      tiktok: { type: String, default: 'https://tiktok.com/@gentfits' },
+      youtube: { type: String, default: 'https://youtube.com/gentfits' }
+    },
     heroTitle: {
       type: String,
       default: 'Premium Luxury Menswear',

@@ -37,7 +37,7 @@ const Home = () => {
           axios.get('/api/products')
         ]);
         setSettings(settingsRes.data);
-        setProducts(productsRes.data);
+        setProducts(productsRes.data.products || productsRes.data);
       } catch (error) {
         console.error("Fetch error", error);
       } finally {

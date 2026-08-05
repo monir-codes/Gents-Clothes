@@ -62,7 +62,31 @@ const AdminOrders = () => {
                       {order.status || (order.isPaid ? 'Paid' : 'Pending')}
                     </span>
                   </td>
-                  <td><button>Update Status</button></td>
+                  <td>
+                    <select 
+                      value={order.status || 'Pending'} 
+                      onChange={async (e) => {
+                        const newStatus = e.target.value;
+                        try {
+                          await axios.put(`/api/orders/${order._id}/status`, { status: newStatus });
+                          Swal.fire('Success', 'Order status updated', 'success');
+                          // update local state
+                          setOrders(orders.map(o => o._id === order._id ? { ...o, status: newStatus } : o));
+                        } catch (error) {
+                          Swal.fire('Error', 'Failed to update status', 'error');
+                        }
+                      }}
+                      style={{ padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', outline: 'none', cursor: 'pointer' }}
+                    >
+                      <option value="Pending">Pending</option>
+                      <option value="Confirmed">Confirmed</option>
+                      <option value="Processing">Processing</option>
+                      <option value="Shipped">Shipped</option>
+                      <option value="Delivered">Delivered</option>
+                      <option value="Cancelled">Cancelled</option>
+                      <option value="Returned">Returned</option>
+                    </select>
+                  </td>
                 </tr>
               ))
             )}
@@ -398,6 +422,26 @@ export const AdminSettings = () => {
           <code>[ "FREE SHIPPING ON ORDERS OVER ৳5000", "PREMIUM SUMMER COLLECTION 2026" ]</code>
         </p>
         <textarea rows="4" value={jsonInputs.announcementList} onChange={(e) => handleJsonInputChange('announcementList', e.target.value)} style={{...inputStyle, fontFamily: 'monospace', fontSize: '13px'}} />
+        
+        <h4 style={{marginTop: '20px', marginBottom: '10px'}}>Social Media Links</h4>
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+          <div style={{ flex: '1 1 45%' }}>
+            <label style={labelStyle}>Facebook</label>
+            <input type="text" value={settings.socialLinks?.facebook || ''} onChange={(e) => handleNestedChange('socialLinks', 'facebook', e.target.value)} style={inputStyle} />
+          </div>
+          <div style={{ flex: '1 1 45%' }}>
+            <label style={labelStyle}>Instagram</label>
+            <input type="text" value={settings.socialLinks?.instagram || ''} onChange={(e) => handleNestedChange('socialLinks', 'instagram', e.target.value)} style={inputStyle} />
+          </div>
+          <div style={{ flex: '1 1 45%' }}>
+            <label style={labelStyle}>TikTok</label>
+            <input type="text" value={settings.socialLinks?.tiktok || ''} onChange={(e) => handleNestedChange('socialLinks', 'tiktok', e.target.value)} style={inputStyle} />
+          </div>
+          <div style={{ flex: '1 1 45%' }}>
+            <label style={labelStyle}>YouTube</label>
+            <input type="text" value={settings.socialLinks?.youtube || ''} onChange={(e) => handleNestedChange('socialLinks', 'youtube', e.target.value)} style={inputStyle} />
+          </div>
+        </div>
       </div>
 
       <div style={sectionStyle}>

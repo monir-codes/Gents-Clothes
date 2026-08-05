@@ -4,6 +4,8 @@ import axios from 'axios';
 import { ShoppingBag, Heart, Star, Truck, RefreshCcw, ShieldCheck, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 import useCartStore from '../store/useCartStore';
+import useWishlistStore from '../store/useWishlistStore';
+import useAuthStore from '../store/useAuthStore';
 import Loader from '../components/Loader';
 import SEO from '../components/SEO';
 import ProductCard from '../components/ProductCard';
@@ -24,7 +26,15 @@ const ProductDetails = () => {
   const [activeTab, setActiveTab] = useState('description');
   const [isSizeRecommenderOpen, setIsSizeRecommenderOpen] = useState(false);
   
+  // Review state
+  const [rating, setRating] = useState(5);
+  const [comment, setComment] = useState('');
+  const [reviewSubmitLoading, setReviewSubmitLoading] = useState(false);
+  const [reviewMessage, setReviewMessage] = useState('');
+
   const { addToCart } = useCartStore();
+  const { toggleWishlist, isInWishlist } = useWishlistStore();
+  const { user, token } = useAuthStore();
 
   const handleAddToCart = () => {
     addToCart({
@@ -37,6 +47,27 @@ const ProductDetails = () => {
       color: selectedColor,
       size: selectedSize
     });
+  };
+
+  const submitReview = async (e) => {
+    e.preventDefault();
+    if (!user) {
+      setReviewMessage('You must be logged in to review.');
+      return;
+    }
+    setReviewSubmitLoading(true);
+    setReviewMessage('');
+    try {
+      await axios.post(`/api/products/${id}/reviews`, { rating, comment }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setReviewMessage('Review submitted! It will appear after admin approval.');
+      setComment('');
+      setRating(5);
+    } catch (error) {
+      setReviewMessage(error.response?.data?.message || 'Failed to submit review');
+    }
+    setReviewSubmitLoading(false);
   };
 
   useEffect(() => {
@@ -198,8 +229,12 @@ const ProductDetails = () => {
               <ShoppingBag size={20} /> Add to Cart
             </motion.button>
             
-            <button className={styles.wishlistBtn}>
-              <Heart size={20} />
+            <button 
+              className={styles.wishlistBtn}
+              onClick={() => toggleWishlist(product)}
+              style={{ color: isInWishlist(product._id) ? 'var(--color-error)' : 'var(--color-text-primary)' }}
+            >
+              <Heart size={20} fill={isInWishlist(product._id) ? 'var(--color-error)' : 'none'} />
             </button>
           </div>
 
@@ -261,7 +296,67 @@ const ProductDetails = () => {
             </ul>
           )}
           {activeTab === 'reviews' && (
-            <p>No reviews yet.</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
+              <div>
+                <h3 style={{ fontSize: '1.2rem', marginBottom: '15px' }}>Customer Reviews</h3>
+                {product.reviews && product.reviews.filter(r => r.isApproved).length > 0 ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                    {product.reviews.filter(r => r.isApproved).map(review => (
+                      <div key={review._id} style={{ padding: '15px', border: '1px solid var(--color-border)', borderRadius: '8px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+                          <strong>{review.name}</strong>
+                          <div style={{ color: 'var(--color-accent)' }}>
+                            {'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}
+                          </div>
+                        </div>
+                        <p style={{ margin: 0 }}>{review.comment}</p>
+                        {review.adminReply && (
+                          <div style={{ marginTop: '15px', padding: '10px', background: 'var(--color-surface)', borderLeft: '3px solid var(--color-accent)' }}>
+                            <strong>Admin Reply:</strong>
+                            <p style={{ margin: 0, marginTop: '5px', fontSize: '0.9rem' }}>{review.adminReply}</p>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p>No reviews yet.</p>
+                )}
+              </div>
+
+              <div style={{ padding: '20px', background: 'var(--color-surface)', borderRadius: '8px' }}>
+                <h3 style={{ fontSize: '1.2rem', marginBottom: '15px' }}>Write a Review</h3>
+                {!user ? (
+                  <p>Please <Link to="/login" style={{ color: 'var(--color-accent)', textDecoration: 'underline' }}>log in</Link> to write a review.</p>
+                ) : (
+                  <form onSubmit={submitReview} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                    <div>
+                      <label style={{ display: 'block', marginBottom: '5px' }}>Rating</label>
+                      <select value={rating} onChange={(e) => setRating(e.target.value)} style={{ padding: '10px', borderRadius: '4px', border: '1px solid var(--color-border)', width: '100px' }}>
+                        <option value="5">5 - Excellent</option>
+                        <option value="4">4 - Very Good</option>
+                        <option value="3">3 - Good</option>
+                        <option value="2">2 - Fair</option>
+                        <option value="1">1 - Poor</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', marginBottom: '5px' }}>Comment</label>
+                      <textarea 
+                        value={comment} 
+                        onChange={(e) => setComment(e.target.value)}
+                        required
+                        style={{ padding: '10px', borderRadius: '4px', border: '1px solid var(--color-border)', width: '100%', minHeight: '100px', resize: 'vertical' }}
+                      />
+                    </div>
+                    <button type="submit" disabled={reviewSubmitLoading} style={{ padding: '10px 20px', background: 'var(--color-text-primary)', color: 'white', borderRadius: '4px', cursor: reviewSubmitLoading ? 'not-allowed' : 'pointer', width: 'fit-content' }}>
+                      {reviewSubmitLoading ? 'Submitting...' : 'Submit Review'}
+                    </button>
+                    {reviewMessage && <p style={{ color: reviewMessage.includes('failed') ? 'var(--color-error)' : 'var(--color-success)', marginTop: '10px' }}>{reviewMessage}</p>}
+                  </form>
+                )}
+              </div>
+            </div>
           )}
         </div>
       </motion.div>

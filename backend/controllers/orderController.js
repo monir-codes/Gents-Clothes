@@ -110,6 +110,34 @@ const getOrders = async (req, res) => {
   res.json(orders);
 };
 
+// @desc    Track order publicly
+// @route   POST /api/orders/track
+// @access  Public
+const trackOrder = async (req, res) => {
+  const { orderId, phone } = req.body;
+  try {
+    const order = await Order.findById(orderId).populate('user', 'name');
+    
+    if (order) {
+      if (order.shippingAddress.phone !== phone) {
+        return res.status(401).json({ message: 'Invalid phone number for this order' });
+      }
+      res.json({
+        _id: order._id,
+        status: order.status,
+        createdAt: order.createdAt,
+        deliveredAt: order.deliveredAt,
+        orderItems: order.orderItems,
+        totalPrice: order.totalPrice
+      });
+    } else {
+      res.status(404).json({ message: 'Order not found' });
+    }
+  } catch (error) {
+    res.status(404).json({ message: 'Invalid Order ID' });
+  }
+};
+
 module.exports = {
   addOrderItems,
   getOrderById,
@@ -117,4 +145,5 @@ module.exports = {
   updateOrderStatus,
   getMyOrders,
   getOrders,
+  trackOrder,
 };

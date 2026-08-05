@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Search, Heart, ShoppingBag, User, Menu, X, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import useCartStore from '../store/useCartStore';
 import useWishlistStore from '../store/useWishlistStore';
+import useAuthStore from '../store/useAuthStore';
 import SearchModal from './SearchModal';
-import { auth, signInWithGoogle, logOut } from '../config/firebase';
-import { onAuthStateChanged } from 'firebase/auth';
 import axios from 'axios';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
@@ -16,17 +15,20 @@ import styles from './Navbar.module.css';
 const Navbar = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [user, setUser] = useState(null);
   const [announcements, setAnnouncements] = useState(['FREE SHIPPING ON ORDERS OVER ৳5000 | PREMIUM SUMMER COLLECTION 2026']);
   const { cartItems, toggleCart } = useCartStore();
   const { wishlistItems } = useWishlistStore();
+  const { user } = useAuthStore();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+    setIsSearchOpen(false);
+  }, [location.pathname]);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-    });
-
     const fetchSettings = async () => {
       try {
         const { data } = await axios.get('/api/settings');
@@ -40,8 +42,6 @@ const Navbar = () => {
       }
     };
     fetchSettings();
-
-    return () => unsubscribe();
   }, []);
 
   const handleAuth = async () => {
@@ -139,7 +139,7 @@ const Navbar = () => {
             <div className={styles.mobileAuthBox}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <User size={24} />
-                <span>{user ? user.displayName || 'User' : 'Guest'}</span>
+                <span>{user ? user.name || 'User' : 'Guest'}</span>
               </div>
               <button className={styles.mobileAuthBtn} onClick={handleAuth}>
                 {user ? 'Logout' : 'Login / Signup'}

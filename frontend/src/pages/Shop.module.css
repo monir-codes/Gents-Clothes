@@ -182,14 +182,19 @@
 
   .toolbarActions {
     display: flex;
-    justify-content: space-between;
+    gap: var(--space-2);
     width: 100%;
   }
   .mobileFilterBtn {
     display: flex;
     flex: 1;
+    font-size: 0.85rem;
+    padding: 8px 12px;
   }
   .sortSelect {
-    flex: 1;
+    flex: 1.5;
+    font-size: 0.85rem;
+    padding: 8px 10px;
+    text-overflow: ellipsis;
   }
 }

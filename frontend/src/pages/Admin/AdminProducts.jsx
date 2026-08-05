@@ -21,13 +21,17 @@ const AdminProducts = () => {
     brand: 'GentFits',
     countInStock: 0,
     description: '',
-    image: ''
+    image: '',
+    oldPrice: '',
+    sku: '',
+    sizes: '',
+    colors: ''
   });
 
   const fetchProducts = async () => {
     try {
-      const { data } = await axios.get('/api/products');
-      setProducts(data);
+      const { data } = await axios.get('/api/products?limit=100');
+      setProducts(data.products || data);
     } catch (error) {
       console.error(error);
     }
@@ -57,7 +61,7 @@ const AdminProducts = () => {
       const data = await response.json();
       
       if (data.success) {
-        setFormData({ ...formData, image: data.data.url });
+        setFormData(prev => ({ ...prev, image: data.data.url }));
         Swal.fire('Success', 'Image uploaded to ImgBB successfully!', 'success');
       } else {
         Swal.fire('Error', 'ImgBB upload failed. Check API Key.', 'error');
@@ -98,11 +102,17 @@ const AdminProducts = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      const submissionData = {
+        ...formData,
+        sizes: typeof formData.sizes === 'string' ? formData.sizes.split(',').map(s => s.trim()).filter(Boolean) : formData.sizes,
+        colors: typeof formData.colors === 'string' ? formData.colors.split(',').map(c => c.trim()).filter(Boolean) : formData.colors
+      };
+
       if (editingId) {
-        await axios.put(`/api/products/${editingId}`, formData);
+        await axios.put(`/api/products/${editingId}`, submissionData);
         Swal.fire('Updated!', 'Product updated successfully.', 'success');
       } else {
-        await axios.post('/api/products', formData);
+        await axios.post('/api/products', submissionData);
         Swal.fire('Added!', 'Product added successfully.', 'success');
       }
       setIsModalOpen(false);
@@ -114,7 +124,7 @@ const AdminProducts = () => {
 
   const openAddModal = () => {
     setEditingId(null);
-    setFormData({ name: '', price: 0, category: '', brand: 'GentFits', countInStock: 0, description: '', image: '' });
+    setFormData({ name: '', price: 0, oldPrice: '', category: '', brand: 'GentFits', countInStock: 0, description: '', image: '', sku: '', sizes: '', colors: '' });
     setIsModalOpen(true);
   };
 
@@ -127,7 +137,11 @@ const AdminProducts = () => {
       brand: product.brand,
       countInStock: product.countInStock,
       description: product.description,
-      image: product.image
+      image: product.image,
+      oldPrice: product.oldPrice || '',
+      sku: product.sku || '',
+      sizes: product.sizes ? product.sizes.join(', ') : '',
+      colors: product.colors ? product.colors.join(', ') : ''
     });
     setIsModalOpen(true);
   };
@@ -203,7 +217,7 @@ const AdminProducts = () => {
 
       {isModalOpen && (
         <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000, padding: '20px' }}>
-          <div style={{ background: 'var(--color-surface)', width: '100%', maxWidth: '600px', maxHeight: '90vh', overflowY: 'auto', padding: '30px', borderRadius: '8px', position: 'relative' }}>
+          <div style={{ background: 'var(--color-surface)', width: '100%', maxWidth: '700px', maxHeight: '90vh', overflowY: 'auto', padding: '30px', borderRadius: '8px', position: 'relative' }}>
             <button onClick={() => setIsModalOpen(false)} style={{ position: 'absolute', top: '20px', right: '20px' }}>
               <X size={24} />
             </button>
@@ -226,17 +240,24 @@ const AdminProducts = () => {
                 </div>
               </div>
 
-              <input type="text" name="name" placeholder="Product Name" value={formData.name} onChange={handleInputChange} required style={{ padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px' }} />
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <input type="text" name="name" placeholder="Product Name" value={formData.name} onChange={handleInputChange} required style={{ flex: 2, padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px' }} />
+                <input type="text" name="sku" placeholder="Product Code (e.g. GF-001)" value={formData.sku} onChange={handleInputChange} style={{ flex: 1, padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px' }} />
+              </div>
               
               <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                <div style={{ flex: '1 1 45%' }}>
+                <div style={{ flex: '1 1 30%' }}>
                   <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '5px', fontWeight: 600 }}>Price (৳)</label>
                   <input type="number" name="price" placeholder="Price (৳)" value={formData.price} onChange={handleInputChange} required style={{ width: '100%', padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px' }} />
                 </div>
-                <div style={{ flex: '1 1 45%' }}>
+                <div style={{ flex: '1 1 30%' }}>
+                  <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '5px', fontWeight: 600 }}>Previous Price (Optional)</label>
+                  <input type="number" name="oldPrice" placeholder="e.g. 2500" value={formData.oldPrice} onChange={handleInputChange} style={{ width: '100%', padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px' }} />
+                </div>
+                <div style={{ flex: '1 1 30%' }}>
                   <label style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '5px', fontWeight: 600 }}>
                     Stock Quantity 
-                    <span style={{ color: formData.countInStock > 0 ? 'var(--color-success, #28a745)' : 'var(--color-error)' }}>
+                    <span style={{ color: formData.countInStock > 0 ? 'var(--color-success)' : 'var(--color-error)' }}>
                       {formData.countInStock > 0 ? ' (In Stock)' : ' (Out of Stock)'}
                     </span>
                   </label>
@@ -244,7 +265,27 @@ const AdminProducts = () => {
                 </div>
               </div>
 
-              <input type="text" name="category" placeholder="Category (e.g., Summer)" value={formData.category} onChange={handleInputChange} required style={{ padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px' }} />
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '5px', fontWeight: 600 }}>Category</label>
+                  <select name="category" value={formData.category} onChange={handleInputChange} required style={{ width: '100%', padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px' }}>
+                    <option value="" disabled>Select Category</option>
+                    <option value="T-Shirts">T-Shirts</option>
+                    <option value="Polos">Polos</option>
+                    <option value="Shirts">Shirts</option>
+                    <option value="Panjabis">Panjabis</option>
+                    <option value="Hoodies">Hoodies</option>
+                  </select>
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '5px', fontWeight: 600 }}>Sizes (comma separated)</label>
+                  <input type="text" name="sizes" placeholder="e.g. S, M, L, XL" value={formData.sizes} onChange={handleInputChange} style={{ width: '100%', padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px' }} />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '5px', fontWeight: 600 }}>Colors (comma separated)</label>
+                  <input type="text" name="colors" placeholder="e.g. Black, White, Navy" value={formData.colors} onChange={handleInputChange} style={{ width: '100%', padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px' }} />
+                </div>
+              </div>
               
               <div style={{ position: 'relative' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>

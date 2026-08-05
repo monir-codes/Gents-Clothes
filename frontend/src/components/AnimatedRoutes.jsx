@@ -18,6 +18,7 @@ import { About, FAQ, Contact, LegalPage } from '../pages/StaticPages';
 import AdminLayout from '../pages/Admin/AdminLayout';
 import AdminDashboard from '../pages/Admin/AdminDashboard';
 import AdminProducts from '../pages/Admin/AdminProducts';
+import AdminReviews from '../pages/Admin/AdminReviews';
 import AdminOrders, { AdminCustomers, AdminMarketing, AdminSettings } from '../pages/Admin/AdminModules';
 import AdminSecurityWrapper from './AdminSecurityWrapper';
 
@@ -80,6 +81,7 @@ const AnimatedRoutes = () => {
         <Route path="/admin" element={<PageWrapper><AdminSecurityWrapper><AdminLayout /></AdminSecurityWrapper></PageWrapper>}>
           <Route index element={<AdminDashboard />} />
           <Route path="products" element={<AdminProducts />} />
+          <Route path="reviews" element={<AdminReviews />} />
           <Route path="orders" element={<AdminOrders />} />
           <Route path="customers" element={<AdminCustomers />} />
           <Route path="marketing" element={<AdminMarketing />} />

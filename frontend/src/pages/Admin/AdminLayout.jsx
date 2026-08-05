@@ -28,6 +28,9 @@ const AdminLayout = () => {
           <Link to="/admin/products" onClick={() => setSidebarOpen(false)} className={`${styles.navItem} ${location.pathname.includes('/products') ? styles.active : ''}`}>
             <Package size={20} /> Products
           </Link>
+          <Link to="/admin/reviews" onClick={() => setSidebarOpen(false)} className={`${styles.navItem} ${location.pathname.includes('/reviews') ? styles.active : ''}`}>
+            <Sparkles size={20} /> Reviews
+          </Link>
           <Link to="/admin/orders" onClick={() => setSidebarOpen(false)} className={`${styles.navItem} ${location.pathname.includes('/orders') ? styles.active : ''}`}>
             <ShoppingCart size={20} /> Orders
           </Link>
