@@ -22,7 +22,27 @@ import PressMentions from '../components/PressMentions';
 import styles from './Home.module.css';
 
 const Home = () => {
-  const [settings, setSettings] = useState(null);
+  const [settings, setSettings] = useState({
+    heroVideo: null,
+    heroSlideshow: [],
+    heroTitle: 'ELEVATE YOUR STYLE',
+    heroSubtitle: 'Premium Men\'s Fashion',
+    announcementText: '',
+    announcementList: [],
+    featuredCategories: [],
+    featuredCollections: [],
+    limitedEdition: null,
+    shopTheLook: [],
+    premiumCollection: null,
+    features: [],
+    brandStory: null,
+    featuredVideoSection: null,
+    reviews: [],
+    instagramImages: [],
+    newsletter: null,
+    marqueeText: '',
+    whatsappNumber: '',
+  });
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isQuizOpen, setIsQuizOpen] = useState(false);
@@ -48,7 +68,7 @@ const Home = () => {
     fetchSettingsAndProducts();
   }, []);
 
-  if (loading || !settings) return <Loader fullScreen />;
+  if (loading) return <Loader fullScreen />;
 
   return (
     <div style={{ overflowX: 'hidden' }}>

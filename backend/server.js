@@ -2,21 +2,9 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
-const seedData = require('./utils/seedData');
 
 // Load env vars
 dotenv.config();
-
-// Connect to database safely – Vercel Serverless may start without all env vars
-(async () => {
-  try {
-    await connectDB();
-    console.log('✅ DB connection established');
-  } catch (err) {
-    console.error('⚠️ DB connection failed:', err.message);
-    // Continue without crashing the function; individual routes should handle missing DB
-  }
-})();
 
 const app = express();
 
@@ -27,9 +15,24 @@ const settingsRoutes = require('./routes/settingsRoutes');
 const statsRoutes = require('./routes/statsRoutes');
 const aiRoutes = require('./routes/aiRoutes');
 
-// Middleware
+// CORS — allow all origins for now (tighten in production)
+app.use(cors({ origin: '*' }));
 app.use(express.json());
-app.use(cors());
+
+// Middleware: ensure DB is connected before every request.
+// This is the correct pattern for Vercel serverless — avoids cold-start race conditions.
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    console.error('DB connection failed on request:', err.message);
+    // Don't block the request — let individual controllers handle missing DB
+    next();
+  }
+});
+
+
 
 // Routes
 app.use('/api/users', userRoutes);
@@ -39,9 +42,9 @@ app.use('/api/settings', settingsRoutes);
 app.use('/api/stats', statsRoutes);
 app.use('/api/ai', aiRoutes);
 
-// Basic Route
+// Health check
 app.get('/', (req, res) => {
-  res.send('GentFits API is running...');
+  res.json({ status: 'GentFits API is running', timestamp: new Date().toISOString() });
 });
 
 // Start server only if not running on Vercel Serverless
