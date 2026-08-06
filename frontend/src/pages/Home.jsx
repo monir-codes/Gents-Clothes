@@ -91,33 +91,32 @@ const Home = () => {
           </video>
         ) : settings.heroSlideshow && settings.heroSlideshow.length > 0 ? (
           settings.heroSlideshow.length > 1 ? (
-            <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: -2 }}>
+            <div className={styles.heroBackgroundWrapper}>
               <Swiper
                 modules={[Autoplay, EffectFade]}
                 effect="fade"
                 speed={1500}
-                autoplay={{ delay: 4000, disableOnInteraction: false }}
+                autoplay={{ delay: 5000, disableOnInteraction: false }}
                 allowTouchMove={false}
                 style={{ width: '100%', height: '100%' }}
               >
                 {settings.heroSlideshow.map((imgUrl, idx) => (
                   <SwiperSlide key={idx}>
                     <motion.div 
-                      className={styles.heroBackground} 
-                      style={{ 
-                        backgroundImage: `url(${imgUrl})`,
-                        y: y1,
-                        width: '100%',
-                        height: '100%'
-                      }} 
-                    />
+                      style={{ y: y1, width: '100%', height: '100%' }}
+                    >
+                      <div 
+                        className={styles.heroBackground} 
+                        style={{ backgroundImage: `url(${imgUrl})` }} 
+                      />
+                    </motion.div>
                   </SwiperSlide>
                 ))}
               </Swiper>
             </div>
           ) : (
             <motion.div 
-              className={styles.heroBackground} 
+              className={styles.heroBackgroundStatic} 
               style={{ 
                 backgroundImage: `url(${settings.heroSlideshow[0]})`,
                 y: y1 
@@ -126,7 +125,7 @@ const Home = () => {
           )
         ) : (
           <motion.div 
-            className={styles.heroBackground} 
+            className={styles.heroBackgroundStatic} 
             style={{ 
               backgroundImage: `url(${settings.heroImage || '/images/hero-banner.jpg'})`,
               y: y1 
