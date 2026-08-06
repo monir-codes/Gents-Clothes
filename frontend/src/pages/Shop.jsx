@@ -58,7 +58,8 @@ const Shop = ({ hideHeader }) => {
         }
 
         const { data } = await axios.get(query);
-        setProducts(data.products || data);
+        const prodData = data.products ?? data;
+        setProducts(Array.isArray(prodData) ? prodData : []);
         setTotalPages(data.pages || 1);
         setTotalProducts(data.total || data.length || 0);
         setLoading(false);
@@ -95,9 +96,9 @@ const Shop = ({ hideHeader }) => {
     setPage(1);
   };
 
-  const displayedProducts = isAiRecommended 
-    ? products.sort(() => 0.5 - Math.random()).slice(0, 6) 
-    : products.filter(p => p.name && p.name.toLowerCase().includes(searchTerm.toLowerCase()));
+  const displayedProducts = isAiRecommended
+    ? (Array.isArray(products) ? products.sort(() => 0.5 - Math.random()).slice(0, 6) : [])
+    : (Array.isArray(products) ? products.filter(p => p.name && p.name.toLowerCase().includes(searchTerm.toLowerCase())) : []);
   const filteredProducts = displayedProducts;
 
   return (
