@@ -12,10 +12,6 @@ export default defineConfig({
       '/uploads': {
         target: 'https://gent-fits-1do5.vercel.app',
         changeOrigin: true,
-      },
-      '/sitemap.xml': {
-        target: 'http://localhost:5000',
-        changeOrigin: true,
       }
     }
   }
