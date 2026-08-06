@@ -7,8 +7,16 @@ const seedData = require('./utils/seedData');
 // Load env vars
 dotenv.config();
 
-// Connect to database
-connectDB();
+// Connect to database safely – Vercel Serverless may start without all env vars
+(async () => {
+  try {
+    await connectDB();
+    console.log('✅ DB connection established');
+  } catch (err) {
+    console.error('⚠️ DB connection failed:', err.message);
+    // Continue without crashing the function; individual routes should handle missing DB
+  }
+})();
 
 const app = express();
 
@@ -37,6 +45,8 @@ app.get('/', (req, res) => {
 });
 
 // Start server only if not running on Vercel Serverless
+// In Vercel Serverless environment we export the Express app without starting a listener.
+// The platform will invoke the exported handler for each request.
 if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
   const PORT = process.env.PORT || 5000;
   app.listen(PORT, () => {

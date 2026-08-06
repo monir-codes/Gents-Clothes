@@ -5,7 +5,7 @@ import CartDrawer from './components/CartDrawer';
 import FloatingWidgets from './components/FloatingWidgets';
 import Footer from './components/Footer';
 import AnimatedRoutes from './components/AnimatedRoutes';
-import VerifyEmail from './pages/VerifyEmail'; // ensure route is handled inside AnimatedRoutes
+
 
 function App() {
   return (
