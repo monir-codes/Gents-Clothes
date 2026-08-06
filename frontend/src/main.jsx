@@ -5,10 +5,9 @@ import axios from 'axios';
 import './index.css'
 import App from './App.jsx'
 
-// In production, point to the live Vercel backend. In dev, it will use the Vite proxy if this is removed, 
-// but setting it explicitly ensures Vercel frontend can talk to Vercel backend.
+// In production, point to the live Vercel backend using the env variable.
 if (import.meta.env.PROD) {
-  axios.defaults.baseURL = '';
+  axios.defaults.baseURL = import.meta.env.VITE_API_URL || 'https://gent-fits-1do5.vercel.app';
 }
 
 createRoot(document.getElementById('root')).render(

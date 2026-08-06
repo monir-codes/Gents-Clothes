@@ -12,7 +12,7 @@ const sendVerificationEmail = async (email, token) => {
     },
   });
 
-  const verificationUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/verify-email/${token}`;
+  const verificationUrl = `${process.env.FRONTEND_URL || 'http://:5173'}/verify-email/${token}`;
 
   // If there are no real credentials provided, we just log the URL to the console for dev purposes.
   if (!process.env.SMTP_USER) {

@@ -8,7 +8,7 @@ const nodemailer = require('nodemailer');
  * @param {string} token - Verification token stored in DB
  */
 const sendVerificationEmail = async (email, token) => {
-  const redirectUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/verify-email?token=${token}`;
+  const redirectUrl = `${process.env.FRONTEND_URL || 'http://:5173'}/verify-email?token=${token}`;
   const actionCodeSettings = {
     url: redirectUrl,
     handleCodeInApp: true,
