@@ -43,6 +43,7 @@ app.use('/api/settings', settingsRoutes);
 app.use('/api/stats', statsRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/sitemap.xml', sitemapRoute);
+app.use('/sitemap.xml', sitemapRoute);
 
 // Health check
 app.get('/', (req, res) => {
