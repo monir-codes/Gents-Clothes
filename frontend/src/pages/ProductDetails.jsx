@@ -115,7 +115,8 @@ const ProductDetails = () => {
     <>
     <SEO 
       title={product.name} 
-      description={product.description || "Premium luxury clothing from GentFits"} 
+      description={product.description?.substring(0, 160) || "Premium luxury clothing from GentFits"} 
+      keywords={`${product.name}, buy ${product.name} online, ${product.category} in BD, ${product.brand} clothing, premium ${product.category}, buy panjabi online Dhaka, cash on delivery mens clothing BD, GentFits ${product.category}`}
       type="product" 
     />
     <div className={`container ${styles.productContainer}`}>

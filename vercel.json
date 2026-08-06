@@ -25,6 +25,10 @@
       }
     },
     {
+      "src": "/sitemap.xml",
+      "dest": "/api/index.js"
+    },
+    {
       "handle": "filesystem"
     },
     {
