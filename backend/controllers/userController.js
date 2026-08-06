@@ -1,5 +1,7 @@
 const User = require('../models/User');
 const generateToken = require('../utils/generateToken');
+const sendVerificationEmail = require('../utils/sendEmail');
+const crypto = require('crypto');
 
 // @desc    Auth user & get token
 // @route   POST /api/users/login
@@ -10,6 +12,10 @@ const authUser = async (req, res) => {
   const user = await User.findOne({ email });
 
   if (user && (await user.matchPassword(password))) {
+    if (!user.isVerified) {
+      return res.status(401).json({ message: 'Please verify your email address before logging in.' });
+    }
+
     res.json({
       _id: user._id,
       name: user.name,
@@ -34,23 +40,40 @@ const registerUser = async (req, res) => {
     return res.status(400).json({ message: 'User already exists' });
   }
 
+  // Directly create user and mark as verified
   const user = await User.create({
     name,
     email,
     password,
+    isVerified: true
   });
 
   if (user) {
     res.status(201).json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      isAdmin: user.isAdmin,
-      token: generateToken(user._id),
+      message: 'Registration successful! You can now log in.'
     });
   } else {
     res.status(400).json({ message: 'Invalid user data' });
   }
+};
+
+// @desc    Verify user email
+// @route   GET /api/users/verify/:token
+// @access  Public
+const verifyEmail = async (req, res) => {
+  const { token } = req.params;
+
+  const user = await User.findOne({ verificationToken: token });
+
+  if (!user) {
+    return res.status(400).json({ message: 'Invalid or expired verification token' });
+  }
+
+  user.isVerified = true;
+  user.verificationToken = undefined; // Clear the token
+  await user.save();
+
+  res.json({ message: 'Email verified successfully! You can now log in.' });
 };
 
 // @desc    Get user profile
@@ -135,6 +158,7 @@ const deleteUser = async (req, res) => {
 module.exports = {
   authUser,
   registerUser,
+  verifyEmail,
   getUserProfile,
   updateUserProfile,
   getUsers,

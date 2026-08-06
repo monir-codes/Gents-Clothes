@@ -29,8 +29,9 @@ const useAuthStore = create(
         set({ isLoading: true, error: null });
         try {
           const { data } = await axios.post('/api/users', { name, email, password });
-          set({ user: data, token: data.token, isLoading: false });
-          return true;
+          // Registration successful, but wait for verification.
+          set({ isLoading: false });
+          return data; // returns { message: "..." }
         } catch (error) {
           set({ 
             isLoading: false, 

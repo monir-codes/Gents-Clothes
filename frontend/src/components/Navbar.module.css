@@ -123,6 +123,55 @@
   display: block;
 }
 
+/* Auth links for desktop when user not logged in */
+.authLinks {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.authLink {
+  color: var(--color-text-primary);
+  font-weight: 500;
+  text-decoration: none;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.authLink:hover {
+  color: var(--color-accent);
+}
+
+
+.userMenu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  z-index: 1000;
+  min-width: 130px;
+}
+
+.userMenuItem {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  color: var(--color-text-primary);
+  text-decoration: none;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  text-align: left;
+}
+
+.userMenuItem:hover {
+  background-color: var(--color-accent);
+  color: var(--color-background);
+}
+
 .mobileAuthBox {
   display: flex;
   justify-content: space-between;

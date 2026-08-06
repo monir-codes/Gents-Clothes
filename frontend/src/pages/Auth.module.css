@@ -85,6 +85,22 @@
   text-decoration: underline;
 }
 
+.passwordToggle {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+}
+
+.error {
+  color: var(--color-error);
+  font-size: 0.85rem;
+  margin-bottom: var(--space-2);
+  text-align: center;
+  background-color: rgba(217, 83, 79, 0.1);
+  padding: 8px;
+  border-radius: var(--radius-sm);
+}
 .error {
   color: var(--color-error);
   font-size: 0.85rem;

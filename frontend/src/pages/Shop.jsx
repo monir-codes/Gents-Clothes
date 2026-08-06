@@ -14,6 +14,7 @@ const Shop = ({ hideHeader }) => {
   
   // Filter States
   const [selectedCategories, setSelectedCategories] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
   const [selectedSizes, setSelectedSizes] = useState([]);
   const [priceRange, setPriceRange] = useState(''); // 'under1000', '1000-2000', '2000-5000', 'over5000'
   const [sortOption, setSortOption] = useState('Featured');
@@ -94,9 +95,10 @@ const Shop = ({ hideHeader }) => {
     setPage(1);
   };
 
-  const filteredProducts = isAiRecommended 
+  const displayedProducts = isAiRecommended 
     ? products.sort(() => 0.5 - Math.random()).slice(0, 6) 
-    : products;
+    : products.filter(p => p.name && p.name.toLowerCase().includes(searchTerm.toLowerCase()));
+  const filteredProducts = displayedProducts;
 
   return (
     <>
@@ -193,6 +195,7 @@ const Shop = ({ hideHeader }) => {
             </div>
 
             <div className={styles.toolbarActions}>
+            <input type="text" placeholder="Search products..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className={styles.searchInput} style={{ padding: '8px 12px', border: '1px solid var(--color-border)', borderRadius: '4px', flex: '1' }} />
               <button 
                 className={styles.mobileFilterBtn} 
                 onClick={() => setIsMobileFilterOpen(true)}

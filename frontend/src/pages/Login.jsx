@@ -1,16 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Eye, EyeOff } from 'lucide-react';
 import useAuthStore from '../store/useAuthStore';
 import { signInWithGoogle } from '../config/firebase';
 import styles from './Auth.module.css';
 
 const Login = () => {
+  const [showPassword, setShowPassword] = useState(false);
+  const togglePasswordVisibility = () => setShowPassword(prev => !prev);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   
   const navigate = useNavigate();
   const location = useLocation();
   const { login, user, isLoading, error, clearError } = useAuthStore();
+
+  const [message, setMessage] = useState(null);
 
   const redirect = location.search ? location.search.split('=')[1] : '/dashboard';
 
@@ -23,6 +28,19 @@ const Login = () => {
 
   const submitHandler = async (e) => {
     e.preventDefault();
+    setMessage(null);
+    
+    if (password.length < 6) {
+      setMessage('Password must be at least 6 characters long');
+      return;
+    }
+    const emailDomain = email.split('@')[1];
+    const allowedDomains = ['gmail.com', 'outlook.com', 'yahoo.com'];
+    if (!allowedDomains.includes(emailDomain)) {
+      setMessage('Only Gmail, Outlook, or Yahoo emails are allowed');
+      return;
+    }
+
     await login(email, password);
   };
 
@@ -44,7 +62,7 @@ const Login = () => {
         <h1 className={styles.title}>Welcome to GentFits</h1>
         <p style={{ color: 'var(--color-text-secondary)', marginBottom: '30px', textAlign: 'center' }}>Sign in to access your premium account</p>
         
-        {error && <div className={styles.error}>{error}</div>}
+        {(error || message) && <div className={styles.error}>{error || message}</div>}
         
         <form onSubmit={submitHandler}>
           <div className={styles.formGroup}>
@@ -60,14 +78,19 @@ const Login = () => {
           </div>
           <div className={styles.formGroup}>
             <label className={styles.label}>Password</label>
-            <input 
-              type="password" 
-              required
-              className={styles.input} 
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
-            />
+            <div className={styles.passwordWrapper} style={{ position: 'relative' }}>
+              <input 
+                type={showPassword ? "text" : "password"} 
+                required
+                className={styles.input} 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter your password"
+              />
+              <button type="button" onClick={togglePasswordVisibility} className={styles.passwordToggle} style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'transparent', border: 'none', cursor: 'pointer' }} aria-label={showPassword ? "Hide password" : "Show password"}>
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
+            </div>
           </div>
           <button type="submit" className={styles.submitBtn} disabled={isLoading}>
             {isLoading ? 'Signing In...' : 'Sign In'}
