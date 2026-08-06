@@ -4,6 +4,7 @@ import Swal from 'sweetalert2';
 import styles from './Admin.module.css';
 import { Upload } from 'lucide-react';
 import Loader from '../../components/Loader';
+import ImageCropperModal from '../../components/ImageCropperModal';
 
 const IMGBB_API_KEY = "affe71bc1ff1277c7d83bc8e9dfe4c3c";
 
@@ -250,6 +251,7 @@ export const AdminSettings = () => {
   const [saving, setSaving] = useState(false);
   const [jsonInputs, setJsonInputs] = useState({});
   const [uploadingField, setUploadingField] = useState(null);
+  const [cropModalData, setCropModalData] = useState(null);
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -295,13 +297,43 @@ export const AdminSettings = () => {
     setJsonInputs(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleImageUpload = async (e, field, isNested = false, parent = null) => {
+  const handleImageUpload = (e, field, isNested = false, parent = null) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    setUploadingField(isNested ? `${parent}.${field}` : field);
+    const reader = new FileReader();
+    reader.onload = () => {
+      setCropModalData({ imageSrc: reader.result, field, isNested, parent });
+    };
+    reader.readAsDataURL(file);
+    e.target.value = null; // Reset input
+  };
+
+  const handleArrayImageUpload = (e, jsonField) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setCropModalData({ imageSrc: reader.result, jsonField });
+    };
+    reader.readAsDataURL(file);
+    e.target.value = null; // Reset input
+  };
+
+  const handleCropComplete = async (croppedBlob) => {
+    const { field, isNested, parent, jsonField } = cropModalData;
+    
+    if (jsonField) {
+      setUploadingField(jsonField);
+    } else {
+      setUploadingField(isNested ? `${parent}.${field}` : field);
+    }
+    
+    setCropModalData(null);
+
     const imgData = new FormData();
-    imgData.append('image', file);
+    imgData.append('image', croppedBlob, 'image.jpg');
 
     try {
       const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
@@ -311,45 +343,21 @@ export const AdminSettings = () => {
       const data = await response.json();
       
       if (data.success) {
-        if (isNested) {
+        if (jsonField) {
+          let currentArray = [];
+          try {
+            currentArray = JSON.parse(jsonInputs[jsonField]);
+            if (!Array.isArray(currentArray)) currentArray = [];
+          } catch(err) {
+            currentArray = [];
+          }
+          currentArray.push(data.data.url);
+          setJsonInputs(prev => ({ ...prev, [jsonField]: JSON.stringify(currentArray, null, 2) }));
+        } else if (isNested) {
           handleNestedChange(parent, field, data.data.url);
         } else {
           setSettings(prev => ({ ...prev, [field]: data.data.url }));
         }
-      } else {
-        Swal.fire('Error', 'ImgBB upload failed', 'error');
-      }
-    } catch (error) {
-      Swal.fire('Error', 'Image upload failed', 'error');
-    }
-    setUploadingField(null);
-  };
-
-  const handleArrayImageUpload = async (e, jsonField) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    setUploadingField(jsonField);
-    const imgData = new FormData();
-    imgData.append('image', file);
-
-    try {
-      const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
-        method: 'POST',
-        body: imgData,
-      });
-      const data = await response.json();
-      
-      if (data.success) {
-        let currentArray = [];
-        try {
-          currentArray = JSON.parse(jsonInputs[jsonField]);
-          if (!Array.isArray(currentArray)) currentArray = [];
-        } catch(err) {
-          currentArray = [];
-        }
-        currentArray.push(data.data.url);
-        setJsonInputs(prev => ({ ...prev, [jsonField]: JSON.stringify(currentArray, null, 2) }));
       } else {
         Swal.fire('Error', 'ImgBB upload failed', 'error');
       }
@@ -591,24 +599,32 @@ export const AdminSettings = () => {
             }} style={{...inputStyle, marginBottom: 0}} />
             <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', background: 'var(--color-surface-hover)', padding: '10px 15px', borderRadius: '4px', whiteSpace: 'nowrap', border: '1px solid var(--color-border)' }}>
               <Upload size={16} /> {uploadingField === 'staticPages.about.heroImage' ? 'Uploading...' : 'Upload'}
-              <input type="file" style={{ display: 'none' }} accept="image/*" onChange={async (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-                setUploadingField('staticPages.about.heroImage');
-                const imgData = new FormData();
-                imgData.append('image', file);
-                try {
-                  const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body: imgData });
-                  const data = await res.json();
-                  if (data.success) {
-                    const staticPages = {...(settings.staticPages || {})};
-                    if(!staticPages.about) staticPages.about = {};
-                    staticPages.about.heroImage = data.data.url;
-                    setSettings({...settings, staticPages});
-                  } else Swal.fire('Error', 'ImgBB upload failed', 'error');
-                } catch (error) { Swal.fire('Error', 'Image upload failed', 'error'); }
-                setUploadingField(null);
-              }} />
+              <input type="file" style={{ display: 'none' }} accept="image/*" onChange={(e) => {
+                  const file = e.target.files[0];
+                  if (!file) return;
+                  const reader = new FileReader();
+                  reader.onload = () => {
+                    setCropModalData({
+                      imageSrc: reader.result,
+                      onCropCompleteForLocal: async (croppedBlob) => {
+                        setUploadingField('staticPages.about.heroImage');
+                        setCropModalData(null);
+                        const imgData = new FormData();
+                        imgData.append('image', croppedBlob, 'image.jpg');
+                        try {
+                          const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body: imgData });
+                          const data = await res.json();
+                          if (data.success) {
+                            handleNestedChange('staticPages', 'about', { ...settings.staticPages?.about, heroImage: data.data.url });
+                          } else Swal.fire('Error', 'ImgBB upload failed', 'error');
+                        } catch (error) { Swal.fire('Error', 'Image upload failed', 'error'); }
+                        setUploadingField(null);
+                      }
+                    });
+                  };
+                  reader.readAsDataURL(file);
+                  e.target.value = null;
+                }} />
             </label>
           </div>
           
@@ -630,23 +646,34 @@ export const AdminSettings = () => {
             }} style={{...inputStyle, marginBottom: 0}} />
             <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', background: 'var(--color-surface-hover)', padding: '10px 15px', borderRadius: '4px', whiteSpace: 'nowrap', border: '1px solid var(--color-border)' }}>
               <Upload size={16} /> {uploadingField === 'staticPages.about.materialsImage1' ? 'Uploading...' : 'Upload'}
-              <input type="file" style={{ display: 'none' }} accept="image/*" onChange={async (e) => {
+              <input type="file" style={{ display: 'none' }} accept="image/*" onChange={(e) => {
                 const file = e.target.files[0];
                 if (!file) return;
-                setUploadingField('staticPages.about.materialsImage1');
-                const imgData = new FormData();
-                imgData.append('image', file);
-                try {
-                  const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body: imgData });
-                  const data = await res.json();
-                  if (data.success) {
-                    const staticPages = {...(settings.staticPages || {})};
-                    if(!staticPages.about) staticPages.about = {};
-                    staticPages.about.materialsImage1 = data.data.url;
-                    setSettings({...settings, staticPages});
-                  } else Swal.fire('Error', 'ImgBB upload failed', 'error');
-                } catch (error) { Swal.fire('Error', 'Image upload failed', 'error'); }
-                setUploadingField(null);
+                const reader = new FileReader();
+                reader.onload = () => {
+                  setCropModalData({
+                    imageSrc: reader.result,
+                    onCropCompleteForLocal: async (croppedBlob) => {
+                      setUploadingField('staticPages.about.materialsImage1');
+                      setCropModalData(null);
+                      const imgData = new FormData();
+                      imgData.append('image', croppedBlob, 'image.jpg');
+                      try {
+                        const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body: imgData });
+                        const data = await res.json();
+                        if (data.success) {
+                          const staticPages = {...(settings.staticPages || {})};
+                          if(!staticPages.about) staticPages.about = {};
+                          staticPages.about.materialsImage1 = data.data.url;
+                          setSettings({...settings, staticPages});
+                        } else Swal.fire('Error', 'ImgBB upload failed', 'error');
+                      } catch (error) { Swal.fire('Error', 'Image upload failed', 'error'); }
+                      setUploadingField(null);
+                    }
+                  });
+                };
+                reader.readAsDataURL(file);
+                e.target.value = null;
               }} />
             </label>
           </div>
@@ -661,23 +688,34 @@ export const AdminSettings = () => {
             }} style={{...inputStyle, marginBottom: 0}} />
             <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', background: 'var(--color-surface-hover)', padding: '10px 15px', borderRadius: '4px', whiteSpace: 'nowrap', border: '1px solid var(--color-border)' }}>
               <Upload size={16} /> {uploadingField === 'staticPages.about.materialsImage2' ? 'Uploading...' : 'Upload'}
-              <input type="file" style={{ display: 'none' }} accept="image/*" onChange={async (e) => {
+              <input type="file" style={{ display: 'none' }} accept="image/*" onChange={(e) => {
                 const file = e.target.files[0];
                 if (!file) return;
-                setUploadingField('staticPages.about.materialsImage2');
-                const imgData = new FormData();
-                imgData.append('image', file);
-                try {
-                  const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body: imgData });
-                  const data = await res.json();
-                  if (data.success) {
-                    const staticPages = {...(settings.staticPages || {})};
-                    if(!staticPages.about) staticPages.about = {};
-                    staticPages.about.materialsImage2 = data.data.url;
-                    setSettings({...settings, staticPages});
-                  } else Swal.fire('Error', 'ImgBB upload failed', 'error');
-                } catch (error) { Swal.fire('Error', 'Image upload failed', 'error'); }
-                setUploadingField(null);
+                const reader = new FileReader();
+                reader.onload = () => {
+                  setCropModalData({
+                    imageSrc: reader.result,
+                    onCropCompleteForLocal: async (croppedBlob) => {
+                      setUploadingField('staticPages.about.materialsImage2');
+                      setCropModalData(null);
+                      const imgData = new FormData();
+                      imgData.append('image', croppedBlob, 'image.jpg');
+                      try {
+                        const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body: imgData });
+                        const data = await res.json();
+                        if (data.success) {
+                          const staticPages = {...(settings.staticPages || {})};
+                          if(!staticPages.about) staticPages.about = {};
+                          staticPages.about.materialsImage2 = data.data.url;
+                          setSettings({...settings, staticPages});
+                        } else Swal.fire('Error', 'ImgBB upload failed', 'error');
+                      } catch (error) { Swal.fire('Error', 'Image upload failed', 'error'); }
+                      setUploadingField(null);
+                    }
+                  });
+                };
+                reader.readAsDataURL(file);
+                e.target.value = null;
               }} />
             </label>
           </div>
@@ -708,6 +746,20 @@ export const AdminSettings = () => {
         ))}
       </div>
 
+      {cropModalData && (
+        <ImageCropperModal
+          imageSrc={cropModalData.imageSrc}
+          onCropComplete={(blob) => {
+            if (cropModalData.onCropCompleteForLocal) {
+              cropModalData.onCropCompleteForLocal(blob);
+            } else {
+              handleCropComplete(blob);
+            }
+          }}
+          onCancel={() => setCropModalData(null)}
+          aspectRatio={undefined}
+        />
+      )}
     </div>
   );
 };

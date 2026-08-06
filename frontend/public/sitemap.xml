@@ -2,13 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <!-- Core Pages -->
   <url>
-    <loc>https://www.gentfits.com/</loc>
+    <loc>https://gentfits.vercel.app/</loc>
     <lastmod>2026-08-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://www.gentfits.com/shop</loc>
+    <loc>https://gentfits.vercel.app/shop</loc>
     <lastmod>2026-08-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
@@ -16,46 +16,46 @@
   
   <!-- Categories -->
   <url>
-    <loc>https://www.gentfits.com/shop?category=tshirts</loc>
+    <loc>https://gentfits.vercel.app/shop?category=tshirts</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.gentfits.com/shop?category=panjabis</loc>
+    <loc>https://gentfits.vercel.app/shop?category=panjabis</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.gentfits.com/shop?category=shirts</loc>
+    <loc>https://gentfits.vercel.app/shop?category=shirts</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   
   <!-- Support & Brand Pages -->
   <url>
-    <loc>https://www.gentfits.com/about</loc>
+    <loc>https://gentfits.vercel.app/about</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://www.gentfits.com/contact</loc>
+    <loc>https://gentfits.vercel.app/contact</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://www.gentfits.com/faq</loc>
+    <loc>https://gentfits.vercel.app/faq</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   
   <!-- Legal Pages -->
   <url>
-    <loc>https://www.gentfits.com/privacy</loc>
+    <loc>https://gentfits.vercel.app/privacy</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://www.gentfits.com/terms</loc>
+    <loc>https://gentfits.vercel.app/terms</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>

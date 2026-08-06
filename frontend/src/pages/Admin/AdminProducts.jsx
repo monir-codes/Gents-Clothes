@@ -3,6 +3,7 @@ import axios from 'axios';
 import styles from './Admin.module.css';
 import { Plus, Edit, Trash2, X, Upload } from 'lucide-react';
 import Swal from 'sweetalert2';
+import ImageCropperModal from '../../components/ImageCropperModal';
 
 // User's official ImgBB API key
 const IMGBB_API_KEY = "affe71bc1ff1277c7d83bc8e9dfe4c3c"; 
@@ -13,6 +14,7 @@ const AdminProducts = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const [cropModalData, setCropModalData] = useState(null);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -45,13 +47,23 @@ const AdminProducts = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleImageUpload = async (e) => {
+  const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
+    const reader = new FileReader();
+    reader.onload = () => {
+      setCropModalData(reader.result);
+    };
+    reader.readAsDataURL(file);
+    e.target.value = null; // Reset input
+  };
+
+  const handleCropComplete = async (croppedBlob) => {
+    setCropModalData(null);
     setIsUploading(true);
     const imgData = new FormData();
-    imgData.append('image', file);
+    imgData.append('image', croppedBlob, 'product.jpg');
 
     try {
       const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
@@ -317,6 +329,15 @@ const AdminProducts = () => {
             </form>
           </div>
         </div>
+      )}
+
+      {cropModalData && (
+        <ImageCropperModal
+          imageSrc={cropModalData}
+          onCropComplete={handleCropComplete}
+          onCancel={() => setCropModalData(null)}
+          aspectRatio={undefined}
+        />
       )}
     </div>
   );
