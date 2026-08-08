@@ -172,6 +172,11 @@
     font-size: 0.9rem;
   }
   
+  .priceContainer {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  
   .oldPrice {
     font-size: 0.8rem;
   }

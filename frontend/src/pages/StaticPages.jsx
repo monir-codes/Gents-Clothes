@@ -19,7 +19,7 @@ const StaticPageTemplate = ({ title, children, contentKey }) => {
   }, []);
 
   return (
-    <div className="container" style={{ padding: '60px 0', minHeight: '60vh', maxWidth: '800px' }}>
+    <div className="container" style={{ paddingTop: '60px', paddingBottom: '60px', minHeight: '60vh', maxWidth: '800px' }}>
       <h1 style={{ fontSize: 'clamp(1.8rem, 5vw, 2.5rem)', marginBottom: '32px', textAlign: 'center' }}>{title}</h1>
       <div style={{ lineHeight: 1.8, color: 'var(--color-text-secondary)', fontSize: '1.05rem' }}>
         {contentKey && settings?.staticPages?.[contentKey] ? (
@@ -66,8 +66,8 @@ export const About = () => {
     </div>
 
     {/* Split Section */}
-    <div className="container" style={{ padding: '80px 24px' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '60px', alignItems: 'center', marginBottom: '80px' }}>
+    <div className="container" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '60px', alignItems: 'center', marginBottom: '80px' }}>
         <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
           <h2 style={{ fontSize: 'clamp(1.8rem, 5vw, 2.5rem)', marginBottom: '20px' }}>A Legacy of Elegance</h2>
           <p style={{ color: 'var(--color-text-secondary)', lineHeight: 1.8, fontSize: '1.1rem' }}>
@@ -84,7 +84,7 @@ export const About = () => {
         />
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '60px', alignItems: 'center' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '60px', alignItems: 'center' }}>
         <motion.img 
           src={settings?.staticPages?.about?.materialsImage2 || '/images/hero-banner.jpg'} 
           alt="Fabrics" 

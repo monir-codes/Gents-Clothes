@@ -138,9 +138,13 @@
   gap: var(--space-4);
 }
 
+.productGrid > div {
+  min-width: 0;
+}
+
 @media (max-width: 768px) {
   .productGrid {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: var(--space-2);
     justify-content: center;
   }

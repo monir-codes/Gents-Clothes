@@ -2,10 +2,11 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import SEO from '../components/SEO';
 import CategoryCard from '../components/CategoryCard';
+import styles from './Shop.module.css';
 
 const Collections = () => {
   return (
-    <div className="container" style={{ padding: '60px var(--space-3)', minHeight: '80vh' }}>
+    <div className="container" style={{ paddingTop: '60px', paddingBottom: '60px', minHeight: '80vh' }}>
       <SEO title="Collections" description="Explore GentFits exclusive collections" />
       
       <motion.div 
@@ -18,7 +19,7 @@ const Collections = () => {
       </motion.div>
 
       <motion.div 
-        style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--space-4)' }}
+        className={styles.productGrid}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ staggerChildren: 0.2 }}

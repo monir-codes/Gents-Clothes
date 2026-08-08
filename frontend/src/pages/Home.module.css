@@ -264,6 +264,10 @@
   gap: var(--space-4);
 }
 
+.productGrid > div {
+  min-width: 0;
+}
+
 @media (max-width: 768px) {
   .productGrid {
     grid-template-columns: repeat(2, 1fr);
@@ -348,6 +352,9 @@
   grid-template-columns: 1fr 1fr;
   gap: var(--space-6);
   align-items: center;
+}
+.shopTheLook > div {
+  min-width: 0;
 }
 .lookImage {
   position: relative;
