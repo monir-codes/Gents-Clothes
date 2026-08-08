@@ -85,19 +85,51 @@
 }
 
 .sortSelect {
+  padding: 10px 36px 10px 16px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-background);
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23333%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.3s ease;
+  color: var(--color-text-primary);
+}
+
+.sortSelect:hover {
+  border-color: var(--color-accent);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.sortSelect:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px rgba(201, 162, 101, 0.2);
+}
+
+.searchInput {
   padding: 10px 16px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   background-color: var(--color-background);
   font-family: inherit;
   font-size: 0.95rem;
-  font-weight: 500;
-  cursor: pointer;
   outline: none;
+  transition: all 0.3s ease;
+  flex: 1;
 }
 
-.sortSelect:hover {
-  border-color: var(--color-text-primary);
+.searchInput:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px rgba(201, 162, 101, 0.2);
 }
 
 .productGrid {

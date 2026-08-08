@@ -196,7 +196,7 @@ const Shop = ({ hideHeader }) => {
             </div>
 
             <div className={styles.toolbarActions}>
-            <input type="text" placeholder="Search products..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className={styles.searchInput} style={{ padding: '8px 12px', border: '1px solid var(--color-border)', borderRadius: '4px', flex: '1' }} />
+              <input type="text" placeholder="Search products..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className={styles.searchInput} />
               <button 
                 className={styles.mobileFilterBtn} 
                 onClick={() => setIsMobileFilterOpen(true)}

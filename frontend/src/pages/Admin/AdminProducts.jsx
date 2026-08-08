@@ -332,7 +332,13 @@ const AdminProducts = () => {
                     <option value="Polos">Polos</option>
                     <option value="Shirts">Shirts</option>
                     <option value="Panjabis">Panjabis</option>
+                    <option value="Pants">Pants</option>
+                    <option value="Jeans">Jeans</option>
+                    <option value="Jackets">Jackets</option>
                     <option value="Hoodies">Hoodies</option>
+                    <option value="Suits">Suits</option>
+                    <option value="Combos">Combos</option>
+                    <option value="Accessories">Accessories</option>
                   </select>
                 </div>
                 <div style={{ flex: '1 1 200px' }}>

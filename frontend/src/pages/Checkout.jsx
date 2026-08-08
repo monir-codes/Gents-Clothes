@@ -19,10 +19,24 @@ const Checkout = () => {
   });
 
   const [paymentMethod, setPaymentMethod] = useState('COD');
+  const [transactionId, setTransactionId] = useState('');
+  const [settings, setSettings] = useState(null);
 
   const itemsPrice = cartItems.reduce((acc, item) => acc + item.price * item.qty, 0);
   const shippingPrice = itemsPrice > 5000 ? 0 : 100;
   const totalPrice = itemsPrice + shippingPrice;
+
+  React.useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const { data } = await fetch('/api/settings').then(res => res.json());
+        setSettings(data);
+      } catch (err) {
+        console.error("Failed to fetch settings", err);
+      }
+    };
+    fetchSettings();
+  }, []);
 
   // Auth Guard
   React.useEffect(() => {
@@ -34,6 +48,11 @@ const Checkout = () => {
   const handlePlaceOrder = (e) => {
     e.preventDefault();
     
+    if (paymentMethod === 'Advance Payment' && !transactionId) {
+      Swal.fire('Required', 'Please enter your Transaction ID for Advance Payment', 'warning');
+      return;
+    }
+    
     Swal.fire({
       title: 'Confirm Order?',
       text: "Are you sure you want to place this order?",
@@ -42,13 +61,48 @@ const Checkout = () => {
       confirmButtonColor: '#000',
       cancelButtonColor: '#d33',
       confirmButtonText: 'Yes, confirm it!'
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        // Generate a pseudo-random Order ID for the success page
-        const orderId = 'ORD-' + Math.floor(100000 + Math.random() * 900000);
-        
-        clearCart();
-        navigate('/order-success', { state: { orderId, totalPrice, paymentMethod } });
+        try {
+          const config = {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${useAuthStore.getState().token}`
+            }
+          };
+          
+          const orderData = {
+            orderItems: cartItems,
+            shippingAddress: {
+              fullName: address.fullName,
+              phone: address.phone,
+              street: address.street,
+              city: address.city,
+              district: address.district,
+              postalCode: '1000', // Default or make dynamic later
+              country: 'Bangladesh'
+            },
+            paymentMethod,
+            transactionId: paymentMethod === 'Advance Payment' ? transactionId : '',
+            itemsPrice,
+            shippingPrice,
+            totalPrice
+          };
+
+          const { data } = await fetch('/api/orders', {
+            method: 'POST',
+            headers: config.headers,
+            body: JSON.stringify(orderData)
+          }).then(async res => {
+            if (!res.ok) throw new Error(await res.text());
+            return res.json();
+          });
+
+          clearCart();
+          navigate('/order-success', { state: { orderId: data._id, totalPrice, paymentMethod } });
+        } catch (error) {
+          Swal.fire('Error', 'Failed to place order. Please try again.', 'error');
+        }
       }
     });
   };
@@ -114,13 +168,47 @@ const Checkout = () => {
               <input 
                 type="radio" 
                 name="payment" 
-                value="SSLCommerz"
-                checked={paymentMethod === 'SSLCommerz'}
-                onChange={() => setPaymentMethod('SSLCommerz')}
+                value="Advance Payment"
+                checked={paymentMethod === 'Advance Payment'}
+                onChange={() => setPaymentMethod('Advance Payment')}
               />
-              Online Payment (Card / Mobile Banking)
+              Advance Payment (Ogrim Tk)
             </label>
           </div>
+
+          {paymentMethod === 'Advance Payment' && (
+            <div style={{ background: 'var(--color-surface)', padding: '20px', borderRadius: '8px', marginTop: '20px', border: '1px solid var(--color-border)' }}>
+              <h4 style={{ marginBottom: '10px' }}>Payment Instructions</h4>
+              <p style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)', marginBottom: '5px' }}>
+                Please send <strong>৳{totalPrice}</strong> using the following method:
+              </p>
+              <div style={{ background: 'var(--color-background)', padding: '15px', borderRadius: '4px', marginBottom: '15px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span style={{ fontWeight: 600 }}>Method:</span>
+                  <span>{settings?.paymentSettings?.advancePaymentMethod || 'bKash (Send Money)'}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span style={{ fontWeight: 600 }}>Number:</span>
+                  <span style={{ fontWeight: 700, color: 'var(--color-accent)' }}>{settings?.paymentSettings?.advancePaymentNumber || 'Loading...'}</span>
+                </div>
+              </div>
+              
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Transaction ID</label>
+                <input 
+                  type="text" 
+                  required 
+                  className={styles.input} 
+                  placeholder="e.g. 9F8A7B6C5D"
+                  value={transactionId} 
+                  onChange={e => setTransactionId(e.target.value)} 
+                />
+                <p style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', marginTop: '5px' }}>
+                  Enter the transaction ID received via SMS after your payment.
+                </p>
+              </div>
+            </div>
+          )}
 
           <button type="submit" className={styles.placeOrderBtn}>Place Order</button>
         </form>

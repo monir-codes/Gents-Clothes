@@ -17,7 +17,7 @@ const Login = () => {
 
   const [message, setMessage] = useState(null);
 
-  const redirect = location.search ? location.search.split('=')[1] : '/dashboard';
+  const redirect = location.search ? location.search.split('=')[1] : '/shop';
 
   useEffect(() => {
     if (user) {
@@ -32,12 +32,6 @@ const Login = () => {
     
     if (password.length < 6) {
       setMessage('Password must be at least 6 characters long');
-      return;
-    }
-    const emailDomain = email.split('@')[1];
-    const allowedDomains = ['gmail.com', 'outlook.com', 'yahoo.com'];
-    if (!allowedDomains.includes(emailDomain)) {
-      setMessage('Only Gmail, Outlook, or Yahoo emails are allowed');
       return;
     }
 

@@ -123,6 +123,10 @@ const settingsSchema = mongoose.Schema(
       sizeGuide: { type: String, default: '<p>This is the standard Size Guide document. For full legal text, please refer to our official terms.</p>' },
       privacy: { type: String, default: '<p>This is the standard Privacy Policy document. For full legal text, please refer to our official terms.</p>' },
       terms: { type: String, default: '<p>This is the standard Terms of Service document. For full legal text, please refer to our official terms.</p>' }
+    },
+    paymentSettings: {
+      advancePaymentMethod: { type: String, default: 'bKash (Send Money)' },
+      advancePaymentNumber: { type: String, default: '01700000000' }
     }
   },
   {

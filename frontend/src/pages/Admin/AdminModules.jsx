@@ -453,6 +453,16 @@ export const AdminSettings = () => {
       </div>
 
       <div style={sectionStyle}>
+        <h3>Payment Settings</h3>
+        <label style={labelStyle}>Advance Payment Method</label>
+        <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginBottom: '8px' }}>E.g. bKash (Send Money), Nagad (Cash Out)</p>
+        <input type="text" value={settings.paymentSettings?.advancePaymentMethod || ''} onChange={(e) => handleNestedChange('paymentSettings', 'advancePaymentMethod', e.target.value)} style={inputStyle} />
+        
+        <label style={labelStyle}>Advance Payment Number</label>
+        <input type="text" value={settings.paymentSettings?.advancePaymentNumber || ''} onChange={(e) => handleNestedChange('paymentSettings', 'advancePaymentNumber', e.target.value)} style={inputStyle} />
+      </div>
+
+      <div style={sectionStyle}>
         <h3>Hero Section</h3>
         <label style={labelStyle}>Title</label>
         <input type="text" name="heroTitle" value={settings.heroTitle || ''} onChange={handleChange} style={inputStyle} />

@@ -12,10 +12,6 @@ const authUser = async (req, res) => {
   const user = await User.findOne({ email });
 
   if (user && (await user.matchPassword(password))) {
-    if (!user.isVerified) {
-      return res.status(401).json({ message: 'Please verify your email address before logging in.' });
-    }
-
     res.json({
       _id: user._id,
       name: user.name,

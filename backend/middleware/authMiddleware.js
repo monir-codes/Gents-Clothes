@@ -2,14 +2,32 @@
 // The middleware now simply calls next() for every request.
 // This file remains for future use but currently does nothing.
 
-const protect = (req, res, next) => {
-  // No token verification – allow all requests.
-  next();
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
+
+const protect = async (req, res, next) => {
+  let token;
+
+  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+    try {
+      token = req.headers.authorization.split(' ')[1];
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      req.user = await User.findById(decoded.id).select('-password');
+      next();
+    } catch (error) {
+      return res.status(401).json({ message: 'Not authorized, token failed' });
+    }
+  } else {
+    return res.status(401).json({ message: 'Not authorized, no token' });
+  }
 };
 
 const admin = (req, res, next) => {
-  // No admin check – allow all requests.
-  next();
+  if (req.user && req.user.isAdmin) {
+    next();
+  } else {
+    res.status(401).json({ message: 'Not authorized as an admin' });
+  }
 };
 
 module.exports = { protect, admin };

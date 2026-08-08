@@ -139,9 +139,9 @@
 @media (max-width: 768px) {
   .actions {
     transform: none; /* Always in place */
-    flex-direction: row; /* Horizontal on bottom maybe? Or keep vertical top right */
-    top: auto;
-    bottom: var(--space-2);
+    flex-direction: column;
+    top: var(--space-2);
+    bottom: auto;
     right: var(--space-2);
     opacity: 0.9;
   }

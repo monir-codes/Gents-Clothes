@@ -34,6 +34,10 @@ const orderSchema = new mongoose.Schema({
     required: true,
     default: 'COD'
   },
+  transactionId: {
+    type: String,
+    default: ''
+  },
   paymentResult: {
     id: { type: String },
     status: { type: String },

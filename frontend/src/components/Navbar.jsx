@@ -158,9 +158,21 @@ const Navbar = () => {
                 <User size={24} />
                 <span>{user ? user.name || 'User' : 'Guest'}</span>
               </div>
-              <button className={styles.mobileAuthBtn} onClick={handleAuth}>
-                {user ? 'Logout' : 'Login'}
-              </button>
+              
+              {!user ? (
+                <button className={styles.mobileAuthBtn} onClick={() => { setIsMobileMenuOpen(false); navigate('/login'); }}>
+                  Login
+                </button>
+              ) : (
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <button className={styles.mobileAuthBtn} onClick={() => { setIsMobileMenuOpen(false); navigate('/dashboard'); }} style={{ background: 'var(--color-text-primary)', color: 'white' }}>
+                    Profile
+                  </button>
+                  <button className={styles.mobileAuthBtn} onClick={() => { setIsMobileMenuOpen(false); logout(); navigate('/'); }} style={{ background: 'var(--color-error)', color: 'white' }}>
+                    Logout
+                  </button>
+                </div>
+              )}
             </div>
 
             <Link to="/shop" className={styles.mobileNavLink} onClick={() => setIsMobileMenuOpen(false)}>Shop</Link>
