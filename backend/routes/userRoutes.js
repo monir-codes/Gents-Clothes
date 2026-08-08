@@ -1,10 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const { authUser, registerUser, getUserProfile, updateUserProfile, getUsers, deleteUser, verifyEmail } = require('../controllers/userController');
+const { authUser, registerUser, getUserProfile, updateUserProfile, getUsers, deleteUser, verifyEmail, googleLogin } = require('../controllers/userController');
 const { protect, admin } = require('../middleware/authMiddleware');
 
 router.route('/').post(registerUser).get(protect, admin, getUsers);
 router.post('/login', authUser);
+router.post('/google', googleLogin);
 router.get('/verify/:token', verifyEmail);
 router.route('/profile')
   .get(protect, getUserProfile)

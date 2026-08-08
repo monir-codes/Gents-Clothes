@@ -64,7 +64,6 @@
 .content {
   flex-grow: 1;
   padding: var(--space-5);
-  overflow-y: auto;
 }
 
 .dashboardHeader {

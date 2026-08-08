@@ -15,6 +15,7 @@ const AdminProducts = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [cropModalData, setCropModalData] = useState(null);
+  const [imageTarget, setImageTarget] = useState(null); // 'image' or 'hoverImage'
 
   const [formData, setFormData] = useState({
     name: '',
@@ -24,10 +25,16 @@ const AdminProducts = () => {
     countInStock: 0,
     description: '',
     image: '',
+    hoverImage: '',
     oldPrice: '',
     sku: '',
     sizes: '',
-    colors: ''
+    colors: '',
+    fabricDetails: {
+      material: '',
+      gsm: '',
+      washInstruction: ''
+    }
   });
 
   const fetchProducts = async () => {
@@ -47,7 +54,15 @@ const AdminProducts = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleImageUpload = (e) => {
+  const handleFabricDetailChange = (e) => {
+    setFormData({
+      ...formData,
+      fabricDetails: { ...formData.fabricDetails, [e.target.name]: e.target.value }
+    });
+  };
+
+  const handleImageUpload = (e, target) => {
+    setImageTarget(target);
     const file = e.target.files[0];
     if (!file) return;
 
@@ -73,7 +88,7 @@ const AdminProducts = () => {
       const data = await response.json();
       
       if (data.success) {
-        setFormData(prev => ({ ...prev, image: data.data.url }));
+        setFormData(prev => ({ ...prev, [imageTarget]: data.data.url }));
         Swal.fire('Success', 'Image uploaded to ImgBB successfully!', 'success');
       } else {
         Swal.fire('Error', 'ImgBB upload failed. Check API Key.', 'error');
@@ -84,28 +99,35 @@ const AdminProducts = () => {
     setIsUploading(false);
   };
 
-  const generateDescription = async () => {
-    const context = formData.description || formData.name;
+  const generateDetails = async () => {
+    const context = formData.name || formData.description;
     if (!context) {
-      Swal.fire('Error', 'Please enter a product name or basic description first', 'warning');
+      Swal.fire('Error', 'Please enter a product name first', 'warning');
       return;
     }
     
     setIsGenerating(true);
     try {
-      const { data } = await axios.post('/api/ai/generate', { type: 'description', context });
-      setFormData(prev => ({ ...prev, description: data.result }));
-      Swal.fire({
-        title: 'Success',
-        text: 'Description generated successfully!',
-        icon: 'success',
-        toast: true,
-        position: 'top-end',
-        showConfirmButton: false,
-        timer: 3000
-      });
+      const { data } = await axios.post('/api/ai/generate', { type: 'product_details', context });
+      try {
+        const resultString = data.result.replace(/```json/g, '').replace(/```/g, '').trim();
+        const parsedData = JSON.parse(resultString);
+        setFormData(prev => ({
+          ...prev,
+          description: parsedData.description || prev.description,
+          fabricDetails: {
+            material: parsedData.material || prev.fabricDetails?.material || '',
+            gsm: parsedData.gsm || prev.fabricDetails?.gsm || '',
+            washInstruction: parsedData.washInstruction || prev.fabricDetails?.washInstruction || ''
+          }
+        }));
+        Swal.fire({ title: 'Success', text: 'All details generated!', icon: 'success', toast: true, position: 'top-end', showConfirmButton: false, timer: 3000 });
+      } catch (parseError) {
+        console.error("Failed to parse JSON:", data.result);
+        Swal.fire('Error', 'Failed to parse AI response. Please try again.', 'error');
+      }
     } catch (error) {
-      Swal.fire('Error', error.response?.data?.message || 'Failed to generate description', 'error');
+      Swal.fire('Error', error.response?.data?.message || 'Failed to generate details', 'error');
     } finally {
       setIsGenerating(false);
     }
@@ -136,7 +158,7 @@ const AdminProducts = () => {
 
   const openAddModal = () => {
     setEditingId(null);
-    setFormData({ name: '', price: 0, oldPrice: '', category: '', brand: 'GentFits', countInStock: 0, description: '', image: '', sku: '', sizes: '', colors: '' });
+    setFormData({ name: '', price: 0, oldPrice: '', category: '', brand: 'GentFits', countInStock: 0, description: '', image: '', hoverImage: '', sku: '', sizes: '', colors: '', fabricDetails: { material: '', gsm: '', washInstruction: '' } });
     setIsModalOpen(true);
   };
 
@@ -150,10 +172,16 @@ const AdminProducts = () => {
       countInStock: product.countInStock,
       description: product.description,
       image: product.image,
+      hoverImage: product.hoverImage || '',
       oldPrice: product.oldPrice || '',
       sku: product.sku || '',
       sizes: product.sizes ? product.sizes.join(', ') : '',
-      colors: product.colors ? product.colors.join(', ') : ''
+      colors: product.colors ? product.colors.join(', ') : '',
+      fabricDetails: {
+        material: product.fabricDetails?.material || '',
+        gsm: product.fabricDetails?.gsm || '',
+        washInstruction: product.fabricDetails?.washInstruction || ''
+      }
     });
     setIsModalOpen(true);
   };
@@ -237,24 +265,42 @@ const AdminProducts = () => {
             
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
               
-              {/* ImgBB Image Upload */}
-              <div style={{ border: '2px dashed var(--color-border)', padding: '20px', textAlign: 'center', borderRadius: '8px' }}>
-                {formData.image ? (
-                  <img src={formData.image} alt="Preview" style={{ height: '100px', marginBottom: '10px' }} />
-                ) : (
-                  <Upload size={32} style={{ marginBottom: '10px', color: 'var(--color-text-secondary)' }} />
-                )}
-                <div>
-                  <label style={{ cursor: 'pointer', color: 'var(--color-accent)', fontWeight: 600 }}>
-                    {isUploading ? 'Uploading to ImgBB...' : 'Upload Image'}
-                    <input type="file" style={{ display: 'none' }} accept="image/*" onChange={handleImageUpload} />
-                  </label>
+              {/* Images Upload */}
+              <div style={{ display: 'flex', gap: '15px' }}>
+                <div style={{ flex: 1, border: '2px dashed var(--color-border)', padding: '20px', textAlign: 'center', borderRadius: '8px' }}>
+                  <p style={{ fontWeight: 600, marginBottom: '10px' }}>Main Image</p>
+                  {formData.image ? (
+                    <img src={formData.image} alt="Preview" style={{ height: '100px', marginBottom: '10px', objectFit: 'contain' }} />
+                  ) : (
+                    <Upload size={32} style={{ marginBottom: '10px', color: 'var(--color-text-secondary)' }} />
+                  )}
+                  <div>
+                    <label style={{ cursor: 'pointer', color: 'var(--color-accent)', fontWeight: 600 }}>
+                      {isUploading && imageTarget === 'image' ? 'Uploading...' : 'Upload Main Image'}
+                      <input type="file" style={{ display: 'none' }} accept="image/*" onChange={(e) => handleImageUpload(e, 'image')} />
+                    </label>
+                  </div>
+                </div>
+
+                <div style={{ flex: 1, border: '2px dashed var(--color-border)', padding: '20px', textAlign: 'center', borderRadius: '8px' }}>
+                  <p style={{ fontWeight: 600, marginBottom: '10px' }}>Hover Image</p>
+                  {formData.hoverImage ? (
+                    <img src={formData.hoverImage} alt="Preview" style={{ height: '100px', marginBottom: '10px', objectFit: 'contain' }} />
+                  ) : (
+                    <Upload size={32} style={{ marginBottom: '10px', color: 'var(--color-text-secondary)' }} />
+                  )}
+                  <div>
+                    <label style={{ cursor: 'pointer', color: 'var(--color-accent)', fontWeight: 600 }}>
+                      {isUploading && imageTarget === 'hoverImage' ? 'Uploading...' : 'Upload Hover Image'}
+                      <input type="file" style={{ display: 'none' }} accept="image/*" onChange={(e) => handleImageUpload(e, 'hoverImage')} />
+                    </label>
+                  </div>
                 </div>
               </div>
 
-              <div style={{ display: 'flex', gap: '10px' }}>
-                <input type="text" name="name" placeholder="Product Name" value={formData.name} onChange={handleInputChange} required style={{ flex: 2, padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px' }} />
-                <input type="text" name="sku" placeholder="Product Code (e.g. GF-001)" value={formData.sku} onChange={handleInputChange} style={{ flex: 1, padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px' }} />
+              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                <input type="text" name="name" placeholder="Product Name" value={formData.name} onChange={handleInputChange} required style={{ flex: '1 1 250px', padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px' }} />
+                <input type="text" name="sku" placeholder="Product Code (e.g. GF-001)" value={formData.sku} onChange={handleInputChange} style={{ flex: '1 1 150px', padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px' }} />
               </div>
               
               <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
@@ -277,8 +323,8 @@ const AdminProducts = () => {
                 </div>
               </div>
 
-              <div style={{ display: 'flex', gap: '10px' }}>
-                <div style={{ flex: 1 }}>
+              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                <div style={{ flex: '1 1 200px' }}>
                   <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '5px', fontWeight: 600 }}>Category</label>
                   <select name="category" value={formData.category} onChange={handleInputChange} required style={{ width: '100%', padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px' }}>
                     <option value="" disabled>Select Category</option>
@@ -289,11 +335,11 @@ const AdminProducts = () => {
                     <option value="Hoodies">Hoodies</option>
                   </select>
                 </div>
-                <div style={{ flex: 1 }}>
+                <div style={{ flex: '1 1 200px' }}>
                   <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '5px', fontWeight: 600 }}>Sizes (comma separated)</label>
                   <input type="text" name="sizes" placeholder="e.g. S, M, L, XL" value={formData.sizes} onChange={handleInputChange} style={{ width: '100%', padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px' }} />
                 </div>
-                <div style={{ flex: 1 }}>
+                <div style={{ flex: '1 1 200px' }}>
                   <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '5px', fontWeight: 600 }}>Colors (comma separated)</label>
                   <input type="text" name="colors" placeholder="e.g. Black, White, Navy" value={formData.colors} onChange={handleInputChange} style={{ width: '100%', padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px' }} />
                 </div>
@@ -301,10 +347,10 @@ const AdminProducts = () => {
               
               <div style={{ position: 'relative' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                  <label style={{ fontWeight: 600, fontSize: '0.9rem' }}>Product Description</label>
+                  <label style={{ fontWeight: 600, fontSize: '0.9rem' }}>Product & Fabric Details</label>
                   <button 
                     type="button" 
-                    onClick={generateDescription}
+                    onClick={generateDetails}
                     disabled={isGenerating}
                     style={{ 
                       background: 'var(--color-accent)', 
@@ -317,10 +363,26 @@ const AdminProducts = () => {
                       opacity: isGenerating ? 0.7 : 1
                     }}
                   >
-                    {isGenerating ? 'Generating...' : '✨ Rewrite/Generate with AI'}
+                    {isGenerating ? 'Generating...' : '✨ Generate All Details with AI'}
                   </button>
                 </div>
-                <textarea name="description" placeholder="Enter basic details and click 'Generate with AI', or write full description here..." value={formData.description} onChange={handleInputChange} required style={{ padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px', minHeight: '120px', width: '100%', fontFamily: 'inherit', resize: 'vertical' }}></textarea>
+                
+                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '10px' }}>
+                  <div style={{ flex: '1 1 30%' }}>
+                    <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '5px', fontWeight: 600 }}>Material</label>
+                    <input type="text" name="material" placeholder="e.g. 100% Cotton" value={formData.fabricDetails.material} onChange={handleFabricDetailChange} style={{ width: '100%', padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px' }} />
+                  </div>
+                  <div style={{ flex: '1 1 30%' }}>
+                    <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '5px', fontWeight: 600 }}>GSM</label>
+                    <input type="text" name="gsm" placeholder="e.g. 160 GSM" value={formData.fabricDetails.gsm} onChange={handleFabricDetailChange} style={{ width: '100%', padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px' }} />
+                  </div>
+                  <div style={{ flex: '1 1 30%' }}>
+                    <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '5px', fontWeight: 600 }}>Wash Instruction</label>
+                    <input type="text" name="washInstruction" placeholder="e.g. Machine wash cold" value={formData.fabricDetails.washInstruction} onChange={handleFabricDetailChange} style={{ width: '100%', padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px' }} />
+                  </div>
+                </div>
+
+                <textarea name="description" placeholder="Enter basic details and click 'Generate All Details with AI', or write full description here..." value={formData.description} onChange={handleInputChange} required style={{ padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px', minHeight: '120px', width: '100%', fontFamily: 'inherit', resize: 'vertical' }}></textarea>
               </div>
 
               <button type="submit" style={{ padding: '12px', background: 'var(--color-text-primary)', color: 'white', borderRadius: '4px', fontWeight: 600, marginTop: '10px' }}>

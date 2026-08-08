@@ -310,7 +310,12 @@
   .mainSection {
     flex-direction: column;
   }
-  .gallery, .info {
+  .gallery {
+    width: 100%;
+    position: relative;
+    top: auto;
+  }
+  .info {
     width: 100%;
   }
   .title {

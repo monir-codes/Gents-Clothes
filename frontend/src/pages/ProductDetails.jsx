@@ -19,6 +19,7 @@ const ProductDetails = () => {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [relatedProducts, setRelatedProducts] = useState([]);
+  const [displayImage, setDisplayImage] = useState('');
   
   // Selections
   const [selectedColor, setSelectedColor] = useState('');
@@ -76,6 +77,7 @@ const ProductDetails = () => {
       try {
         const { data } = await axios.get(`/api/products/${id}`);
         setProduct(data);
+        setDisplayImage(data.image);
         if(data.colors?.length > 0) setSelectedColor(data.colors[0]);
         if(data.sizes?.length > 0) setSelectedSize(data.sizes[0]);
         setLoading(false);
@@ -135,12 +137,12 @@ const ProductDetails = () => {
           transition={{ duration: 0.6 }}
         >
           <div className={styles.mainImageContainer}>
-            <img src={product.image} alt={product.name} className={styles.mainImage} />
+            <img src={displayImage || product.image} alt={product.name} className={styles.mainImage} />
           </div>
           <div className={styles.thumbnailList}>
-            <img src={product.image} alt="Thumb 1" className={styles.thumbnail} />
+            <img src={product.image} alt="Thumb 1" className={styles.thumbnail} onClick={() => setDisplayImage(product.image)} style={{ borderColor: displayImage === product.image ? 'var(--color-accent)' : 'transparent' }} />
             {product.hoverImage && (
-              <img src={product.hoverImage} alt="Thumb 2" className={styles.thumbnail} />
+              <img src={product.hoverImage} alt="Thumb 2" className={styles.thumbnail} onClick={() => setDisplayImage(product.hoverImage)} style={{ borderColor: displayImage === product.hoverImage ? 'var(--color-accent)' : 'transparent' }} />
             )}
           </div>
         </motion.div>
@@ -220,15 +222,17 @@ const ProductDetails = () => {
             <div className={styles.qtyBox}>
               <button onClick={() => setQty(Math.max(1, qty - 1))}>-</button>
               <input type="number" value={qty} readOnly />
-              <button onClick={() => setQty(qty + 1)}>+</button>
+              <button onClick={() => setQty(Math.min(product.countInStock, qty + 1))}>+</button>
             </div>
             
             <motion.button 
               className={styles.addToCartBtn} 
               onClick={handleAddToCart}
               whileTap={{ scale: 0.95 }}
+              disabled={product.countInStock === 0}
+              style={{ opacity: product.countInStock === 0 ? 0.5 : 1, cursor: product.countInStock === 0 ? 'not-allowed' : 'pointer' }}
             >
-              <ShoppingBag size={20} /> Add to Cart
+              <ShoppingBag size={20} /> {product.countInStock > 0 ? 'Add to Cart' : 'Out of Stock'}
             </motion.button>
             
             <button 

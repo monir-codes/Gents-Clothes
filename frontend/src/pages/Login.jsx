@@ -13,7 +13,7 @@ const Login = () => {
   
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, user, isLoading, error, clearError } = useAuthStore();
+  const { login, googleLogin, user, isLoading, error, clearError } = useAuthStore();
 
   const [message, setMessage] = useState(null);
 
@@ -46,13 +46,13 @@ const Login = () => {
 
   const handleGoogleLogin = async () => {
     try {
-      // NOTE: This currently only triggers Firebase popup, we need backend integration to fully sync Google users.
-      // Assuming for now it works as a placeholder or it needs to be completed.
-      // await signInWithGoogle();
-      // navigate(redirect);
-      alert("Google Login is currently disabled. Please use Email/Password.");
+      const gUser = await signInWithGoogle();
+      if (gUser && gUser.email) {
+        await googleLogin(gUser.displayName || 'Google User', gUser.email);
+      }
     } catch (error) {
       console.error("Google Sign In Failed", error);
+      setMessage("Google Sign In Failed. Please try again.");
     }
   };
 

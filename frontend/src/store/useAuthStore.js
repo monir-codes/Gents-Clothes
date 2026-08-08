@@ -25,6 +25,21 @@ const useAuthStore = create(
         }
       },
 
+      googleLogin: async (name, email) => {
+        set({ isLoading: true, error: null });
+        try {
+          const { data } = await axios.post('/api/users/google', { name, email });
+          set({ user: data, token: data.token, isLoading: false });
+          return true;
+        } catch (error) {
+          set({ 
+            isLoading: false, 
+            error: error.response?.data?.message || 'Google Login failed' 
+          });
+          return false;
+        }
+      },
+
       register: async (name, email, password) => {
         set({ isLoading: true, error: null });
         try {

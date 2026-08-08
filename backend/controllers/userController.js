@@ -155,6 +155,46 @@ const deleteUser = async (req, res) => {
   }
 };
 
+// @desc    Google login
+// @route   POST /api/users/google
+// @access  Public
+const googleLogin = async (req, res) => {
+  const { name, email } = req.body;
+
+  let user = await User.findOne({ email });
+
+  if (user) {
+    res.json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      isAdmin: user.isAdmin,
+      token: generateToken(user._id),
+    });
+  } else {
+    // Generate a random password for google users
+    const generatedPassword = crypto.randomBytes(16).toString('hex');
+    user = await User.create({
+      name,
+      email,
+      password: generatedPassword,
+      isVerified: true
+    });
+
+    if (user) {
+      res.status(201).json({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        isAdmin: user.isAdmin,
+        token: generateToken(user._id),
+      });
+    } else {
+      res.status(400).json({ message: 'Invalid user data' });
+    }
+  }
+};
+
 module.exports = {
   authUser,
   registerUser,
@@ -163,4 +203,5 @@ module.exports = {
   updateUserProfile,
   getUsers,
   deleteUser,
+  googleLogin,
 };
