@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import useCartStore from '../store/useCartStore';
 import useAuthStore from '../store/useAuthStore';
 import styles from './Checkout.module.css';
@@ -10,6 +11,18 @@ const Checkout = () => {
   const { user } = useAuthStore();
   const navigate = useNavigate();
 
+  const bdDistricts = [
+    'Bagerhat', 'Bandarban', 'Barguna', 'Barishal', 'Bhola', 'Bogra', 'Brahmanbaria', 'Chandpur', 
+    'Chattogram', 'Chuadanga', 'Comilla', 'Cox\'s Bazar', 'Dhaka', 'Dinajpur', 'Faridpur', 'Feni', 
+    'Gaibandha', 'Gazipur', 'Gopalganj', 'Habiganj', 'Jamalpur', 'Jashore', 'Jhalokati', 'Jhenaidah', 
+    'Joypurhat', 'Khagrachhari', 'Khulna', 'Kishoreganj', 'Kurigram', 'Kushtia', 'Lakshmipur', 
+    'Lalmonirhat', 'Madaripur', 'Magura', 'Manikganj', 'Meherpur', 'Moulvibazar', 'Munshiganj', 
+    'Mymensingh', 'Naogaon', 'Narail', 'Narayanganj', 'Narsingdi', 'Natore', 'Netrokona', 'Nilphamari', 
+    'Noakhali', 'Pabna', 'Panchagarh', 'Patuakhali', 'Pirojpur', 'Rajbari', 'Rajshahi', 'Rangamati', 
+    'Rangpur', 'Satkhira', 'Shariatpur', 'Sherpur', 'Sirajganj', 'Sunamganj', 'Sylhet', 'Tangail', 
+    'Thakurgaon'
+  ];
+
   const [address, setAddress] = useState({
     fullName: user?.name || '',
     phone: user?.phone || '',
@@ -19,24 +32,10 @@ const Checkout = () => {
   });
 
   const [paymentMethod, setPaymentMethod] = useState('COD');
-  const [transactionId, setTransactionId] = useState('');
-  const [settings, setSettings] = useState(null);
 
   const itemsPrice = cartItems.reduce((acc, item) => acc + item.price * item.qty, 0);
   const shippingPrice = itemsPrice > 5000 ? 0 : 100;
   const totalPrice = itemsPrice + shippingPrice;
-
-  React.useEffect(() => {
-    const fetchSettings = async () => {
-      try {
-        const { data } = await fetch('/api/settings').then(res => res.json());
-        setSettings(data);
-      } catch (err) {
-        console.error("Failed to fetch settings", err);
-      }
-    };
-    fetchSettings();
-  }, []);
 
   // Auth Guard
   React.useEffect(() => {
@@ -47,11 +46,6 @@ const Checkout = () => {
 
   const handlePlaceOrder = (e) => {
     e.preventDefault();
-    
-    if (paymentMethod === 'Advance Payment' && !transactionId) {
-      Swal.fire('Required', 'Please enter your Transaction ID for Advance Payment', 'warning');
-      return;
-    }
     
     Swal.fire({
       title: 'Confirm Order?',
@@ -64,13 +58,6 @@ const Checkout = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const config = {
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${useAuthStore.getState().token}`
-            }
-          };
-          
           const orderData = {
             orderItems: cartItems,
             shippingAddress: {
@@ -79,23 +66,19 @@ const Checkout = () => {
               street: address.street,
               city: address.city,
               district: address.district,
-              postalCode: '1000', // Default or make dynamic later
+              postalCode: '1000',
               country: 'Bangladesh'
             },
             paymentMethod,
-            transactionId: paymentMethod === 'Advance Payment' ? transactionId : '',
             itemsPrice,
             shippingPrice,
             totalPrice
           };
 
-          const { data } = await fetch('/api/orders', {
-            method: 'POST',
-            headers: config.headers,
-            body: JSON.stringify(orderData)
-          }).then(async res => {
-            if (!res.ok) throw new Error(await res.text());
-            return res.json();
+          const { data } = await axios.post('/api/orders', orderData, {
+            headers: {
+              Authorization: `Bearer ${useAuthStore.getState().token}`
+            }
           });
 
           clearCart();
@@ -144,10 +127,9 @@ const Checkout = () => {
               <label className={styles.label}>District</label>
               <select required className={styles.input} value={address.district} onChange={e => setAddress({...address, district: e.target.value})}>
                 <option value="">Select District</option>
-                <option value="Dhaka">Dhaka</option>
-                <option value="Chittagong">Chittagong</option>
-                <option value="Sylhet">Sylhet</option>
-                <option value="Rajshahi">Rajshahi</option>
+                {bdDistricts.map(district => (
+                  <option key={district} value={district}>{district}</option>
+                ))}
               </select>
             </div>
           </div>
@@ -164,51 +146,7 @@ const Checkout = () => {
               />
               Cash on Delivery (COD)
             </label>
-            <label className={styles.radioLabel}>
-              <input 
-                type="radio" 
-                name="payment" 
-                value="Advance Payment"
-                checked={paymentMethod === 'Advance Payment'}
-                onChange={() => setPaymentMethod('Advance Payment')}
-              />
-              Advance Payment
-            </label>
           </div>
-
-          {paymentMethod === 'Advance Payment' && (
-            <div style={{ background: 'var(--color-surface)', padding: '20px', borderRadius: '8px', marginTop: '20px', border: '1px solid var(--color-border)' }}>
-              <h4 style={{ marginBottom: '10px' }}>Payment Instructions</h4>
-              <p style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)', marginBottom: '5px' }}>
-                Please send <strong>৳{totalPrice}</strong> using the following method:
-              </p>
-              <div style={{ background: 'var(--color-background)', padding: '15px', borderRadius: '4px', marginBottom: '15px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ fontWeight: 600 }}>Method:</span>
-                  <span>{settings?.paymentSettings?.advancePaymentMethod || 'bKash (Send Money)'}</span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ fontWeight: 600 }}>Number:</span>
-                  <span style={{ fontWeight: 700, color: 'var(--color-accent)' }}>{settings?.paymentSettings?.advancePaymentNumber || 'Loading...'}</span>
-                </div>
-              </div>
-              
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Transaction ID</label>
-                <input 
-                  type="text" 
-                  required 
-                  className={styles.input} 
-                  placeholder="e.g. 9F8A7B6C5D"
-                  value={transactionId} 
-                  onChange={e => setTransactionId(e.target.value)} 
-                />
-                <p style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', marginTop: '5px' }}>
-                  Enter the transaction ID received via SMS after your payment.
-                </p>
-              </div>
-            </div>
-          )}
 
           <button type="submit" className={styles.placeOrderBtn}>Place Order</button>
         </form>

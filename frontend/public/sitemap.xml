@@ -19,4 +19,10 @@
   <url><loc>https://gentsclothes.vercel.app/terms</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
   
   <!-- Dynamic Products -->
+  <url>
+    <loc>https://gentsclothes.vercel.app/product/6a7b9c3848f331ea24895d17</loc>
+    <lastmod>2026-08-11</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
 </urlset>

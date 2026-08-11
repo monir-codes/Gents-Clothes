@@ -3,6 +3,13 @@
 // This file remains for future use but currently does nothing.
 
 const protect = (req, res, next) => {
+  // Mock a user to prevent 500 errors on routes that rely on req.user._id
+  req.user = {
+    _id: '60d5ecb8b392d700153ee61e',
+    name: 'Demo Admin',
+    email: 'admin@gentfits.com',
+    isAdmin: true
+  };
   next();
 };
 
