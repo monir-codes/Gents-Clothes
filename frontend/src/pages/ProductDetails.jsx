@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { ShoppingBag, Heart, Star, Truck, RefreshCcw, ShieldCheck, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -25,7 +25,10 @@ const ProductDetails = () => {
   const [selectedColor, setSelectedColor] = useState('');
   const [selectedSize, setSelectedSize] = useState('');
   const [qty, setQty] = useState(1);
-  const [activeTab, setActiveTab] = useState('description');
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const initialTab = searchParams.get('tab') || 'description';
+  const [activeTab, setActiveTab] = useState(initialTab);
   const [isSizeRecommenderOpen, setIsSizeRecommenderOpen] = useState(false);
   
   // Review state
@@ -333,7 +336,7 @@ const ProductDetails = () => {
               <div style={{ padding: '20px', background: 'var(--color-surface)', borderRadius: '8px' }}>
                 <h3 style={{ fontSize: '1.2rem', marginBottom: '15px' }}>Write a Review</h3>
                 {!user ? (
-                  <p>Please <Link to="/login" style={{ color: 'var(--color-accent)', textDecoration: 'underline' }}>log in</Link> to write a review.</p>
+                  <p>Please <Link to={`/login?redirect=/product/${product._id}?tab=reviews`} style={{ color: 'var(--color-accent)', textDecoration: 'underline' }}>log in</Link> to write a review.</p>
                 ) : (
                   <form onSubmit={submitReview} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                     <div>

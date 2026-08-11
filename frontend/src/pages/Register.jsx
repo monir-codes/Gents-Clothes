@@ -20,7 +20,8 @@ const Register = () => {
   const location = useLocation();
   const { register, user, isLoading, error, clearError } = useAuthStore();
 
-  const redirect = location.search ? location.search.split('=')[1] : '/dashboard';
+  const searchParams = new URLSearchParams(location.search);
+  const redirect = searchParams.get('redirect') || '/dashboard';
 
   useEffect(() => {
     if (user) {

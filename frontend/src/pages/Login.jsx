@@ -17,7 +17,8 @@ const Login = () => {
 
   const [message, setMessage] = useState(null);
 
-  const redirect = location.search ? location.search.split('=')[1] : '/shop';
+  const searchParams = new URLSearchParams(location.search);
+  const redirect = searchParams.get('redirect') || '/shop';
 
   useEffect(() => {
     if (user) {
