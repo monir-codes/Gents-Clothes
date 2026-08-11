@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import https from 'https';
 
-const API_URL = 'https://gent-fits-1do5.vercel.app/api/products';
+const API_URL = 'https://gents-clothes-server.vercel.app/api/products';
 const BASE_URL = 'https://gentsclothes.vercel.app';
 
 console.log('Generating dynamic sitemap...');
@@ -55,7 +55,7 @@ https.get(API_URL, (res) => {
       if (!fs.existsSync(publicDir)) {
         fs.mkdirSync(publicDir, { recursive: true });
       }
-      
+
       fs.writeFileSync(path.join(publicDir, 'sitemap.xml'), xml);
       console.log(`Successfully generated sitemap.xml with ${Array.isArray(products) ? products.length : 0} products.`);
     } catch (e) {

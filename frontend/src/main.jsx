@@ -7,7 +7,8 @@ import App from './App.jsx'
 
 // In production, point to the live Vercel backend using the env variable.
 if (import.meta.env.PROD) {
-  axios.defaults.baseURL = import.meta.env.VITE_API_URL || 'https://gents-clothes-server.vercel.app';
+  // Hardcoded to ensure Vercel's outdated env variables don't override this
+  axios.defaults.baseURL = 'https://gents-clothes-server.vercel.app';
 }
 
 createRoot(document.getElementById('root')).render(
