@@ -3,7 +3,7 @@ import axios from 'axios';
 import styles from './Admin.module.css';
 import { Plus, Edit, Trash2, X, Upload } from 'lucide-react';
 import Swal from 'sweetalert2';
-import ImageCropperModal from '../../components/ImageCropperModal';
+import useAuthStore from '../../store/useAuthStore';
 
 // User's official ImgBB API key
 const IMGBB_API_KEY = "affe71bc1ff1277c7d83bc8e9dfe4c3c"; 
@@ -14,8 +14,8 @@ const AdminProducts = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [editingId, setEditingId] = useState(null);
-  const [cropModalData, setCropModalData] = useState(null);
   const [imageTarget, setImageTarget] = useState(null); // 'image' or 'hoverImage'
+  const { token } = useAuthStore();
   const [magicText, setMagicText] = useState('');
   const [isMagicLoading, setIsMagicLoading] = useState(false);
 
@@ -63,24 +63,14 @@ const AdminProducts = () => {
     });
   };
 
-  const handleImageUpload = (e, target) => {
-    setImageTarget(target);
+  const handleImageUpload = async (e, target) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      setCropModalData(reader.result);
-    };
-    reader.readAsDataURL(file);
-    e.target.value = null; // Reset input
-  };
-
-  const handleCropComplete = async (croppedBlob) => {
-    setCropModalData(null);
     setIsUploading(true);
+    setImageTarget(target);
     const imgData = new FormData();
-    imgData.append('image', croppedBlob, 'product.jpg');
+    imgData.append('image', file);
 
     try {
       const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
@@ -90,15 +80,17 @@ const AdminProducts = () => {
       const data = await response.json();
       
       if (data.success) {
-        setFormData(prev => ({ ...prev, [imageTarget]: data.data.url }));
-        Swal.fire('Success', 'Image uploaded to ImgBB successfully!', 'success');
+        setFormData(prev => ({ ...prev, [target]: data.data.url }));
+        Swal.fire({ title: 'Success', text: 'Image uploaded successfully!', icon: 'success', toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
       } else {
-        Swal.fire('Error', 'ImgBB upload failed. Check API Key.', 'error');
+        Swal.fire('Error', 'Image upload failed. Check API Key.', 'error');
       }
     } catch (error) {
       Swal.fire('Error', 'Image upload failed', 'error');
     }
+    
     setIsUploading(false);
+    e.target.value = null; // Reset input
   };
 
   const generateDetails = async () => {
@@ -184,11 +176,17 @@ const AdminProducts = () => {
         colors: typeof formData.colors === 'string' ? formData.colors.split(',').map(c => c.trim()).filter(Boolean) : formData.colors
       };
 
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      };
+
       if (editingId) {
-        await axios.put(`/api/products/${editingId}`, submissionData);
+        await axios.put(`/api/products/${editingId}`, submissionData, config);
         Swal.fire('Updated!', 'Product updated successfully.', 'success');
       } else {
-        await axios.post('/api/products', submissionData);
+        await axios.post('/api/products', submissionData, config);
         Swal.fire('Added!', 'Product added successfully.', 'success');
       }
       setIsModalOpen(false);
@@ -243,7 +241,12 @@ const AdminProducts = () => {
 
     if (result.isConfirmed) {
       try {
-        await axios.delete(`/api/products/${id}`);
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        };
+        await axios.delete(`/api/products/${id}`, config);
         Swal.fire('Deleted!', 'Product has been deleted.', 'success');
         fetchProducts();
       } catch (error) {
@@ -477,14 +480,6 @@ const AdminProducts = () => {
         </div>
       )}
 
-      {cropModalData && (
-        <ImageCropperModal
-          imageSrc={cropModalData}
-          onCropComplete={handleCropComplete}
-          onCancel={() => setCropModalData(null)}
-          aspectRatio={undefined}
-        />
-      )}
     </div>
   );
 };
