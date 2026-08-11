@@ -118,4 +118,7 @@
   .checkoutContainer {
     flex-direction: column-reverse;
   }
+  .row {
+    flex-direction: column;
+  }
 }

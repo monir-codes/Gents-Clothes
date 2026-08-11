@@ -11,7 +11,9 @@ const CartDrawer = () => {
 
   const handleCheckout = () => {
     toggleCart();
-    navigate('/checkout');
+    setTimeout(() => {
+      navigate('/checkout');
+    }, 300);
   };
 
   const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.qty, 0);

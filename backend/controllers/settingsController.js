@@ -31,7 +31,7 @@ const updateSettings = async (req, res) => {
       'announcementText', 'announcementList', 'whatsappNumber', 'heroTitle', 'heroSubtitle', 'heroImage', 'heroVideo', 'heroSlideshow',
       'marqueeText', 'featuredCategories', 'featuredCollections', 'limitedEdition',
       'shopTheLook', 'premiumCollection', 'features', 'brandStory',
-      'featuredVideoSection', 'reviews', 'instagramImages', 'newsletter', 'staticPages'
+      'featuredVideoSection', 'reviews', 'instagramImages', 'newsletter', 'staticPages', 'paymentSettings'
     ];
 
     allowedFields.forEach(field => {

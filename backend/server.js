@@ -15,8 +15,9 @@ const settingsRoutes = require('./routes/settingsRoutes');
 const statsRoutes = require('./routes/statsRoutes');
 const aiRoutes = require('./routes/aiRoutes');
 
-// CORS — allow all origins for now (tighten in production)
-app.use(cors({ origin: '*' }));
+// CORS
+const allowedOrigins = process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : ['http://localhost:5173'];
+app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.use(express.json());
 
 // Middleware: ensure DB is connected before every request.
@@ -27,8 +28,7 @@ app.use(async (req, res, next) => {
     next();
   } catch (err) {
     console.error('DB connection failed on request:', err.message);
-    // Don't block the request — let individual controllers handle missing DB
-    next();
+    return res.status(503).json({ message: 'Service Unavailable: Database connection failed' });
   }
 });
 
@@ -45,6 +45,16 @@ app.use('/api/ai', aiRoutes);
 // Health check
 app.get('/', (req, res) => {
   res.json({ status: 'GentFits API is running', timestamp: new Date().toISOString() });
+});
+
+// Global Error Handler Middleware
+app.use((err, req, res, next) => {
+  console.error(`Error: ${err.message}`);
+  const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
+  res.status(statusCode).json({
+    message: err.message,
+    stack: process.env.NODE_ENV === 'production' ? null : err.stack,
+  });
 });
 
 // Start server only if not running on Vercel Serverless

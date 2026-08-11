@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 
-const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://gent_fits:bluWk3TM2C2HnFxs@simple-crud-cluster.0hdbxiy.mongodb.net/?appName=Simple-crud-cluster';
+const MONGO_URI = process.env.MONGO_URI;
+
+if (!MONGO_URI) {
+  console.warn("WARNING: MONGO_URI is missing. Database connection will fail.");
+}
 
 // Cache the connection promise so Vercel serverless reuses it across invocations.
 let cached = global.__mongoConnection;

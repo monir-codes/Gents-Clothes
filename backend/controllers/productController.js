@@ -206,17 +206,29 @@ const createProductReview = async (req, res) => {
 // @desc    Get all reviews across all products
 // @route   GET /api/products/reviews/all
 // @access  Private/Admin
-const getAllReviews = async (req, res) => {
+const getAllReviews = async (req, res, next) => {
   try {
-    const products = await Product.find({ 'reviews.0': { $exists: true } });
-    let allReviews = [];
-    products.forEach(p => {
-      p.reviews.forEach(r => {
-        allReviews.push({ ...r.toObject(), productId: p._id, productName: p.name, productImage: p.image });
-      });
-    });
-    // sort newest first
-    allReviews.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    const allReviews = await Product.aggregate([
+      { $match: { 'reviews.0': { $exists: true } } },
+      { $unwind: '$reviews' },
+      {
+        $project: {
+          _id: '$reviews._id',
+          name: '$reviews.name',
+          rating: '$reviews.rating',
+          comment: '$reviews.comment',
+          isApproved: '$reviews.isApproved',
+          adminReply: '$reviews.adminReply',
+          user: '$reviews.user',
+          createdAt: '$reviews.createdAt',
+          updatedAt: '$reviews.updatedAt',
+          productId: '$_id',
+          productName: '$name',
+          productImage: '$image'
+        }
+      },
+      { $sort: { createdAt: -1 } }
+    ]);
     res.json(allReviews);
   } catch (error) {
     res.status(500).json({ message: 'Server Error', error: error.message });

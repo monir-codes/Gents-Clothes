@@ -93,28 +93,28 @@ const Dashboard = () => {
         {activeTab === 'profile' && (
           <>
             <h1 className={styles.title}>Profile Settings</h1>
-            <div style={{ background: 'var(--color-surface)', padding: '24px', borderRadius: '8px' }}>
+            <div className={styles.formCard}>
               <form onSubmit={handleProfileUpdate}>
-                <div style={{ marginBottom: '15px' }}>
-                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 600 }}>Full Name</label>
-                  <input type="text" value={profileData.name} onChange={e => setProfileData({...profileData, name: e.target.value})} style={{ width: '100%', padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px' }} required />
+                <div className={styles.formGroup}>
+                  <label className={styles.formLabel}>Full Name</label>
+                  <input type="text" value={profileData.name} onChange={e => setProfileData({...profileData, name: e.target.value})} className={styles.formInput} required />
                 </div>
-                <div style={{ marginBottom: '15px' }}>
-                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 600 }}>Phone Number</label>
-                  <input type="tel" value={profileData.phone} onChange={e => setProfileData({...profileData, phone: e.target.value})} style={{ width: '100%', padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px' }} required />
+                <div className={styles.formGroup}>
+                  <label className={styles.formLabel}>Phone Number</label>
+                  <input type="tel" value={profileData.phone} onChange={e => setProfileData({...profileData, phone: e.target.value})} className={styles.formInput} required />
                 </div>
-                <div style={{ marginBottom: '15px' }}>
-                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 600 }}>Street Address</label>
-                  <input type="text" value={profileData.street} onChange={e => setProfileData({...profileData, street: e.target.value})} style={{ width: '100%', padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px' }} required />
+                <div className={styles.formGroup}>
+                  <label className={styles.formLabel}>Street Address</label>
+                  <input type="text" value={profileData.street} onChange={e => setProfileData({...profileData, street: e.target.value})} className={styles.formInput} required />
                 </div>
-                <div style={{ display: 'flex', gap: '15px', marginBottom: '20px' }}>
-                  <div style={{ flex: 1 }}>
-                    <label style={{ display: 'block', marginBottom: '5px', fontWeight: 600 }}>City</label>
-                    <input type="text" value={profileData.city} onChange={e => setProfileData({...profileData, city: e.target.value})} style={{ width: '100%', padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px' }} required />
+                <div className={styles.formRow}>
+                  <div className={styles.formCol}>
+                    <label className={styles.formLabel}>City</label>
+                    <input type="text" value={profileData.city} onChange={e => setProfileData({...profileData, city: e.target.value})} className={styles.formInput} required />
                   </div>
-                  <div style={{ flex: 1 }}>
-                    <label style={{ display: 'block', marginBottom: '5px', fontWeight: 600 }}>District</label>
-                    <select value={profileData.district} onChange={e => setProfileData({...profileData, district: e.target.value})} style={{ width: '100%', padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px' }} required>
+                  <div className={styles.formCol}>
+                    <label className={styles.formLabel}>District</label>
+                    <select value={profileData.district} onChange={e => setProfileData({...profileData, district: e.target.value})} className={styles.formInput} required>
                       <option value="">Select District</option>
                       <option value="Dhaka">Dhaka</option>
                       <option value="Chittagong">Chittagong</option>
@@ -123,7 +123,7 @@ const Dashboard = () => {
                     </select>
                   </div>
                 </div>
-                <button type="submit" disabled={isLoading} style={{ padding: '10px 20px', background: 'var(--color-text-primary)', color: 'white', borderRadius: '4px', fontWeight: 600, border: 'none', cursor: 'pointer' }}>
+                <button type="submit" disabled={isLoading} className={styles.submitBtn}>
                   {isLoading ? 'Saving...' : 'Save Changes'}
                 </button>
               </form>

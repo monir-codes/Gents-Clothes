@@ -172,7 +172,7 @@ const Checkout = () => {
                 checked={paymentMethod === 'Advance Payment'}
                 onChange={() => setPaymentMethod('Advance Payment')}
               />
-              Advance Payment (Ogrim Tk)
+              Advance Payment
             </label>
           </div>
 
