@@ -16,6 +16,8 @@ const AdminProducts = () => {
   const [editingId, setEditingId] = useState(null);
   const [cropModalData, setCropModalData] = useState(null);
   const [imageTarget, setImageTarget] = useState(null); // 'image' or 'hoverImage'
+  const [magicText, setMagicText] = useState('');
+  const [isMagicLoading, setIsMagicLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -133,6 +135,46 @@ const AdminProducts = () => {
     }
   };
 
+  const handleMagicFill = async () => {
+    if (!magicText.trim()) {
+      Swal.fire('Error', 'Please paste some text first!', 'warning');
+      return;
+    }
+    
+    setIsMagicLoading(true);
+    try {
+      const { data } = await axios.post('/api/ai/generate', { type: 'smart_extract', context: magicText });
+      try {
+        const resultString = data.result.replace(/```json/g, '').replace(/```/g, '').trim();
+        const parsedData = JSON.parse(resultString);
+        
+        setFormData(prev => ({
+          ...prev,
+          name: parsedData.name || prev.name,
+          price: parsedData.price || prev.price,
+          category: parsedData.category || prev.category,
+          sizes: parsedData.sizes || prev.sizes,
+          colors: parsedData.colors || prev.colors,
+          description: parsedData.description || prev.description,
+          fabricDetails: {
+            material: parsedData.material || prev.fabricDetails?.material || '',
+            gsm: parsedData.gsm || prev.fabricDetails?.gsm || '',
+            washInstruction: parsedData.washInstruction || prev.fabricDetails?.washInstruction || ''
+          }
+        }));
+        setMagicText('');
+        Swal.fire({ title: 'Magic Fill Success!', text: 'Form populated with extracted details.', icon: 'success', toast: true, position: 'top-end', showConfirmButton: false, timer: 3000 });
+      } catch (parseError) {
+        console.error("Failed to parse JSON:", data.result);
+        Swal.fire('Error', 'Failed to parse AI response. Please check your text and try again.', 'error');
+      }
+    } catch (error) {
+      Swal.fire('Error', error.response?.data?.message || 'Failed to extract details', 'error');
+    } finally {
+      setIsMagicLoading(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -158,12 +200,14 @@ const AdminProducts = () => {
 
   const openAddModal = () => {
     setEditingId(null);
+    setMagicText('');
     setFormData({ name: '', price: 0, oldPrice: '', category: '', brand: 'Gents Clothes', countInStock: 0, description: '', image: '', hoverImage: '', sku: '', sizes: '', colors: '', fabricDetails: { material: '', gsm: '', washInstruction: '' } });
     setIsModalOpen(true);
   };
 
   const openEditModal = (product) => {
     setEditingId(product._id);
+    setMagicText('');
     setFormData({
       name: product.name,
       price: product.price,
@@ -263,6 +307,40 @@ const AdminProducts = () => {
             </button>
             <h2 style={{ marginBottom: '20px' }}>{editingId ? 'Edit Product' : 'Add New Product'}</h2>
             
+            {/* Magic Paste Section */}
+            <div style={{ background: 'var(--color-surface-dim, #f9fafb)', padding: '15px', borderRadius: '8px', marginBottom: '20px', border: '1px solid var(--color-border)', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.05)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                <label style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--color-accent)' }}>✨ AI Magic Paste</label>
+                <button 
+                  type="button" 
+                  onClick={handleMagicFill}
+                  disabled={isMagicLoading}
+                  style={{ 
+                    background: 'var(--color-accent)', 
+                    color: 'white', 
+                    border: 'none', 
+                    padding: '6px 14px', 
+                    borderRadius: '4px', 
+                    fontSize: '0.85rem', 
+                    cursor: 'pointer',
+                    fontWeight: 600,
+                    opacity: isMagicLoading ? 0.7 : 1
+                  }}
+                >
+                  {isMagicLoading ? 'Extracting...' : '✨ Auto Fill Form'}
+                </button>
+              </div>
+              <textarea 
+                placeholder="Paste raw product details here (e.g. from WhatsApp, Excel, etc.)..."
+                value={magicText}
+                onChange={(e) => setMagicText(e.target.value)}
+                style={{ width: '100%', padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px', minHeight: '80px', fontFamily: 'inherit', resize: 'vertical' }}
+              ></textarea>
+              <p style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', marginTop: '8px', marginBottom: 0 }}>
+                Gemini AI will analyze your text and automatically fill the Name, Price, Category, Sizes, Colors, Description, and Fabric Details!
+              </p>
+            </div>
+
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
               
               {/* Images Upload */}

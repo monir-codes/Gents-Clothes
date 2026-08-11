@@ -19,28 +19,4 @@
   <url><loc>https://gentsclothes.vercel.app/terms</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
   
   <!-- Dynamic Products -->
-  <url>
-    <loc>https://gentsclothes.vercel.app/product/6a73b16a2efbcc5600cee0ff</loc>
-    <lastmod>2026-08-08</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://gentsclothes.vercel.app/product/6a727379ec40488c3d6d69dd</loc>
-    <lastmod>2026-08-04</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://gentsclothes.vercel.app/product/6a727379ec40488c3d6d69de</loc>
-    <lastmod>2026-08-04</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://gentsclothes.vercel.app/product/6a727379ec40488c3d6d69e0</loc>
-    <lastmod>2026-08-04</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
 </urlset>

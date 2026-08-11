@@ -32,6 +32,19 @@ router.post('/generate', async (req, res) => {
       Input: "${context}"`;
     } else if (type === 'seo') {
       prompt = `Act as an SEO expert. Generate a comma-separated list of 10-15 highly relevant, high-traffic SEO keywords and a compelling meta description (under 160 characters) for the following product: "${context}". Format the response clearly as: "Keywords: [your keywords]\n\nMeta Description: [your description]".`;
+    } else if (type === 'smart_extract') {
+      prompt = `Act as an expert data-entry assistant for an eCommerce store. I will give you a raw, messy block of text containing various product details. Parse it and extract the data into a valid JSON object ONLY. Do NOT include markdown formatting or backticks (e.g. no \`\`\`json). The JSON must have these exact keys (leave as empty string or 0 if missing):
+      - "name": String (Product Title)
+      - "price": Number (Numeric value only)
+      - "category": String (E.g. T-Shirts, Shirts, Panjabis, Pants)
+      - "sizes": String (Comma separated, e.g. "S, M, L, XL")
+      - "colors": String (Comma separated, e.g. "Black, White, Navy")
+      - "description": String (A neat 2-3 sentence summary)
+      - "material": String (e.g. "100% Cotton")
+      - "gsm": String (e.g. "160 GSM")
+      - "washInstruction": String (e.g. "Machine wash cold")
+      
+      Input text: "${context}"`;
     } else {
       return res.status(400).json({ message: 'Invalid generation type' });
     }
