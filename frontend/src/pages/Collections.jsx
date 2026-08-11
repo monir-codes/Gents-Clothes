@@ -7,7 +7,7 @@ import styles from './Shop.module.css';
 const Collections = () => {
   return (
     <div className="container" style={{ paddingTop: '60px', paddingBottom: '60px', minHeight: '80vh' }}>
-      <SEO title="Collections" description="Explore GentFits exclusive collections" />
+      <SEO title="Collections" description="Explore Gents Clothes exclusive collections" />
       
       <motion.div 
         initial={{ opacity: 0, y: 20 }}

@@ -118,7 +118,7 @@ const ProductDetails = () => {
     <>
     <SEO 
       title={product.name} 
-      description={product.description?.substring(0, 160) || "Premium luxury clothing from GentFits"} 
+      description={product.description?.substring(0, 160) || "Premium luxury clothing from Gents Clothes"} 
       keywords={generateProductKeywords(product)}
       type="product" 
     />

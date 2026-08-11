@@ -14,9 +14,9 @@ const UGCSection = () => {
         >
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
             <Camera size={24} />
-            <span style={{ fontWeight: 600, letterSpacing: '1px' }}>@GENTFITS</span>
+            <span style={{ fontWeight: 600, letterSpacing: '1px' }}>@GENTS CLOTHES</span>
           </div>
-          <h2 style={{ fontSize: '2rem', fontWeight: 600, textTransform: 'uppercase' }}>Spotted in GentFits</h2>
+          <h2 style={{ fontSize: '2rem', fontWeight: 600, textTransform: 'uppercase' }}>Spotted in Gents Clothes</h2>
           <p style={{ color: 'var(--color-text-secondary)' }}>Tag us to get featured on our official page.</p>
         </motion.div>
 

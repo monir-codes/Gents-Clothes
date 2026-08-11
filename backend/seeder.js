@@ -27,14 +27,14 @@ const importData = async () => {
     const createdUsers = await User.create([
       {
         name: 'Admin User',
-        email: 'admin@gentfits.com',
+        email: 'admin@gentsclothes.com',
         password: 'password', // will be hashed by pre-save
         isAdmin: true,
         clerkId: 'admin_123'
       },
       {
         name: 'Regular Customer',
-        email: 'customer@gentfits.com',
+        email: 'customer@gentsclothes.com',
         password: 'password',
         clerkId: 'cust_123'
       }

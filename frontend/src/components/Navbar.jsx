@@ -76,7 +76,7 @@ const Navbar = () => {
       
       <div className={`container ${styles.navContainer}`}>
         <Link to="/" className={styles.logo}>
-          GentFits
+          Gents Clothes
         </Link>
         
         <nav className={styles.navLinks}>

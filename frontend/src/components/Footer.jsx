@@ -27,7 +27,7 @@ const Footer = () => {
     <footer className={styles.footer}>
       <div className={`container ${styles.footerContent}`}>
         <div className={styles.footerSection}>
-          <h2 className={styles.brand}>GentFits</h2>
+          <h2 className={styles.brand}>Gents Clothes</h2>
           <p className={styles.description}>
             Redefining luxury men's fashion in Bangladesh. Premium fabrics, flawless tailoring, and timeless designs for the modern gentleman.
           </p>
@@ -89,7 +89,7 @@ const Footer = () => {
 
       <div className={styles.bottomBar}>
         <div className={`container ${styles.bottomBarInner}`}>
-          <p>&copy; {new Date().getFullYear()} GentFits. All Rights Reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Gents Clothes. All Rights Reserved.</p>
           <div className={styles.paymentIcons}>
             <span>VISA</span>
             <span>MasterCard</span>

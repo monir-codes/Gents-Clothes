@@ -84,7 +84,7 @@ const Register = () => {
     <div className={styles.authContainer}>
       <div className={styles.authCard}>
         <h1 className={styles.title}>Create Account</h1>
-        <p style={{ color: 'var(--color-text-secondary)', marginBottom: '30px', textAlign: 'center' }}>Join GentFits for a premium experience</p>
+        <p style={{ color: 'var(--color-text-secondary)', marginBottom: '30px', textAlign: 'center' }}>Join Gents Clothes for a premium experience</p>
 
         {(error || message) && <div className={styles.error}>{error || message}</div>}
         

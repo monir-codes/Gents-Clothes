@@ -5,7 +5,7 @@ import Shop from './Shop';
 const NewArrival = () => {
   return (
     <>
-      <SEO title="New Arrivals" description="The latest premium luxury collection by GentFits." />
+      <SEO title="New Arrivals" description="The latest premium luxury collection by Gents Clothes." />
       {/* We reuse the Shop component but could pass props to filter by 'new' */}
       <div style={{ textAlign: 'center', paddingTop: '40px' }}>
         <h1 style={{ fontSize: '2.5rem', fontWeight: 600 }}>New Arrivals</h1>

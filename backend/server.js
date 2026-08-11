@@ -44,7 +44,7 @@ app.use('/api/ai', aiRoutes);
 
 // Health check
 app.get('/', (req, res) => {
-  res.json({ status: 'GentFits API is running', timestamp: new Date().toISOString() });
+  res.json({ status: 'Gents Clothes API is running', timestamp: new Date().toISOString() });
 });
 
 // Global Error Handler Middleware

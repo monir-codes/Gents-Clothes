@@ -1,8 +1,8 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
 
-const SEO = ({ title, description, keywords, type = 'website', name = 'GentFits' }) => {
-  const defaultKeywords = "GentFits, luxury menswear Bangladesh, premium men's clothing BD, buy panjabi online Dhaka, stylish shirts for men, premium t-shirts BD, men's fashion Bangladesh, exclusive menswear, designer panjabi collection, men's clothing store, fashionable menswear, cash on delivery mens clothing BD, online shopping BD home delivery, best menswear brand in Dhaka, gents fashion BD, eid panjabi collection, casual shirts for men, formal shirts men Dhaka, quality t-shirts online, mens clothing online shopping bangladesh cash on delivery";
+const SEO = ({ title, description, keywords, type = 'website', name = 'Gents Clothes' }) => {
+  const defaultKeywords = "Gents Clothes, luxury menswear Bangladesh, premium men's clothing BD, buy panjabi online Dhaka, stylish shirts for men, premium t-shirts BD, men's fashion Bangladesh, exclusive menswear, designer panjabi collection, men's clothing store, fashionable menswear, cash on delivery mens clothing BD, online shopping BD home delivery, best menswear brand in Dhaka, gents fashion BD, eid panjabi collection, casual shirts for men, formal shirts men Dhaka, quality t-shirts online, mens clothing online shopping bangladesh cash on delivery";
   
   return (
     <Helmet>

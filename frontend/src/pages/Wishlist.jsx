@@ -11,7 +11,7 @@ const Wishlist = () => {
 
   return (
     <>
-      <SEO title="My Wishlist" description="View your saved premium GentFits items." />
+      <SEO title="My Wishlist" description="View your saved premium Gents Clothes items." />
       <div className="container" style={{ padding: 'var(--space-6) var(--space-3)', minHeight: '60vh' }}>
         <h1 style={{ fontSize: '2.5rem', fontWeight: 600, marginBottom: 'var(--space-4)', textAlign: 'center' }}>My Wishlist</h1>
         

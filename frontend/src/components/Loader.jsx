@@ -4,7 +4,7 @@ import styles from './Loader.module.css';
 
 const Loader = ({ fullScreen = false }) => {
   const containerClass = fullScreen ? `${styles.loaderContainer} ${styles.fullScreen}` : styles.loaderContainer;
-  const brandName = "GENTFITS";
+  const brandName = "GENTS CLOTHES";
 
   return (
     <div className={containerClass}>

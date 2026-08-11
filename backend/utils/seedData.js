@@ -15,13 +15,13 @@ const seedData = async () => {
       const createdUsers = await User.create([
         {
           name: 'Admin User',
-          email: 'admin@gentfits.com',
+          email: 'admin@gentsclothes.com',
           password: 'password', // will be hashed by pre-save
           isAdmin: true
         },
         {
           name: 'Regular Customer',
-          email: 'customer@gentfits.com',
+          email: 'customer@gentsclothes.com',
           password: 'password'
         }
       ]);

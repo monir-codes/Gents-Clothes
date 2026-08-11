@@ -27,7 +27,7 @@ const LoyaltyBanner = () => {
           <Gift size={32} color="#fff" />
         </div>
         <div>
-          <h2 style={{ fontSize: '1.8rem', fontWeight: 600, margin: 0 }}>GentFits Insider</h2>
+          <h2 style={{ fontSize: '1.8rem', fontWeight: 600, margin: 0 }}>Gents Clothes Insider</h2>
           <p style={{ margin: 0, color: 'rgba(255,255,255,0.8)' }}>Join our loyalty program and earn exclusive rewards.</p>
         </div>
       </div>

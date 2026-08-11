@@ -24,12 +24,12 @@ const sendVerificationEmail = async (email, token) => {
   }
 
   const mailOptions = {
-    from: '"GentFits" <noreply@gentfits.com>',
+    from: '"Gents Clothes" <noreply@gentsclothes.com>',
     to: email,
-    subject: 'Verify your GentFits account',
+    subject: 'Verify your Gents Clothes account',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
-        <h2 style="color: #333; text-align: center;">Welcome to GentFits!</h2>
+        <h2 style="color: #333; text-align: center;">Welcome to Gents Clothes!</h2>
         <p style="color: #555; font-size: 16px;">Thank you for registering. Please confirm your email address by clicking the button below:</p>
         <div style="text-align: center; margin: 30px 0;">
           <a href="${verificationUrl}" style="background-color: #000; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold;">Verify Email</a>

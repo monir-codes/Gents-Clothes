@@ -52,7 +52,7 @@ const useCartStore = create(
       clearCart: () => set({ cartItems: [] })
     }),
     {
-      name: 'gentfits-cart', // local storage key
+      name: 'gentsclothes-cart', // local storage key
     }
   )
 );

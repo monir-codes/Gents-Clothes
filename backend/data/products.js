@@ -5,7 +5,7 @@ const products = [
     hoverImage: '/images/category-tshirt.png',
     description:
       'Luxurious 100% combed cotton t-shirt with a modern fit. Perfect for layering or wearing on its own.',
-    brand: 'GentFits',
+    brand: 'Gents Clothes',
     category: 'T-Shirts',
     price: 1200,
     oldPrice: 1500,
@@ -27,7 +27,7 @@ const products = [
     hoverImage: '/images/category-tshirt.png',
     description:
       'Elevate your casual look with our signature polo shirt, crafted from premium pique cotton.',
-    brand: 'GentFits',
+    brand: 'Gents Clothes',
     category: 'Polos',
     price: 1800,
     countInStock: 7,
@@ -47,7 +47,7 @@ const products = [
     image: '/images/category-tshirt.png',
     description:
       'A timeless classic for festive occasions. Made with breathable linen for ultimate comfort.',
-    brand: 'GentFits',
+    brand: 'Gents Clothes',
     category: 'Panjabis',
     price: 3500,
     oldPrice: 4000,
@@ -68,7 +68,7 @@ const products = [
     image: '/images/category-tshirt.png',
     description:
       'Stay warm without sacrificing style. Heavyweight fleece fabric for maximum heat retention.',
-    brand: 'GentFits',
+    brand: 'Gents Clothes',
     category: 'Hoodies',
     price: 2500,
     countInStock: 15,

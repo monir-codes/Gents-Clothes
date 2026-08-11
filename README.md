@@ -1,6 +1,6 @@
-# GentFits - Premium Luxury Menswear eCommerce
+# Gents Clothes - Premium Luxury Menswear eCommerce
 
-GentFits is a full-stack, state-of-the-art eCommerce platform built specifically for luxury menswear in Bangladesh. Designed with a premium aesthetic, it offers a seamless shopping experience for customers and a powerful, dynamic admin dashboard for store management.
+Gents Clothes is a full-stack, state-of-the-art eCommerce platform built specifically for luxury menswear in Bangladesh. Designed with a premium aesthetic, it offers a seamless shopping experience for customers and a powerful, dynamic admin dashboard for store management.
 
 ## 🚀 Tech Stack
 
@@ -45,8 +45,8 @@ GentFits is a full-stack, state-of-the-art eCommerce platform built specifically
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/monir-codes/GentFits.git
-   cd GentFits
+   git clone https://github.com/monir-codes/Gents Clothes.git
+   cd Gents Clothes
    ```
 
 2. **Backend Setup:**

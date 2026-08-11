@@ -103,7 +103,7 @@ const Shop = ({ hideHeader }) => {
 
   return (
     <>
-    <SEO title="Shop All Collections" description="Browse all premium luxury products from GentFits." />
+    <SEO title="Shop All Collections" description="Browse all premium luxury products from Gents Clothes." />
     <div className={`container ${styles.shopContainer}`}>
       {/* Sidebar Filters */}
       {!hideHeader && (

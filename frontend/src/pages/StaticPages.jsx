@@ -49,7 +49,7 @@ export const About = () => {
 
   return (
   <div>
-    <SEO title="About Us - Our Story" description="Discover the heritage and craftsmanship behind GentFits." />
+    <SEO title="About Us - Our Story" description="Discover the heritage and craftsmanship behind Gents Clothes." />
     {/* Cinematic Hero */}
     <div style={{ position: 'relative', height: '60vh', width: '100%', overflow: 'hidden' }}>
       <img src={settings?.staticPages?.about?.heroImage || '/images/hero-banner.jpg'} alt="Craftsmanship" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -71,7 +71,7 @@ export const About = () => {
         <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
           <h2 style={{ fontSize: 'clamp(1.8rem, 5vw, 2.5rem)', marginBottom: '20px' }}>A Legacy of Elegance</h2>
           <p style={{ color: 'var(--color-text-secondary)', lineHeight: 1.8, fontSize: '1.1rem' }}>
-            {settings?.staticPages?.about?.storyText || 'GentFits was founded with a singular, uncompromising vision: to redefine luxury menswear in Bangladesh. We believe that true elegance lies in the details—from the meticulous selection of premium fabrics to the flawless precision of our tailoring.'}
+            {settings?.staticPages?.about?.storyText || 'Gents Clothes was founded with a singular, uncompromising vision: to redefine luxury menswear in Bangladesh. We believe that true elegance lies in the details—from the meticulous selection of premium fabrics to the flawless precision of our tailoring.'}
           </p>
         </motion.div>
         <motion.img 

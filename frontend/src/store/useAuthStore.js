@@ -81,7 +81,7 @@ const useAuthStore = create(
       clearError: () => set({ error: null })
     }),
     {
-      name: 'gentfits-auth',
+      name: 'gentsclothes-auth',
     }
   )
 );

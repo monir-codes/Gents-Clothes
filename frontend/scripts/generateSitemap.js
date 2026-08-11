@@ -3,7 +3,7 @@ import path from 'path';
 import https from 'https';
 
 const API_URL = 'https://gent-fits-1do5.vercel.app/api/products';
-const BASE_URL = 'https://gentfits.vercel.app';
+const BASE_URL = 'https://gentsclothes.vercel.app';
 
 console.log('Generating dynamic sitemap...');
 

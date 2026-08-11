@@ -74,7 +74,7 @@ const Home = () => {
     <div style={{ overflowX: 'hidden' }}>
       <SEO 
         title="Home" 
-        description="GentFits - Redefining luxury men's fashion in Bangladesh. Shop premium Panjabis, Shirts, and T-Shirts." 
+        description="Gents Clothes - Redefining luxury men's fashion in Bangladesh. Shop premium Panjabis, Shirts, and T-Shirts." 
       />
       {/* Hero Section */}
       <section className={styles.hero}>

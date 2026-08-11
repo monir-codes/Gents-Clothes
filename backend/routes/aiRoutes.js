@@ -21,9 +21,9 @@ router.post('/generate', async (req, res) => {
     let prompt = '';
     
     if (type === 'description') {
-      prompt = `Act as an expert luxury fashion copywriter. I will provide you with either a product name, details, or an existing product description. Your task is to generate or rewrite it into a highly engaging, premium product description. The tone MUST ALWAYS be elegant, professional, and persuasive, suited for a high-end menswear brand named GentFits. Maintain this exact tone regardless of the input. Do not include markdown formatting or asterisks, just plain text in paragraphs.\n\nInput: "${context}"`;
+      prompt = `Act as an expert luxury fashion copywriter. I will provide you with either a product name, details, or an existing product description. Your task is to generate or rewrite it into a highly engaging, premium product description. The tone MUST ALWAYS be elegant, professional, and persuasive, suited for a high-end menswear brand named Gents Clothes. Maintain this exact tone regardless of the input. Do not include markdown formatting or asterisks, just plain text in paragraphs.\n\nInput: "${context}"`;
     } else if (type === 'product_details') {
-      prompt = `Act as an expert luxury fashion copywriter and product specialist for a menswear brand named GentFits. I will provide a basic product name or description. You need to generate a complete product profile in JSON format ONLY. Do NOT include markdown code block formatting (like \`\`\`json). Return a valid JSON object with the following keys:
+      prompt = `Act as an expert luxury fashion copywriter and product specialist for a menswear brand named Gents Clothes. I will provide a basic product name or description. You need to generate a complete product profile in JSON format ONLY. Do NOT include markdown code block formatting (like \`\`\`json). Return a valid JSON object with the following keys:
       - "description": A highly engaging, elegant, meaningful, and SHORT product description (strictly 2-3 concise sentences maximum).
       - "material": e.g., "100% Premium Egyptian Cotton"
       - "gsm": e.g., "160 GSM" or "N/A" if not applicable

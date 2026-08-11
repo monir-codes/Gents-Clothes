@@ -21,7 +21,7 @@ const AdminProducts = () => {
     name: '',
     price: 0,
     category: '',
-    brand: 'GentFits',
+    brand: 'Gents Clothes',
     countInStock: 0,
     description: '',
     image: '',
@@ -158,7 +158,7 @@ const AdminProducts = () => {
 
   const openAddModal = () => {
     setEditingId(null);
-    setFormData({ name: '', price: 0, oldPrice: '', category: '', brand: 'GentFits', countInStock: 0, description: '', image: '', hoverImage: '', sku: '', sizes: '', colors: '', fabricDetails: { material: '', gsm: '', washInstruction: '' } });
+    setFormData({ name: '', price: 0, oldPrice: '', category: '', brand: 'Gents Clothes', countInStock: 0, description: '', image: '', hoverImage: '', sku: '', sizes: '', colors: '', fabricDetails: { material: '', gsm: '', washInstruction: '' } });
     setIsModalOpen(true);
   };
 

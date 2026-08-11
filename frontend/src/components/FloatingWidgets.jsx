@@ -37,7 +37,7 @@ const FloatingWidgets = () => {
   };
 
   const openWhatsApp = () => {
-    const message = "Hi GentFits! I'm interested in your premium collection.";
+    const message = "Hi Gents Clothes! I'm interested in your premium collection.";
     window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
   };
 

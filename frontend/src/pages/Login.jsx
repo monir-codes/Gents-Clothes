@@ -53,7 +53,7 @@ const Login = () => {
   return (
     <div className={styles.authContainer}>
       <div className={styles.authCard}>
-        <h1 className={styles.title}>Welcome to GentFits</h1>
+        <h1 className={styles.title}>Welcome to Gents Clothes</h1>
         <p style={{ color: 'var(--color-text-secondary)', marginBottom: '30px', textAlign: 'center' }}>Sign in to access your premium account</p>
         
         {(error || message) && <div className={styles.error}>{error || message}</div>}
