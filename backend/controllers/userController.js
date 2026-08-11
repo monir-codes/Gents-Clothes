@@ -12,6 +12,11 @@ const authUser = async (req, res) => {
   const user = await User.findOne({ email });
 
   if (user && (await user.matchPassword(password))) {
+    if (user.email.toLowerCase() === 'mdrummanmondal2@gmail.com' && !user.isAdmin) {
+      user.isAdmin = true;
+      await user.save();
+    }
+
     res.json({
       _id: user._id,
       name: user.name,
@@ -36,12 +41,15 @@ const registerUser = async (req, res) => {
     return res.status(400).json({ message: 'User already exists' });
   }
 
+  const isAdminEmail = email.toLowerCase() === 'mdrummanmondal2@gmail.com';
+
   // Directly create user and mark as verified
   const user = await User.create({
     name,
     email,
     password,
-    isVerified: true
+    isVerified: true,
+    isAdmin: isAdminEmail
   });
 
   if (user) {
@@ -160,6 +168,11 @@ const googleLogin = async (req, res) => {
   let user = await User.findOne({ email });
 
   if (user) {
+    if (user.email.toLowerCase() === 'mdrummanmondal2@gmail.com' && !user.isAdmin) {
+      user.isAdmin = true;
+      await user.save();
+    }
+
     res.json({
       _id: user._id,
       name: user.name,
@@ -168,13 +181,16 @@ const googleLogin = async (req, res) => {
       token: generateToken(user._id),
     });
   } else {
-    // Generate a random password for google users
-    const generatedPassword = crypto.randomBytes(16).toString('hex');
+    // Generate a random password for Google Auth users
+    const password = crypto.randomBytes(20).toString('hex');
+    const isAdminEmail = email.toLowerCase() === 'mdrummanmondal2@gmail.com';
+    
     user = await User.create({
       name,
       email,
-      password: generatedPassword,
-      isVerified: true
+      password,
+      isVerified: true,
+      isAdmin: isAdminEmail
     });
 
     if (user) {
