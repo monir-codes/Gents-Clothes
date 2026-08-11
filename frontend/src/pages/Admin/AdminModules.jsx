@@ -459,8 +459,11 @@ export const AdminSettings = () => {
         <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginBottom: '8px' }}>E.g. bKash (Send Money), Nagad (Cash Out)</p>
         <input type="text" value={settings.paymentSettings?.advancePaymentMethod || ''} onChange={(e) => handleNestedChange('paymentSettings', 'advancePaymentMethod', e.target.value)} style={inputStyle} />
         
-        <label style={labelStyle}>Advance Payment Number</label>
+        <label style={labelStyle}>Advance Payment Number (If Applicable)</label>
         <input type="text" value={settings.paymentSettings?.advancePaymentNumber || ''} onChange={(e) => handleNestedChange('paymentSettings', 'advancePaymentNumber', e.target.value)} style={inputStyle} />
+        
+        <label style={labelStyle}>Delivery Charge (৳)</label>
+        <input type="number" value={settings.paymentSettings?.deliveryCharge ?? 120} onChange={(e) => handleNestedChange('paymentSettings', 'deliveryCharge', Number(e.target.value))} style={inputStyle} />
       </div>
 
       <div style={sectionStyle}>

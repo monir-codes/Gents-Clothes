@@ -33,15 +33,28 @@ const Checkout = () => {
 
   const [paymentMethod, setPaymentMethod] = useState('COD');
 
+  const [deliveryCharge, setDeliveryCharge] = useState(100);
+
   const itemsPrice = cartItems.reduce((acc, item) => acc + item.price * item.qty, 0);
-  const shippingPrice = itemsPrice > 5000 ? 0 : 100;
+  const shippingPrice = itemsPrice > 5000 ? 0 : deliveryCharge;
   const totalPrice = itemsPrice + shippingPrice;
 
-  // Auth Guard
+  // Auth Guard & Fetch Settings
   React.useEffect(() => {
     if (!user) {
       navigate('/login?redirect=/checkout');
     }
+    const fetchSettings = async () => {
+      try {
+        const { data } = await axios.get('/api/settings');
+        if (data && data.paymentSettings && data.paymentSettings.deliveryCharge !== undefined) {
+          setDeliveryCharge(data.paymentSettings.deliveryCharge);
+        }
+      } catch (error) {
+        console.error('Error fetching settings:', error);
+      }
+    };
+    fetchSettings();
   }, [user, navigate]);
 
   const handlePlaceOrder = (e) => {

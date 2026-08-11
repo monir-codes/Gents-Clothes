@@ -126,7 +126,8 @@ const settingsSchema = mongoose.Schema(
     },
     paymentSettings: {
       advancePaymentMethod: { type: String, default: 'bKash (Send Money)' },
-      advancePaymentNumber: { type: String, default: '01700000000' }
+      advancePaymentNumber: { type: String, default: '01700000000' },
+      deliveryCharge: { type: Number, default: 120 }
     }
   },
   {
