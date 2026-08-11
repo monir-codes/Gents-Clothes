@@ -3,6 +3,7 @@ import axios from 'axios';
 import Loader from '../../components/Loader';
 import styles from './Admin.module.css';
 import { TrendingUp, Users, Package, DollarSign } from 'lucide-react';
+import useAuthStore from '../../store/useAuthStore';
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState({
@@ -17,7 +18,9 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const { data } = await axios.get('/api/stats');
+        const token = useAuthStore.getState().token;
+        const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+        const { data } = await axios.get('/api/stats', config);
         setStats(data);
         setLoading(false);
       } catch (error) {

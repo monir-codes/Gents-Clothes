@@ -5,8 +5,15 @@ import styles from './Admin.module.css';
 import { Upload } from 'lucide-react';
 import Loader from '../../components/Loader';
 import ImageCropperModal from '../../components/ImageCropperModal';
+import useAuthStore from '../../store/useAuthStore';
 
 const IMGBB_API_KEY = "affe71bc1ff1277c7d83bc8e9dfe4c3c";
+
+// Helper to get auth config
+const getAuthConfig = () => {
+  const token = useAuthStore.getState().token;
+  return token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+};
 
 const AdminOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -15,7 +22,7 @@ const AdminOrders = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const { data } = await axios.get('/api/orders');
+        const { data } = await axios.get('/api/orders', getAuthConfig());
         setOrders(data);
       } catch (error) {
         console.error(error);
@@ -69,7 +76,7 @@ const AdminOrders = () => {
                       onChange={async (e) => {
                         const newStatus = e.target.value;
                         try {
-                          await axios.put(`/api/orders/${order._id}/status`, { status: newStatus });
+                          await axios.put(`/api/orders/${order._id}/status`, { status: newStatus }, getAuthConfig());
                           Swal.fire('Success', 'Order status updated', 'success');
                           // update local state
                           setOrders(orders.map(o => o._id === order._id ? { ...o, status: newStatus } : o));
@@ -105,7 +112,7 @@ export const AdminCustomers = () => {
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
-        const { data } = await axios.get('/api/users');
+        const { data } = await axios.get('/api/users', getAuthConfig());
         setCustomers(data);
       } catch (error) {
         console.error(error);
@@ -166,7 +173,7 @@ export const AdminMarketing = () => {
     
     setLoadingType(type);
     try {
-      const { data } = await axios.post('/api/ai/generate', { type, context });
+      const { data } = await axios.post('/api/ai/generate', { type, context }, getAuthConfig());
       setResult(data.result);
       Swal.fire('Success', 'Content generated successfully!', 'success');
     } catch (error) {
@@ -388,7 +395,7 @@ export const AdminSettings = () => {
       if (!dataToSave.featuredVideoSection) dataToSave.featuredVideoSection = {};
       dataToSave.featuredVideoSection.slideshow = (textInputs.featuredVideoSlideshow || '').split('\n').map(s => s.trim()).filter(Boolean);
 
-      await axios.put('/api/settings', dataToSave);
+      await axios.put('/api/settings', dataToSave, getAuthConfig());
       Swal.fire('Success', 'Store Settings saved successfully!', 'success');
     } catch (error) {
       console.error(error);
