@@ -2,12 +2,12 @@ import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
 
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID
+  apiKey: "AIzaSyAfKwFQPKbep8QcP3u-GZ60iZ2t7oBy66A",
+  authDomain: "gentfits-55801.firebaseapp.com",
+  projectId: "gentfits-55801",
+  storageBucket: "gentfits-55801.firebasestorage.app",
+  messagingSenderId: "519555197855",
+  appId: "1:519555197855:web:fb73bda99e9636701dabaa"
 };
 
 const app = initializeApp(firebaseConfig);
