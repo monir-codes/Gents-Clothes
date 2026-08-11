@@ -86,7 +86,7 @@ const createProduct = async (req, res) => {
       colors: colors || [],
       sizes: sizes || [],
       fabricDetails: fabricDetails || '',
-      sku: sku || ''
+      sku: sku || `GF-${Math.floor(100000 + Math.random() * 900000)}`
     });
 
     const createdProduct = await product.save();
@@ -132,7 +132,7 @@ const updateProduct = async (req, res) => {
       product.colors = colors || product.colors;
       product.sizes = sizes || product.sizes;
       product.fabricDetails = fabricDetails || product.fabricDetails;
-      if (sku !== undefined) product.sku = sku;
+      if (sku) product.sku = sku;
 
       const updatedProduct = await product.save();
       res.json(updatedProduct);

@@ -40,7 +40,7 @@ const productSchema = new mongoose.Schema({
   },
   
   // Unique identifiers
-  sku: { type: String, unique: true },
+  sku: { type: String, unique: true, sparse: true },
   barcode: { type: String },
   
   // AI features
