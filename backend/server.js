@@ -14,6 +14,7 @@ const orderRoutes = require('./routes/orderRoutes');
 const settingsRoutes = require('./routes/settingsRoutes');
 const statsRoutes = require('./routes/statsRoutes');
 const aiRoutes = require('./routes/aiRoutes');
+const sitemapRoutes = require('./routes/sitemapRoutes');
 
 // CORS
 const allowedOrigins = [
@@ -45,6 +46,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/stats', statsRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/sitemap.xml', sitemapRoutes);
 
 // Health check
 app.get('/', (req, res) => {

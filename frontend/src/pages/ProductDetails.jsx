@@ -117,6 +117,32 @@ const ProductDetails = () => {
   if (loading) return <Loader fullScreen />;
   if (!product) return <div className="container" style={{padding: '50px 0'}}>Product not found</div>;
 
+  const productUrl = `https://gents-clothes.vercel.app/product/${product._id}`;
+  
+  const productSchema = {
+    "@context": "https://schema.org/",
+    "@type": "Product",
+    "name": product.name,
+    "image": product.image,
+    "description": product.description,
+    "sku": product._id,
+    "offers": {
+      "@type": "Offer",
+      "url": productUrl,
+      "priceCurrency": "BDT",
+      "price": product.price,
+      "itemCondition": "https://schema.org/NewCondition",
+      "availability": product.countInStock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"
+    },
+    ...(product.numReviews > 0 && {
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": product.rating,
+        "reviewCount": product.numReviews
+      }
+    })
+  };
+
   return (
     <>
     <SEO 
@@ -124,6 +150,8 @@ const ProductDetails = () => {
       description={product.description?.substring(0, 160) || "Premium luxury clothing from Gents Clothes"} 
       keywords={generateProductKeywords(product)}
       type="product" 
+      canonical={productUrl}
+      schemaMarkup={productSchema}
     />
     <div className={`container ${styles.productContainer}`}>
       {/* Breadcrumbs */}
@@ -140,12 +168,12 @@ const ProductDetails = () => {
           transition={{ duration: 0.6 }}
         >
           <div className={styles.mainImageContainer}>
-            <img src={displayImage || product.image} alt={product.name} className={styles.mainImage} />
+            <img src={displayImage || product.image} alt={`${product.name} - Front View`} className={styles.mainImage} />
           </div>
           <div className={styles.thumbnailList}>
-            <img src={product.image} alt="Thumb 1" className={styles.thumbnail} onClick={() => setDisplayImage(product.image)} style={{ borderColor: displayImage === product.image ? 'var(--color-accent)' : 'transparent' }} />
+            <img src={product.image} alt={`${product.name} Thumbnail 1`} className={styles.thumbnail} onClick={() => setDisplayImage(product.image)} style={{ borderColor: displayImage === product.image ? 'var(--color-accent)' : 'transparent' }} />
             {product.hoverImage && (
-              <img src={product.hoverImage} alt="Thumb 2" className={styles.thumbnail} onClick={() => setDisplayImage(product.hoverImage)} style={{ borderColor: displayImage === product.hoverImage ? 'var(--color-accent)' : 'transparent' }} />
+              <img src={product.hoverImage} alt={`${product.name} Thumbnail 2`} className={styles.thumbnail} onClick={() => setDisplayImage(product.hoverImage)} style={{ borderColor: displayImage === product.hoverImage ? 'var(--color-accent)' : 'transparent' }} />
             )}
           </div>
         </motion.div>
