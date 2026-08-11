@@ -1,20 +1,40 @@
-// JWT authentication disabled for demo purposes (Per User Request to bypass 401).
-// The middleware now simply calls next() for every request.
-// This file remains for future use but currently does nothing.
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
 
-const protect = (req, res, next) => {
-  // Mock a user to prevent 500 errors on routes that rely on req.user._id
-  req.user = {
-    _id: '60d5ecb8b392d700153ee61e',
-    name: 'Demo Admin',
-    email: 'admin@gentfits.com',
-    isAdmin: true
-  };
-  next();
+const protect = async (req, res, next) => {
+  let token;
+
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith('Bearer')
+  ) {
+    try {
+      token = req.headers.authorization.split(' ')[1];
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      
+      req.user = await User.findById(decoded.id).select('-password');
+      if (!req.user) {
+        return res.status(401).json({ message: 'Not authorized, user not found' });
+      }
+
+      next();
+    } catch (error) {
+      console.error(error);
+      res.status(401).json({ message: 'Not authorized, token failed' });
+    }
+  }
+
+  if (!token) {
+    res.status(401).json({ message: 'Not authorized, no token' });
+  }
 };
 
 const admin = (req, res, next) => {
-  next();
+  if (req.user && req.user.isAdmin) {
+    next();
+  } else {
+    res.status(401).json({ message: 'Not authorized as an admin' });
+  }
 };
 
 module.exports = { protect, admin };
