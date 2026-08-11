@@ -249,7 +249,7 @@ export const AdminSettings = () => {
   const [settings, setSettings] = useState({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [jsonInputs, setJsonInputs] = useState({});
+  const [textInputs, setTextInputs] = useState({});
   const [uploadingField, setUploadingField] = useState(null);
   const [cropModalData, setCropModalData] = useState(null);
 
@@ -258,17 +258,13 @@ export const AdminSettings = () => {
       try {
         const { data } = await axios.get('/api/settings');
         setSettings(data);
-        // Initialize JSON strings for array fields
-        setJsonInputs({
-          marqueeText: JSON.stringify(data.marqueeText || [], null, 2),
-          announcementList: JSON.stringify(data.announcementList || [], null, 2),
-          featuredCategories: JSON.stringify(data.featuredCategories || [], null, 2),
-          featuredCollections: JSON.stringify(data.featuredCollections || [], null, 2),
-          features: JSON.stringify(data.features || [], null, 2),
-          reviews: JSON.stringify(data.reviews || [], null, 2),
-          instagramImages: JSON.stringify(data.instagramImages || [], null, 2),
-          heroSlideshow: JSON.stringify(data.heroSlideshow || [], null, 2),
-          featuredVideoSlideshow: JSON.stringify(data.featuredVideoSection?.slideshow || [], null, 2),
+        // Initialize multiline strings for array fields
+        setTextInputs({
+          marqueeText: (data.marqueeText || []).join('\n'),
+          announcementList: (data.announcementList || []).join('\n'),
+          instagramImages: (data.instagramImages || []).join('\n'),
+          heroSlideshow: (data.heroSlideshow || []).join('\n'),
+          featuredVideoSlideshow: (data.featuredVideoSection?.slideshow || []).join('\n'),
         });
         setLoading(false);
       } catch (error) {
@@ -293,8 +289,25 @@ export const AdminSettings = () => {
     }));
   };
 
-  const handleJsonInputChange = (field, value) => {
-    setJsonInputs(prev => ({ ...prev, [field]: value }));
+  const handleTextInputChange = (field, value) => {
+    setTextInputs(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleObjectArrayChange = (field, index, key, value) => {
+    const newArray = [...(settings[field] || [])];
+    newArray[index] = { ...newArray[index], [key]: value };
+    setSettings({ ...settings, [field]: newArray });
+  };
+  
+  const handleAddObject = (field, defaultObject) => {
+    const newArray = [...(settings[field] || []), defaultObject];
+    setSettings({ ...settings, [field]: newArray });
+  };
+  
+  const handleRemoveObject = (field, index) => {
+    const newArray = [...(settings[field] || [])];
+    newArray.splice(index, 1);
+    setSettings({ ...settings, [field]: newArray });
   };
 
   const handleImageUpload = (e, field, isNested = false, parent = null) => {
@@ -309,23 +322,23 @@ export const AdminSettings = () => {
     e.target.value = null; // Reset input
   };
 
-  const handleArrayImageUpload = (e, jsonField) => {
+  const handleArrayImageUpload = (e, textField) => {
     const file = e.target.files[0];
     if (!file) return;
 
     const reader = new FileReader();
     reader.onload = () => {
-      setCropModalData({ imageSrc: reader.result, jsonField });
+      setCropModalData({ imageSrc: reader.result, textField });
     };
     reader.readAsDataURL(file);
     e.target.value = null; // Reset input
   };
 
   const handleCropComplete = async (croppedBlob) => {
-    const { field, isNested, parent, jsonField } = cropModalData;
+    const { field, isNested, parent, textField } = cropModalData;
     
-    if (jsonField) {
-      setUploadingField(jsonField);
+    if (textField) {
+      setUploadingField(textField);
     } else {
       setUploadingField(isNested ? `${parent}.${field}` : field);
     }
@@ -343,16 +356,11 @@ export const AdminSettings = () => {
       const data = await response.json();
       
       if (data.success) {
-        if (jsonField) {
-          let currentArray = [];
-          try {
-            currentArray = JSON.parse(jsonInputs[jsonField]);
-            if (!Array.isArray(currentArray)) currentArray = [];
-          } catch(err) {
-            currentArray = [];
-          }
-          currentArray.push(data.data.url);
-          setJsonInputs(prev => ({ ...prev, [jsonField]: JSON.stringify(currentArray, null, 2) }));
+        if (textField) {
+          setTextInputs(prev => {
+            const current = prev[textField] ? prev[textField].trim() : '';
+            return { ...prev, [textField]: current ? current + '\n' + data.data.url : data.data.url };
+          });
         } else if (isNested) {
           handleNestedChange(parent, field, data.data.url);
         } else {
@@ -370,28 +378,15 @@ export const AdminSettings = () => {
   const handleSave = async () => {
     setSaving(true);
     try {
-      // Parse JSON fields before saving
       let dataToSave = { ...settings };
-      const arrayFields = ['marqueeText', 'announcementList', 'featuredCategories', 'featuredCollections', 'features', 'reviews', 'instagramImages', 'heroSlideshow'];
       
-      for (const field of arrayFields) {
-        try {
-          dataToSave[field] = JSON.parse(jsonInputs[field]);
-        } catch (e) {
-          Swal.fire('Error', `Invalid JSON formatting in ${field}`, 'error');
-          setSaving(false);
-          return;
-        }
+      const stringArrayFields = ['marqueeText', 'announcementList', 'instagramImages', 'heroSlideshow'];
+      for (const field of stringArrayFields) {
+        dataToSave[field] = (textInputs[field] || '').split('\n').map(s => s.trim()).filter(Boolean);
       }
 
-      try {
-        if (!dataToSave.featuredVideoSection) dataToSave.featuredVideoSection = {};
-        dataToSave.featuredVideoSection.slideshow = JSON.parse(jsonInputs.featuredVideoSlideshow);
-      } catch (e) {
-        Swal.fire('Error', `Invalid JSON formatting in Featured Video Slideshow`, 'error');
-        setSaving(false);
-        return;
-      }
+      if (!dataToSave.featuredVideoSection) dataToSave.featuredVideoSection = {};
+      dataToSave.featuredVideoSection.slideshow = (textInputs.featuredVideoSlideshow || '').split('\n').map(s => s.trim()).filter(Boolean);
 
       await axios.put('/api/settings', dataToSave);
       Swal.fire('Success', 'Store Settings saved successfully!', 'success');
@@ -424,12 +419,11 @@ export const AdminSettings = () => {
         <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginBottom: '8px' }}>Enter the number with country code, e.g., 8801700000000</p>
         <input type="text" name="whatsappNumber" value={settings.whatsappNumber || ''} onChange={handleChange} style={inputStyle} />
         
-        <label style={labelStyle}>Announcements (Array of strings)</label>
+        <label style={labelStyle}>Announcements (One per line)</label>
         <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginBottom: '8px' }}>
-          Format as a JSON array. If you add multiple, they will automatically swipe in the header. If one, it will stay fixed.<br/>
-          <code>[ "FREE SHIPPING ON ORDERS OVER ৳5000", "PREMIUM SUMMER COLLECTION 2026" ]</code>
+          Type each announcement on a new line. They will automatically swipe in the header.
         </p>
-        <textarea rows="4" value={jsonInputs.announcementList} onChange={(e) => handleJsonInputChange('announcementList', e.target.value)} style={{...inputStyle, fontFamily: 'monospace', fontSize: '13px'}} />
+        <textarea rows="4" value={textInputs.announcementList} onChange={(e) => handleTextInputChange('announcementList', e.target.value)} style={{...inputStyle, fontFamily: 'inherit', fontSize: '14px'}} />
         
         <h4 style={{marginTop: '20px', marginBottom: '10px'}}>Social Media Links</h4>
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
@@ -482,12 +476,12 @@ export const AdminSettings = () => {
         <label style={labelStyle}>Background Video URL (Optional MP4)</label>
         <input type="text" name="heroVideo" value={settings.heroVideo || ''} onChange={handleChange} style={inputStyle} />
         
-        <label style={labelStyle}>Hero Slideshow (Array of Image URLs) - Replaces static image</label>
+        <label style={labelStyle}>Hero Slideshow URLs (One per line) - Replaces static image</label>
         <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginBottom: '8px' }}>
-          Upload an image directly to add it to the slideshow, or edit the JSON array manually.
+          Upload an image directly to add it to the slideshow, or paste URLs manually.
         </p>
         <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', marginBottom: '15px' }}>
-          <textarea rows="4" placeholder='[\n  "https://i.ibb.co/example1.jpg",\n  "https://i.ibb.co/example2.jpg"\n]' value={jsonInputs.heroSlideshow} onChange={(e) => handleJsonInputChange('heroSlideshow', e.target.value)} style={{...inputStyle, fontFamily: 'monospace', fontSize: '13px', marginBottom: 0}} />
+          <textarea rows="4" placeholder="https://i.ibb.co/example1.jpg" value={textInputs.heroSlideshow} onChange={(e) => handleTextInputChange('heroSlideshow', e.target.value)} style={{...inputStyle, fontFamily: 'inherit', fontSize: '14px', marginBottom: 0}} />
           <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', background: 'var(--color-surface-hover)', padding: '10px 15px', borderRadius: '4px', whiteSpace: 'nowrap', border: '1px solid var(--color-border)', height: '42px' }}>
             <Upload size={16} /> {uploadingField === 'heroSlideshow' ? 'Uploading...' : 'Add Image'}
             <input type="file" style={{ display: 'none' }} accept="image/*" onChange={(e) => handleArrayImageUpload(e, 'heroSlideshow')} />
@@ -504,12 +498,9 @@ export const AdminSettings = () => {
         <label style={labelStyle}>Video URL (MP4)</label>
         <input type="text" value={settings.featuredVideoSection?.videoUrl || ''} onChange={(e) => handleNestedChange('featuredVideoSection', 'videoUrl', e.target.value)} style={inputStyle} />
         
-        <label style={labelStyle}>Slideshow Images (Array of URLs) - Used if no video</label>
-        <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginBottom: '8px' }}>
-          Upload an image directly to add it to the slideshow, or edit the JSON array manually.
-        </p>
+        <label style={labelStyle}>Slideshow Images URLs (One per line) - Used if no video</label>
         <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', marginBottom: '15px' }}>
-          <textarea rows="4" placeholder='[\n  "https://i.ibb.co/example1.jpg",\n  "https://i.ibb.co/example2.jpg"\n]' value={jsonInputs.featuredVideoSlideshow} onChange={(e) => handleJsonInputChange('featuredVideoSlideshow', e.target.value)} style={{...inputStyle, fontFamily: 'monospace', fontSize: '13px', marginBottom: 0}} />
+          <textarea rows="4" placeholder="https://i.ibb.co/example1.jpg" value={textInputs.featuredVideoSlideshow} onChange={(e) => handleTextInputChange('featuredVideoSlideshow', e.target.value)} style={{...inputStyle, fontFamily: 'inherit', fontSize: '14px', marginBottom: 0}} />
           <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', background: 'var(--color-surface-hover)', padding: '10px 15px', borderRadius: '4px', whiteSpace: 'nowrap', border: '1px solid var(--color-border)', height: '42px' }}>
             <Upload size={16} /> {uploadingField === 'featuredVideoSlideshow' ? 'Uploading...' : 'Add Image'}
             <input type="file" style={{ display: 'none' }} accept="image/*" onChange={(e) => handleArrayImageUpload(e, 'featuredVideoSlideshow')} />
@@ -577,20 +568,62 @@ export const AdminSettings = () => {
       </div>
 
       <div style={sectionStyle}>
-        <h3>Advanced Array Data (JSON)</h3>
-        <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginBottom: '15px' }}>Edit these structures carefully using valid JSON formatting. Do not break the quotes or brackets.</p>
+        <h3>Dynamic Lists & Text Options</h3>
+        <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginBottom: '15px' }}>Easily add, edit, or remove items. No JSON needed.</p>
         
-        <label style={labelStyle}>Marquee Text (Array of strings)</label>
-        <textarea rows="3" value={jsonInputs.marqueeText} onChange={(e) => handleJsonInputChange('marqueeText', e.target.value)} style={{...inputStyle, fontFamily: 'monospace', fontSize: '13px'}} />
+        <label style={labelStyle}>Marquee Text (One per line)</label>
+        <textarea rows="3" value={textInputs.marqueeText} onChange={(e) => handleTextInputChange('marqueeText', e.target.value)} style={{...inputStyle, fontFamily: 'inherit', fontSize: '14px'}} />
 
-        <label style={labelStyle}>Featured Categories (Array of objects)</label>
-        <textarea rows="6" value={jsonInputs.featuredCategories} onChange={(e) => handleJsonInputChange('featuredCategories', e.target.value)} style={{...inputStyle, fontFamily: 'monospace', fontSize: '13px'}} />
+        <label style={labelStyle}>Featured Categories</label>
+        {settings.featuredCategories?.map((cat, i) => (
+          <div key={i} style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
+            <input type="text" value={cat.title || ''} onChange={(e) => handleObjectArrayChange('featuredCategories', i, 'title', e.target.value)} placeholder="Title" style={{...inputStyle, marginBottom: 0, flex: 1}} />
+            <input type="text" value={cat.image || ''} onChange={(e) => handleObjectArrayChange('featuredCategories', i, 'image', e.target.value)} placeholder="Image URL" style={{...inputStyle, marginBottom: 0, flex: 2}} />
+            <input type="text" value={cat.link || ''} onChange={(e) => handleObjectArrayChange('featuredCategories', i, 'link', e.target.value)} placeholder="Link (/shop?category=X)" style={{...inputStyle, marginBottom: 0, flex: 1}} />
+            <button onClick={() => handleRemoveObject('featuredCategories', i)} style={{ padding: '0 10px', background: 'var(--color-error)', color: 'white', border: 'none', borderRadius: '4px' }}>X</button>
+          </div>
+        ))}
+        <button onClick={() => handleAddObject('featuredCategories', { title: '', image: '', link: '' })} style={{ padding: '5px 10px', background: 'var(--color-accent)', color: 'white', border: 'none', borderRadius: '4px', marginBottom: '15px' }}>+ Add Category</button>
 
-        <label style={labelStyle}>Featured Collections (Array of objects)</label>
-        <textarea rows="6" value={jsonInputs.featuredCollections} onChange={(e) => handleJsonInputChange('featuredCollections', e.target.value)} style={{...inputStyle, fontFamily: 'monospace', fontSize: '13px'}} />
+        <label style={labelStyle}>Featured Collections</label>
+        {settings.featuredCollections?.map((col, i) => (
+          <div key={i} style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
+            <input type="text" value={col.title || ''} onChange={(e) => handleObjectArrayChange('featuredCollections', i, 'title', e.target.value)} placeholder="Title" style={{...inputStyle, marginBottom: 0, flex: 1}} />
+            <input type="text" value={col.image || ''} onChange={(e) => handleObjectArrayChange('featuredCollections', i, 'image', e.target.value)} placeholder="Image URL" style={{...inputStyle, marginBottom: 0, flex: 2}} />
+            <input type="text" value={col.link || ''} onChange={(e) => handleObjectArrayChange('featuredCollections', i, 'link', e.target.value)} placeholder="Link" style={{...inputStyle, marginBottom: 0, flex: 1}} />
+            <button onClick={() => handleRemoveObject('featuredCollections', i)} style={{ padding: '0 10px', background: 'var(--color-error)', color: 'white', border: 'none', borderRadius: '4px' }}>X</button>
+          </div>
+        ))}
+        <button onClick={() => handleAddObject('featuredCollections', { title: '', image: '', link: '' })} style={{ padding: '5px 10px', background: 'var(--color-accent)', color: 'white', border: 'none', borderRadius: '4px', marginBottom: '15px' }}>+ Add Collection</button>
+
+        <label style={labelStyle}>Features (Why Choose Us)</label>
+        {settings.features?.map((feat, i) => (
+          <div key={i} style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
+            <select value={feat.icon || 'Shield'} onChange={(e) => handleObjectArrayChange('features', i, 'icon', e.target.value)} style={{...inputStyle, marginBottom: 0, flex: 1}}>
+              <option value="Shield">Shield</option>
+              <option value="Truck">Truck</option>
+              <option value="RefreshCw">Refresh</option>
+            </select>
+            <input type="text" value={feat.title || ''} onChange={(e) => handleObjectArrayChange('features', i, 'title', e.target.value)} placeholder="Title" style={{...inputStyle, marginBottom: 0, flex: 1}} />
+            <input type="text" value={feat.subtitle || ''} onChange={(e) => handleObjectArrayChange('features', i, 'subtitle', e.target.value)} placeholder="Subtitle" style={{...inputStyle, marginBottom: 0, flex: 2}} />
+            <button onClick={() => handleRemoveObject('features', i)} style={{ padding: '0 10px', background: 'var(--color-error)', color: 'white', border: 'none', borderRadius: '4px' }}>X</button>
+          </div>
+        ))}
+        <button onClick={() => handleAddObject('features', { icon: 'Shield', title: '', subtitle: '' })} style={{ padding: '5px 10px', background: 'var(--color-accent)', color: 'white', border: 'none', borderRadius: '4px', marginBottom: '15px' }}>+ Add Feature</button>
+
+        <label style={labelStyle}>Customer Reviews</label>
+        {settings.reviews?.map((rev, i) => (
+          <div key={i} style={{ display: 'flex', gap: '10px', marginBottom: '10px', alignItems: 'center' }}>
+            <input type="text" value={rev.author || ''} onChange={(e) => handleObjectArrayChange('reviews', i, 'author', e.target.value)} placeholder="Author" style={{...inputStyle, marginBottom: 0, flex: 1}} />
+            <input type="number" min="1" max="5" value={rev.rating || 5} onChange={(e) => handleObjectArrayChange('reviews', i, 'rating', Number(e.target.value))} placeholder="Rating (1-5)" style={{...inputStyle, marginBottom: 0, flex: 1}} />
+            <input type="text" value={rev.text || ''} onChange={(e) => handleObjectArrayChange('reviews', i, 'text', e.target.value)} placeholder="Review text" style={{...inputStyle, marginBottom: 0, flex: 3}} />
+            <button onClick={() => handleRemoveObject('reviews', i)} style={{ padding: '0 10px', background: 'var(--color-error)', color: 'white', border: 'none', borderRadius: '4px', height: '42px' }}>X</button>
+          </div>
+        ))}
+        <button onClick={() => handleAddObject('reviews', { author: '', rating: 5, text: '' })} style={{ padding: '5px 10px', background: 'var(--color-accent)', color: 'white', border: 'none', borderRadius: '4px', marginBottom: '15px' }}>+ Add Review</button>
         
-        <label style={labelStyle}>Instagram Gallery Images (Array of strings)</label>
-        <textarea rows="4" value={jsonInputs.instagramImages} onChange={(e) => handleJsonInputChange('instagramImages', e.target.value)} style={{...inputStyle, fontFamily: 'monospace', fontSize: '13px'}} />
+        <label style={labelStyle}>Instagram Gallery Image URLs (One per line)</label>
+        <textarea rows="4" value={textInputs.instagramImages} onChange={(e) => handleTextInputChange('instagramImages', e.target.value)} style={{...inputStyle, fontFamily: 'inherit', fontSize: '14px'}} />
       </div>
 
       <div style={sectionStyle}>
