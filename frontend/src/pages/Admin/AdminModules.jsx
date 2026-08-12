@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import styles from './Admin.module.css';
-import { Upload } from 'lucide-react';
+import { Upload, X } from 'lucide-react';
 import Loader from '../../components/Loader';
 import ImageCropperModal from '../../components/ImageCropperModal';
 import useAuthStore from '../../store/useAuthStore';
@@ -31,6 +31,10 @@ const AdminOrders = () => {
       }
     };
     fetchOrders();
+    
+    // Polling every 10 seconds for real-time updates
+    const intervalId = setInterval(fetchOrders, 10000);
+    return () => clearInterval(intervalId);
   }, []);
 
   if (loading) return <Loader />;
@@ -108,6 +112,7 @@ const AdminOrders = () => {
 export const AdminCustomers = () => {
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
 
   useEffect(() => {
     const fetchCustomers = async () => {
@@ -149,13 +154,45 @@ export const AdminCustomers = () => {
                   <td>{customer.name}</td>
                   <td>{customer.email}</td>
                   <td>{customer.isAdmin ? 'Admin' : 'Customer'}</td>
-                  <td><button>View Profile</button></td>
+                  <td><button onClick={() => setSelectedCustomer(customer)} style={{ padding: '6px 12px', background: 'var(--color-accent)', color: 'white', borderRadius: '4px', border: 'none', cursor: 'pointer' }}>View Profile</button></td>
                 </tr>
               ))
             )}
           </tbody>
         </table>
       </div>
+      {selectedCustomer && (
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000, padding: '20px' }}>
+          <div style={{ background: 'var(--color-surface)', width: '100%', maxWidth: '500px', padding: '30px', borderRadius: '8px', position: 'relative' }}>
+            <button onClick={() => setSelectedCustomer(null)} style={{ position: 'absolute', top: '20px', right: '20px', background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--color-text-primary)' }}>
+              <X size={24} />
+            </button>
+            <h2 style={{ marginBottom: '20px', fontSize: '1.5rem', fontWeight: 'bold' }}>Customer Profile</h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+              <div><strong>Name:</strong> {selectedCustomer.name}</div>
+              <div><strong>Email:</strong> {selectedCustomer.email}</div>
+              <div><strong>Role:</strong> {selectedCustomer.isAdmin ? 'Admin' : 'Customer'}</div>
+              <div><strong>Phone:</strong> {selectedCustomer.phone || 'N/A'}</div>
+              <div><strong>Verified:</strong> {selectedCustomer.isVerified ? 'Yes' : 'No'}</div>
+              <div><strong>Joined:</strong> {new Date(selectedCustomer.createdAt).toLocaleDateString()}</div>
+              <div>
+                <strong>Addresses:</strong>
+                {selectedCustomer.addresses && selectedCustomer.addresses.length > 0 ? (
+                  <ul style={{ paddingLeft: '20px', marginTop: '5px' }}>
+                    {selectedCustomer.addresses.map((addr, idx) => (
+                      <li key={idx} style={{ marginBottom: '5px', fontSize: '0.9rem' }}>
+                        {addr.street}, {addr.city}, {addr.district} - {addr.zipCode}, {addr.country}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <span style={{ marginLeft: '5px' }}>No address saved</span>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

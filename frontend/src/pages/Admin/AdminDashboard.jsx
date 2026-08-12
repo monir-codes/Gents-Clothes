@@ -29,6 +29,10 @@ const AdminDashboard = () => {
       }
     };
     fetchStats();
+    
+    // Polling every 10 seconds for real-time updates
+    const intervalId = setInterval(fetchStats, 10000);
+    return () => clearInterval(intervalId);
   }, []);
 
   if (loading) return <Loader />;

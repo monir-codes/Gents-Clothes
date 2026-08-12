@@ -1,10 +1,11 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
-const connectDB = require('./config/db');
 
-// Load env vars
+// Load env vars FIRST so subsequent requires have access to them
 dotenv.config();
+
+const connectDB = require('./config/db');
 
 const app = express();
 
@@ -68,9 +69,10 @@ app.use((err, req, res, next) => {
 // The platform will invoke the exported handler for each request.
 if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
   const PORT = process.env.PORT || 5000;
-  app.listen(PORT, () => {
+  const server = app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });
+  console.log('Server is listening:', server.listening);
 }
 
 module.exports = app;

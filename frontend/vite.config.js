@@ -6,11 +6,11 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://gents-clothes-server.vercel.app',
+        target: 'http://localhost:5000',
         changeOrigin: true,
       },
       '/uploads': {
-        target: 'https://gents-clothes-server.vercel.app',
+        target: 'http://localhost:5000',
         changeOrigin: true,
       }
     }
