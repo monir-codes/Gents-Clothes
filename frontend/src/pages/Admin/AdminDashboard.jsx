@@ -79,7 +79,10 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      <h2 style={{ marginBottom: '16px' }}>Recent Orders</h2>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+        <h2 style={{ margin: 0 }}>Recent Orders</h2>
+        <a href="/admin/orders" style={{ padding: '6px 12px', background: 'var(--color-accent)', color: 'white', borderRadius: '4px', textDecoration: 'none', fontSize: '0.9rem' }}>Manage Orders</a>
+      </div>
       <div className={styles.tableContainer}>
         <table className={styles.table}>
           <thead>

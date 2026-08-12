@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import styles from './Admin.module.css';
-import { Upload, X } from 'lucide-react';
+import { Upload, X, Trash2 } from 'lucide-react';
 import Loader from '../../components/Loader';
 import ImageCropperModal from '../../components/ImageCropperModal';
 import useAuthStore from '../../store/useAuthStore';
@@ -36,6 +36,28 @@ const AdminOrders = () => {
     const intervalId = setInterval(fetchOrders, 10000);
     return () => clearInterval(intervalId);
   }, []);
+
+  const handleDeleteOrder = async (orderId) => {
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!'
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await axios.delete(`/api/orders/${orderId}`, getAuthConfig());
+        setOrders(orders.filter(order => order._id !== orderId));
+        Swal.fire('Deleted!', 'Order has been deleted.', 'success');
+      } catch (error) {
+        Swal.fire('Error!', 'Failed to delete order.', 'error');
+      }
+    }
+  };
 
   if (loading) return <Loader />;
 
@@ -98,6 +120,13 @@ const AdminOrders = () => {
                       <option value="Cancelled">Cancelled</option>
                       <option value="Returned">Returned</option>
                     </select>
+                    <button 
+                      onClick={() => handleDeleteOrder(order._id)}
+                      style={{ padding: '6px', marginLeft: '10px', background: '#fee2e2', color: '#dc2626', borderRadius: '4px', border: '1px solid #f87171', cursor: 'pointer', display: 'inline-flex', alignItems: 'center' }}
+                      title="Delete Order"
+                    >
+                      <Trash2 size={16} />
+                    </button>
                   </td>
                 </tr>
               ))
