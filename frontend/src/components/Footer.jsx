@@ -90,12 +90,6 @@ const Footer = () => {
       <div className={styles.bottomBar}>
         <div className={`container ${styles.bottomBarInner}`}>
           <p>&copy; {new Date().getFullYear()} Gents Clothes. All Rights Reserved.</p>
-          <div className={styles.paymentIcons}>
-            <span>VISA</span>
-            <span>MasterCard</span>
-            <span>bKash</span>
-            <span>Nagad</span>
-          </div>
           <div className={styles.legalLinks}>
             <Link to="/privacy">Privacy Policy</Link>
             <Link to="/terms">Terms of Service</Link>
