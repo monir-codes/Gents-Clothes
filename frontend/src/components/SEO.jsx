@@ -2,7 +2,7 @@ import React from 'react';
 import { Helmet } from 'react-helmet-async';
 
 const SEO = ({ title, description, keywords, type = 'website', name = 'Gents Clothes', canonical, schemaMarkup }) => {
-  const defaultKeywords = "Gents Clothes, luxury menswear Bangladesh, premium men's clothing BD, buy panjabi online Dhaka, stylish shirts for men, premium t-shirts BD, men's fashion Bangladesh, exclusive menswear, designer panjabi collection, men's clothing store, fashionable menswear, cash on delivery mens clothing BD, online shopping BD home delivery, best menswear brand in Dhaka, gents fashion BD, eid panjabi collection, casual shirts for men, formal shirts men Dhaka, quality t-shirts online, mens clothing online shopping bangladesh cash on delivery";
+  const defaultKeywords = "Gents Clothes, gents clothes bd, gents clothes bangladesh, buy panjabi online dhaka, premium mens clothing bd, best panjabi brand in bangladesh, panjabi for men, stylish panjabi collection, mens fashion bangladesh, premium t-shirts bd, buy casual shirts online bd, mens polo shirts bd, formal shirts for men dhaka, eid panjabi collection 2024, best menswear brand in dhaka, gents fashion bd, buy mens clothes online bangladesh cash on delivery, mens lifestyle clothing, luxury menswear bangladesh, exclusive panjabi dhaka, online shopping for men in bangladesh, ছেলেদের পোশাক, পাঞ্জাবি ডিজাইন, ছেলেদের শার্ট, ছেলেদের টিশার্ট, men's clothing store dhaka, top clothing brands for men in bd";
   
   return (
     <Helmet>
