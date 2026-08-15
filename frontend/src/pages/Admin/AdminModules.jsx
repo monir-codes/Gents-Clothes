@@ -170,18 +170,34 @@ export const AdminCustomers = () => {
             <tr>
               <th>Name</th>
               <th>Email</th>
+              <th>Phone</th>
+              <th>Status</th>
+              <th>Joined Date</th>
               <th>Role</th>
               <th>Action</th>
             </tr>
           </thead>
           <tbody>
             {customers.length === 0 ? (
-              <tr><td colSpan="4" style={{textAlign: 'center'}}>No customers found</td></tr>
+              <tr><td colSpan="7" style={{textAlign: 'center'}}>No customers found</td></tr>
             ) : (
               customers.map(customer => (
                 <tr key={customer._id}>
                   <td>{customer.name}</td>
                   <td>{customer.email}</td>
+                  <td>{customer.phone || 'N/A'}</td>
+                  <td>
+                    {customer.isVerified ? (
+                      <span style={{ padding: '4px 8px', borderRadius: '12px', fontSize: '0.8rem', fontWeight: 'bold', background: '#dcfce7', color: '#166534' }}>
+                        Verified
+                      </span>
+                    ) : (
+                      <span style={{ padding: '4px 8px', borderRadius: '12px', fontSize: '0.8rem', fontWeight: 'bold', background: '#fee2e2', color: '#991b1b' }}>
+                        Unverified
+                      </span>
+                    )}
+                  </td>
+                  <td>{new Date(customer.createdAt).toLocaleDateString()}</td>
                   <td>{customer.isAdmin ? 'Admin' : 'Customer'}</td>
                   <td><button onClick={() => setSelectedCustomer(customer)} style={{ padding: '6px 12px', background: 'var(--color-accent)', color: 'white', borderRadius: '4px', border: 'none', cursor: 'pointer' }}>View Profile</button></td>
                 </tr>
@@ -198,24 +214,35 @@ export const AdminCustomers = () => {
             </button>
             <h2 style={{ marginBottom: '20px', fontSize: '1.5rem', fontWeight: 'bold' }}>Customer Profile</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-              <div><strong>Name:</strong> {selectedCustomer.name}</div>
-              <div><strong>Email:</strong> {selectedCustomer.email}</div>
-              <div><strong>Role:</strong> {selectedCustomer.isAdmin ? 'Admin' : 'Customer'}</div>
-              <div><strong>Phone:</strong> {selectedCustomer.phone || 'N/A'}</div>
-              <div><strong>Verified:</strong> {selectedCustomer.isVerified ? 'Yes' : 'No'}</div>
-              <div><strong>Joined:</strong> {new Date(selectedCustomer.createdAt).toLocaleDateString()}</div>
-              <div>
-                <strong>Addresses:</strong>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                <div><strong>Name:</strong> <br/>{selectedCustomer.name}</div>
+                <div><strong>Email:</strong> <br/>{selectedCustomer.email}</div>
+                <div><strong>Phone:</strong> <br/>{selectedCustomer.phone || 'N/A'}</div>
+                <div><strong>Role:</strong> <br/>{selectedCustomer.isAdmin ? 'Admin' : 'Customer'}</div>
+                <div>
+                  <strong>Verified:</strong> <br/>
+                  {selectedCustomer.isVerified ? (
+                      <span style={{ color: '#166534', fontWeight: 'bold' }}>Yes</span>
+                  ) : (
+                      <span style={{ color: '#991b1b', fontWeight: 'bold' }}>No</span>
+                  )}
+                </div>
+                <div><strong>Joined:</strong> <br/>{new Date(selectedCustomer.createdAt).toLocaleDateString()}</div>
+              </div>
+              <div style={{ marginTop: '10px', paddingTop: '15px', borderTop: '1px solid var(--color-border)' }}>
+                <strong>Saved Addresses:</strong>
                 {selectedCustomer.addresses && selectedCustomer.addresses.length > 0 ? (
-                  <ul style={{ paddingLeft: '20px', marginTop: '5px' }}>
+                  <ul style={{ paddingLeft: '20px', marginTop: '10px', listStyleType: 'disc' }}>
                     {selectedCustomer.addresses.map((addr, idx) => (
-                      <li key={idx} style={{ marginBottom: '5px', fontSize: '0.9rem' }}>
-                        {addr.street}, {addr.city}, {addr.district} - {addr.zipCode}, {addr.country}
+                      <li key={idx} style={{ marginBottom: '8px', fontSize: '0.9rem', lineHeight: '1.4' }}>
+                        {addr.street}, <br/>
+                        {addr.city}, {addr.district} <br/>
+                        {addr.region && `${addr.region}, `}{addr.country} - {addr.zipCode || ''}
                       </li>
                     ))}
                   </ul>
                 ) : (
-                  <span style={{ marginLeft: '5px' }}>No address saved</span>
+                  <div style={{ marginTop: '5px', color: 'var(--color-text-secondary)', fontStyle: 'italic' }}>No address saved yet.</div>
                 )}
               </div>
             </div>
