@@ -29,8 +29,12 @@ const userSchema = new mongoose.Schema({
   },
   phone: {
     type: String,
-    required: [true, 'Phone number is required'],
-    match: [/^01[3-9]\d{8}$/, 'Please provide a valid 11-digit Bangladeshi phone number'],
+    validate: {
+      validator: function(v) {
+        return !v || /^01[3-9]\d{8}$/.test(v);
+      },
+      message: 'Please provide a valid 11-digit Bangladeshi phone number'
+    }
   },
   otp: {
     type: String
