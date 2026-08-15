@@ -31,7 +31,7 @@ const Navbar = () => {
       try {
         const { data } = await axios.get('/api/settings');
         if (data && data.announcementList && data.announcementList.length > 0) {
-          setAnnouncements(data.announcementList);
+          setAnnouncements(Array.isArray(data.announcementList) ? data.announcementList : [data.announcementList]);
         } else if (data && data.announcementText) {
           setAnnouncements([data.announcementText]);
         }

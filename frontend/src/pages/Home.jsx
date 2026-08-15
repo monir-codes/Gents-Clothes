@@ -56,7 +56,23 @@ const Home = () => {
           axios.get('/api/settings'),
           axios.get('/api/products')
         ]);
-        setSettings(settingsRes.data);
+        
+        let settingsData = settingsRes.data || {};
+        const ensureArray = (val) => Array.isArray(val) ? val : (val ? [val] : []);
+        
+        settingsData.heroSlideshow = ensureArray(settingsData.heroSlideshow);
+        settingsData.marqueeText = ensureArray(settingsData.marqueeText);
+        settingsData.featuredCategories = ensureArray(settingsData.featuredCategories);
+        settingsData.featuredCollections = ensureArray(settingsData.featuredCollections);
+        settingsData.features = ensureArray(settingsData.features);
+        settingsData.reviews = ensureArray(settingsData.reviews);
+        
+        if (settingsData.featuredVideoSection && settingsData.featuredVideoSection.slideshow) {
+           settingsData.featuredVideoSection.slideshow = ensureArray(settingsData.featuredVideoSection.slideshow);
+        }
+
+        setSettings(settingsData);
+
         const prodData = productsRes.data.products ?? productsRes.data;
         setProducts(Array.isArray(prodData) ? prodData : []);
       } catch (error) {
