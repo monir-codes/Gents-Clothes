@@ -1,5 +1,5 @@
 const Order = require('../models/Order');
-
+const { sendOrderNotificationEmail } = require('../utils/sendEmail');
 // @desc    Create new order
 // @route   POST /api/orders
 // @access  Private
@@ -30,6 +30,13 @@ const addOrderItems = async (req, res) => {
     });
 
     const createdOrder = await order.save();
+
+    // Send email to Admin
+    try {
+      await sendOrderNotificationEmail('mdrummanmondal2@gmail.com', createdOrder);
+    } catch (error) {
+      console.error('Failed to send admin order notification email', error);
+    }
 
     res.status(201).json(createdOrder);
   }

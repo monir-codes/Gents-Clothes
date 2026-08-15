@@ -13,6 +13,8 @@ import OrderSuccess from '../pages/OrderSuccess';
 import Wishlist from '../pages/Wishlist';
 import Login from '../pages/Login';
 import Register from '../pages/Register';
+import ForgotPassword from '../pages/ForgotPassword';
+import ResetPassword from '../pages/ResetPassword';
 import Dashboard from '../pages/Dashboard';
 
 import { About, FAQ, Contact, LegalPage } from '../pages/StaticPages';
@@ -64,6 +66,8 @@ const AnimatedRoutes = () => {
         <Route path="/order-success" element={<PageWrapper><OrderSuccess /></PageWrapper>} />
         <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
         <Route path="/register" element={<PageWrapper><Register /></PageWrapper>} />
+        <Route path="/forgot-password" element={<PageWrapper><ForgotPassword /></PageWrapper>} />
+        <Route path="/reset-password" element={<PageWrapper><ResetPassword /></PageWrapper>} />
 
         <Route path="/dashboard" element={<PageWrapper><Dashboard /></PageWrapper>} />
         

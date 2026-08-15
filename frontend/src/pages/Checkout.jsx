@@ -11,35 +11,33 @@ const Checkout = () => {
   const { user } = useAuthStore();
   const navigate = useNavigate();
 
-  const bdDistricts = [
-    'Bagerhat', 'Bandarban', 'Barguna', 'Barishal', 'Bhola', 'Bogra', 'Brahmanbaria', 'Chandpur', 
-    'Chattogram', 'Chuadanga', 'Comilla', 'Cox\'s Bazar', 'Dhaka', 'Dinajpur', 'Faridpur', 'Feni', 
-    'Gaibandha', 'Gazipur', 'Gopalganj', 'Habiganj', 'Jamalpur', 'Jashore', 'Jhalokati', 'Jhenaidah', 
-    'Joypurhat', 'Khagrachhari', 'Khulna', 'Kishoreganj', 'Kurigram', 'Kushtia', 'Lakshmipur', 
-    'Lalmonirhat', 'Madaripur', 'Magura', 'Manikganj', 'Meherpur', 'Moulvibazar', 'Munshiganj', 
-    'Mymensingh', 'Naogaon', 'Narail', 'Narayanganj', 'Narsingdi', 'Natore', 'Netrokona', 'Nilphamari', 
-    'Noakhali', 'Pabna', 'Panchagarh', 'Patuakhali', 'Pirojpur', 'Rajbari', 'Rajshahi', 'Rangamati', 
-    'Rangpur', 'Satkhira', 'Shariatpur', 'Sherpur', 'Sirajganj', 'Sunamganj', 'Sylhet', 'Tangail', 
-    'Thakurgaon'
-  ];
+  const bdDivisions = {
+    Dhaka: ['Dhaka', 'Faridpur', 'Gazipur', 'Gopalganj', 'Kishoreganj', 'Madaripur', 'Manikganj', 'Munshiganj', 'Narayanganj', 'Narsingdi', 'Rajbari', 'Shariatpur', 'Tangail'],
+    Chattogram: ['Bandarban', 'Brahmanbaria', 'Chandpur', 'Chattogram', 'Comilla', "Cox's Bazar", 'Feni', 'Khagrachhari', 'Lakshmipur', 'Noakhali', 'Rangamati'],
+    Rajshahi: ['Bogra', 'Chapainawabganj', 'Joypurhat', 'Naogaon', 'Natore', 'Pabna', 'Rajshahi', 'Sirajganj'],
+    Khulna: ['Bagerhat', 'Chuadanga', 'Jashore', 'Jhenaidah', 'Khulna', 'Kushtia', 'Magura', 'Meherpur', 'Narail', 'Satkhira'],
+    Barishal: ['Barguna', 'Barishal', 'Bhola', 'Jhalokati', 'Patuakhali', 'Pirojpur'],
+    Sylhet: ['Habiganj', 'Moulvibazar', 'Sunamganj', 'Sylhet'],
+    Rangpur: ['Dinajpur', 'Gaibandha', 'Kurigram', 'Lalmonirhat', 'Nilphamari', 'Panchagarh', 'Rangpur', 'Thakurgaon'],
+    Mymensingh: ['Jamalpur', 'Mymensingh', 'Netrokona', 'Sherpur']
+  };
 
   const [address, setAddress] = useState({
     fullName: user?.name || '',
     phone: user?.phone || '',
     street: user?.addresses?.[0]?.street || '',
+    region: '',
     district: user?.addresses?.[0]?.district || '',
     city: user?.addresses?.[0]?.city || ''
   });
 
   const [paymentMethod, setPaymentMethod] = useState('COD');
-
   const [deliveryCharge, setDeliveryCharge] = useState(100);
 
   const itemsPrice = cartItems.reduce((acc, item) => acc + item.price * item.qty, 0);
   const shippingPrice = itemsPrice > 5000 ? 0 : deliveryCharge;
   const totalPrice = itemsPrice + shippingPrice;
 
-  // Auth Guard & Fetch Settings
   React.useEffect(() => {
     if (!user) {
       navigate('/login?redirect=/checkout');
@@ -57,9 +55,18 @@ const Checkout = () => {
     fetchSettings();
   }, [user, navigate]);
 
+  const handleRegionChange = (e) => {
+    setAddress({ ...address, region: e.target.value, district: '' });
+  };
+
   const handlePlaceOrder = (e) => {
     e.preventDefault();
     
+    if (!address.region || !address.district) {
+      Swal.fire('Error', 'Please select both Region and District.', 'error');
+      return;
+    }
+
     Swal.fire({
       title: 'Confirm Order?',
       text: "Are you sure you want to place this order?",
@@ -79,6 +86,7 @@ const Checkout = () => {
               street: address.street,
               city: address.city,
               district: address.district,
+              region: address.region,
               postalCode: '1000',
               country: 'Bangladesh'
             },
@@ -114,6 +122,8 @@ const Checkout = () => {
     );
   }
 
+  const currentDistricts = address.region ? bdDivisions[address.region] : [];
+
   return (
     <div className={`container ${styles.checkoutContainer}`}>
       <div className={styles.formSection}>
@@ -131,20 +141,31 @@ const Checkout = () => {
             <label className={styles.label}>Street Address</label>
             <input required type="text" className={styles.input} value={address.street} onChange={e => setAddress({...address, street: e.target.value})} />
           </div>
+          
           <div className={styles.row}>
             <div className={styles.formGroup}>
-              <label className={styles.label}>City</label>
-              <input required type="text" className={styles.input} value={address.city} onChange={e => setAddress({...address, city: e.target.value})} />
+              <label className={styles.label}>Region (Division)</label>
+              <select required className={styles.input} value={address.region} onChange={handleRegionChange}>
+                <option value="">Select Region</option>
+                {Object.keys(bdDivisions).map(region => (
+                  <option key={region} value={region}>{region}</option>
+                ))}
+              </select>
             </div>
             <div className={styles.formGroup}>
               <label className={styles.label}>District</label>
-              <select required className={styles.input} value={address.district} onChange={e => setAddress({...address, district: e.target.value})}>
+              <select required className={styles.input} value={address.district} onChange={e => setAddress({...address, district: e.target.value})} disabled={!address.region}>
                 <option value="">Select District</option>
-                {bdDistricts.map(district => (
+                {currentDistricts.map(district => (
                   <option key={district} value={district}>{district}</option>
                 ))}
               </select>
             </div>
+          </div>
+
+          <div className={styles.formGroup}>
+            <label className={styles.label}>City/Thana</label>
+            <input required type="text" className={styles.input} value={address.city} onChange={e => setAddress({...address, city: e.target.value})} />
           </div>
 
           <h2 className={styles.sectionTitle} style={{ marginTop: '40px' }}>Payment Method</h2>

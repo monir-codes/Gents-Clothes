@@ -29,6 +29,14 @@ const userSchema = new mongoose.Schema({
   },
   phone: {
     type: String,
+    required: [true, 'Phone number is required'],
+    match: [/^01[3-9]\d{8}$/, 'Please provide a valid 11-digit Bangladeshi phone number'],
+  },
+  otp: {
+    type: String
+  },
+  otpExpires: {
+    type: Date
   },
   addresses: [{
     street: String,

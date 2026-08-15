@@ -9,12 +9,18 @@ const useAuthStore = create(
       token: null,
       isLoading: false,
       error: null,
+      otpEmail: null,
+      otpRequired: false,
 
       login: async (email, password) => {
         set({ isLoading: true, error: null });
         try {
           const { data } = await axios.post('/api/users/login', { email, password });
-          set({ user: data, token: data.token, isLoading: false });
+          if (data.message === 'OTP_SENT') {
+            set({ otpEmail: email, otpRequired: true, isLoading: false });
+            return 'OTP_REQUIRED';
+          }
+          set({ user: data, token: data.token, isLoading: false, otpRequired: false });
           return true;
         } catch (error) {
           set({ 
@@ -29,7 +35,7 @@ const useAuthStore = create(
         set({ isLoading: true, error: null });
         try {
           const { data } = await axios.post('/api/users/google', { name, email });
-          set({ user: data, token: data.token, isLoading: false });
+          set({ user: data, token: data.token, isLoading: false, otpRequired: false });
           return true;
         } catch (error) {
           set({ 
@@ -40,13 +46,16 @@ const useAuthStore = create(
         }
       },
 
-      register: async (name, email, password) => {
+      register: async (name, email, password, phone) => {
         set({ isLoading: true, error: null });
         try {
-          const { data } = await axios.post('/api/users', { name, email, password });
-          // Registration successful, but wait for verification.
+          const { data } = await axios.post('/api/users', { name, email, password, phone });
+          if (data.message === 'OTP_SENT') {
+            set({ otpEmail: email, otpRequired: true, isLoading: false });
+            return 'OTP_REQUIRED';
+          }
           set({ isLoading: false });
-          return data; // returns { message: "..." }
+          return data;
         } catch (error) {
           set({ 
             isLoading: false, 
@@ -56,7 +65,52 @@ const useAuthStore = create(
         }
       },
 
-      logout: () => set({ user: null, token: null }),
+      verifyOtp: async (email, otp) => {
+        set({ isLoading: true, error: null });
+        try {
+          const { data } = await axios.post('/api/users/verify-otp', { email, otp });
+          set({ user: data, token: data.token, isLoading: false, otpRequired: false, otpEmail: null });
+          return true;
+        } catch (error) {
+          set({ 
+            isLoading: false, 
+            error: error.response?.data?.message || 'OTP Verification failed' 
+          });
+          return false;
+        }
+      },
+
+      forgotPassword: async (email) => {
+        set({ isLoading: true, error: null });
+        try {
+          await axios.post('/api/users/forgot-password', { email });
+          set({ otpEmail: email, isLoading: false });
+          return true;
+        } catch (error) {
+          set({ 
+            isLoading: false, 
+            error: error.response?.data?.message || 'Request failed' 
+          });
+          return false;
+        }
+      },
+
+      resetPassword: async (email, otp, password) => {
+        set({ isLoading: true, error: null });
+        try {
+          const { data } = await axios.post('/api/users/reset-password', { email, otp, password });
+          set({ isLoading: false, otpEmail: null });
+          return data;
+        } catch (error) {
+          set({ 
+            isLoading: false, 
+            error: error.response?.data?.message || 'Reset failed' 
+          });
+          return false;
+        }
+      },
+
+      logout: () => set({ user: null, token: null, otpRequired: false, otpEmail: null }),
       
       updateProfile: async (profileData) => {
         set({ isLoading: true, error: null });

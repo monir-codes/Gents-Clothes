@@ -10,10 +10,12 @@ const Login = () => {
   const togglePasswordVisibility = () => setShowPassword(prev => !prev);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [otp, setOtp] = useState('');
+  const [isOtpMode, setIsOtpMode] = useState(false);
   
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, googleLogin, user, isLoading, error, clearError } = useAuthStore();
+  const { login, verifyOtp, googleLogin, user, isLoading, error, clearError, otpEmail } = useAuthStore();
 
   const [message, setMessage] = useState(null);
 
@@ -36,7 +38,24 @@ const Login = () => {
       return;
     }
 
-    await login(email, password);
+    const res = await login(email, password);
+    if (res === 'OTP_REQUIRED') {
+      setIsOtpMode(true);
+      setMessage('An OTP has been sent to your email.');
+    }
+  };
+
+  const handleOtpSubmit = async (e) => {
+    e.preventDefault();
+    setMessage(null);
+    if (otp.length !== 6) {
+      setMessage('OTP must be 6 digits');
+      return;
+    }
+    const res = await verifyOtp(otpEmail || email, otp);
+    if (res) {
+      navigate(redirect);
+    }
   };
 
   const handleGoogleLogin = async () => {
@@ -50,6 +69,37 @@ const Login = () => {
       setMessage("Google Sign In Failed. Please try again.");
     }
   };
+
+  if (isOtpMode) {
+    return (
+      <div className={styles.authContainer}>
+        <div className={styles.authCard} style={{ textAlign: 'center' }}>
+          <h1 className={styles.title}>2-Step Verification</h1>
+          <p style={{ color: 'var(--color-text-secondary)', marginBottom: '30px' }}>Enter the 6-digit OTP sent to your email to continue.</p>
+          
+          {(error || message) && <div className={styles.error}>{error || message}</div>}
+          
+          <form onSubmit={handleOtpSubmit}>
+            <div className={styles.formGroup}>
+              <input 
+                type="text" 
+                required
+                className={styles.input} 
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                placeholder="Enter 6-digit OTP"
+                style={{ textAlign: 'center', fontSize: '1.2rem', letterSpacing: '4px' }}
+                maxLength={6}
+              />
+            </div>
+            <button type="submit" className={styles.submitBtn} disabled={isLoading}>
+              {isLoading ? 'Verifying...' : 'Verify OTP'}
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.authContainer}>
@@ -72,7 +122,12 @@ const Login = () => {
             />
           </div>
           <div className={styles.formGroup}>
-            <label className={styles.label}>Password</label>
+            <label className={styles.label} style={{ display: 'flex', justifyContent: 'space-between' }}>
+              Password
+              <Link to="/forgot-password" style={{ color: 'var(--color-text-secondary)', fontSize: '0.9rem', textDecoration: 'none' }}>
+                Forgot Password?
+              </Link>
+            </label>
             <div className={styles.passwordWrapper} style={{ position: 'relative' }}>
               <input 
                 type={showPassword ? "text" : "password"} 
@@ -107,7 +162,7 @@ const Login = () => {
           Continue with Google
         </button>
 
-        <p className={styles.linkText}>
+        <p className={styles.linkText} style={{ marginTop: '20px' }}>
           Don't have an account?{' '}
           <Link to={redirect ? `/register?redirect=${redirect}` : '/register'} className={styles.link}>
             Create Account

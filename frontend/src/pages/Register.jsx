@@ -11,14 +11,17 @@ const Register = () => {
   const togglePasswordVisibility = () => setShowPassword(prev => !prev);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [otp, setOtp] = useState('');
+  const [isOtpMode, setIsOtpMode] = useState(false);
   const [message, setMessage] = useState(null);
   const [successMsg, setSuccessMsg] = useState(null);
   
   const navigate = useNavigate();
   const location = useLocation();
-  const { register, user, isLoading, error, clearError } = useAuthStore();
+  const { register, verifyOtp, user, isLoading, error, clearError, otpEmail } = useAuthStore();
 
   const searchParams = new URLSearchParams(location.search);
   const redirect = searchParams.get('redirect') || '/dashboard';
@@ -29,17 +32,6 @@ const Register = () => {
     }
     return () => clearError();
   }, [user, navigate, redirect, clearError]);
-
-  // Redirect after successful registration
-  useEffect(() => {
-    if (successMsg) {
-      const timer = setTimeout(() => {
-        const fallback = '/shop';
-        navigate(redirect || fallback);
-      }, 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [successMsg, navigate, redirect]);
 
   const validateForm = () => {
     if (password !== confirmPassword) {
@@ -55,6 +47,10 @@ const Register = () => {
       setMessage('Only Gmail, Outlook, or Yahoo emails are allowed');
       return false;
     }
+    if (!/^01[3-9]\d{8}$/.test(phone)) {
+      setMessage('Please enter a valid 11-digit Bangladeshi phone number (e.g. 01712345678)');
+      return false;
+    }
     return true;
   };
 
@@ -63,19 +59,53 @@ const Register = () => {
     setMessage(null);
     if (!validateForm()) return;
     
-    const res = await register(name, email, password);
-    if (res && res.message) {
-      setSuccessMsg(res.message);
+    const res = await register(name, email, password, phone);
+    if (res === 'OTP_REQUIRED') {
+      setIsOtpMode(true);
+      setSuccessMsg('An OTP has been sent to your email.');
     }
   };
 
-  if (successMsg) {
+  const handleOtpSubmit = async (e) => {
+    e.preventDefault();
+    setMessage(null);
+    if (otp.length !== 6) {
+      setMessage('OTP must be 6 digits');
+      return;
+    }
+    const res = await verifyOtp(otpEmail || email, otp);
+    if (res) {
+      setSuccessMsg('Registration successful!');
+      setTimeout(() => navigate(redirect), 2000);
+    }
+  };
+
+  if (isOtpMode) {
     return (
       <div className={styles.authContainer}>
         <div className={styles.authCard} style={{ textAlign: 'center' }}>
-          <h1 className={styles.title}>Account Created!</h1>
-          <p style={{ color: 'var(--color-text-secondary)', marginBottom: '30px' }}>{successMsg}</p>
-          <p style={{ color: 'var(--color-text-secondary)' }}>Redirecting...</p>
+          <h1 className={styles.title}>Verify Email</h1>
+          <p style={{ color: 'var(--color-text-secondary)', marginBottom: '30px' }}>{successMsg || 'Enter the 6-digit OTP sent to your email.'}</p>
+          
+          {(error || message) && <div className={styles.error}>{error || message}</div>}
+          
+          <form onSubmit={handleOtpSubmit}>
+            <div className={styles.formGroup}>
+              <input 
+                type="text" 
+                required
+                className={styles.input} 
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                placeholder="Enter 6-digit OTP"
+                style={{ textAlign: 'center', fontSize: '1.2rem', letterSpacing: '4px' }}
+                maxLength={6}
+              />
+            </div>
+            <button type="submit" className={styles.submitBtn} disabled={isLoading}>
+              {isLoading ? 'Verifying...' : 'Verify OTP'}
+            </button>
+          </form>
         </div>
       </div>
     );
@@ -110,6 +140,18 @@ const Register = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="e.g. name@gmail.com"
+            />
+          </div>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Phone Number</label>
+            <input 
+              type="tel" 
+              required
+              className={styles.input} 
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="01XXXXXXXXX"
+              maxLength={11}
             />
           </div>
           <div className={styles.formGroup}>
