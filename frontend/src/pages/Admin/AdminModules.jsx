@@ -23,7 +23,7 @@ const AdminOrders = () => {
     const fetchOrders = async () => {
       try {
         const { data } = await axios.get('/api/orders', getAuthConfig());
-        setOrders(data);
+        setOrders(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error(error);
       } finally {
@@ -79,7 +79,7 @@ const AdminOrders = () => {
             </tr>
           </thead>
           <tbody>
-            {orders.length === 0 ? (
+            {!Array.isArray(orders) || orders.length === 0 ? (
               <tr><td colSpan="6" style={{textAlign: 'center'}}>No orders found</td></tr>
             ) : (
               orders.map(order => (
@@ -147,7 +147,7 @@ export const AdminCustomers = () => {
     const fetchCustomers = async () => {
       try {
         const { data } = await axios.get('/api/users', getAuthConfig());
-        setCustomers(data);
+        setCustomers(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error(error);
       } finally {
@@ -178,7 +178,7 @@ export const AdminCustomers = () => {
             </tr>
           </thead>
           <tbody>
-            {customers.length === 0 ? (
+            {!Array.isArray(customers) || customers.length === 0 ? (
               <tr><td colSpan="7" style={{textAlign: 'center'}}>No customers found</td></tr>
             ) : (
               customers.map(customer => (
@@ -360,11 +360,11 @@ export const AdminSettings = () => {
         setSettings(data);
         // Initialize multiline strings for array fields
         setTextInputs({
-          marqueeText: (data.marqueeText || []).join('\n'),
-          announcementList: (data.announcementList || []).join('\n'),
-          instagramImages: (data.instagramImages || []).join('\n'),
-          heroSlideshow: (data.heroSlideshow || []).join('\n'),
-          featuredVideoSlideshow: (data.featuredVideoSection?.slideshow || []).join('\n'),
+          marqueeText: Array.isArray(data.marqueeText) ? data.marqueeText.join('\n') : (data.marqueeText || ''),
+          announcementList: Array.isArray(data.announcementList) ? data.announcementList.join('\n') : (data.announcementList || ''),
+          instagramImages: Array.isArray(data.instagramImages) ? data.instagramImages.join('\n') : (data.instagramImages || ''),
+          heroSlideshow: Array.isArray(data.heroSlideshow) ? data.heroSlideshow.join('\n') : (data.heroSlideshow || ''),
+          featuredVideoSlideshow: Array.isArray(data.featuredVideoSection?.slideshow) ? data.featuredVideoSection.slideshow.join('\n') : (data.featuredVideoSection?.slideshow || ''),
         });
         setLoading(false);
       } catch (error) {

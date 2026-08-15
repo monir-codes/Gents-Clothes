@@ -16,7 +16,7 @@ const AdminReviews = () => {
       const { data } = await axios.get('/api/products/reviews/all', {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setReviews(data);
+      setReviews(Array.isArray(data?.reviews) ? data.reviews : (Array.isArray(data) ? data : []));
       setLoading(false);
     } catch (error) {
       console.error(error);

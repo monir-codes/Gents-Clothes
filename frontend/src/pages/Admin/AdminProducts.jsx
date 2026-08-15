@@ -42,7 +42,7 @@ const AdminProducts = () => {
   const fetchProducts = async () => {
     try {
       const { data } = await axios.get('/api/products?limit=100');
-      setProducts(data.products || data);
+      setProducts(Array.isArray(data?.products) ? data.products : (Array.isArray(data) ? data : []));
     } catch (error) {
       console.error(error);
     }

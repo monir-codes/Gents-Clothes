@@ -94,7 +94,7 @@ const AdminDashboard = () => {
             </tr>
           </thead>
           <tbody>
-            {stats.recentOrders.length > 0 ? stats.recentOrders.map((order) => (
+            {Array.isArray(stats?.recentOrders) && stats.recentOrders.length > 0 ? stats.recentOrders.map((order) => (
               <tr key={order._id}>
                 <td>{order._id.substring(0, 8)}</td>
                 <td>{new Date(order.createdAt).toLocaleDateString()}</td>
