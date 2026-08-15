@@ -201,3 +201,15 @@
     display: none;
   }
 }
+
+@media (max-width: 768px) {
+  .logo {
+    font-size: 1.2rem;
+    letter-spacing: 1px;
+    white-space: nowrap;
+  }
+  
+  .navIcons {
+    gap: var(--space-2);
+  }
+}
