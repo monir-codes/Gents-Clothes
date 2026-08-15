@@ -143,17 +143,53 @@ export const AdminCustomers = () => {
   const [loading, setLoading] = useState(true);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
 
-  useEffect(() => {
-    const fetchCustomers = async () => {
+  const fetchCustomers = async () => {
+    try {
+      const { data } = await axios.get('/api/users', getAuthConfig());
+      setCustomers(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteUser = async (id) => {
+    const { isConfirmed } = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you really want to delete this user? This action cannot be undone.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!'
+    });
+    if (isConfirmed) {
       try {
-        const { data } = await axios.get('/api/users', getAuthConfig());
-        setCustomers(Array.isArray(data) ? data : []);
+        await axios.delete(`/api/users/${id}`, getAuthConfig());
+        Swal.fire('Deleted!', 'User has been deleted.', 'success');
+        fetchCustomers();
+        if (selectedCustomer && selectedCustomer._id === id) setSelectedCustomer(null);
       } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
+        Swal.fire('Error!', error.response?.data?.message || 'Failed to delete user.', 'error');
       }
-    };
+    }
+  };
+
+  const handleToggleAdmin = async (id, currentStatus) => {
+    try {
+      await axios.put(`/api/users/${id}/role`, { isAdmin: !currentStatus }, getAuthConfig());
+      Swal.fire('Updated!', `User role changed to ${!currentStatus ? 'Admin' : 'Customer'}.`, 'success');
+      fetchCustomers();
+      if (selectedCustomer && selectedCustomer._id === id) {
+        setSelectedCustomer({ ...selectedCustomer, isAdmin: !currentStatus });
+      }
+    } catch (error) {
+      Swal.fire('Error!', error.response?.data?.message || 'Failed to update role.', 'error');
+    }
+  };
+
+  useEffect(() => {
     fetchCustomers();
   }, []);
 
@@ -162,7 +198,7 @@ export const AdminCustomers = () => {
   return (
     <div>
       <div className={styles.dashboardHeader}>
-        <h1 className={styles.dashboardTitle}>Customers</h1>
+        <h1 className={styles.dashboardTitle}>User Management</h1>
       </div>
       <div className={styles.tableContainer}>
         <table className={styles.table}>
@@ -199,7 +235,12 @@ export const AdminCustomers = () => {
                   </td>
                   <td>{new Date(customer.createdAt).toLocaleDateString()}</td>
                   <td>{customer.isAdmin ? 'Admin' : 'Customer'}</td>
-                  <td><button onClick={() => setSelectedCustomer(customer)} style={{ padding: '6px 12px', background: 'var(--color-accent)', color: 'white', borderRadius: '4px', border: 'none', cursor: 'pointer' }}>View Profile</button></td>
+                  <td>
+                    <button onClick={() => setSelectedCustomer(customer)} style={{ padding: '6px 12px', background: 'var(--color-accent)', color: 'white', borderRadius: '4px', border: 'none', cursor: 'pointer', marginRight: '5px' }}>View Profile</button>
+                    <button onClick={() => handleDeleteUser(customer._id)} style={{ padding: '6px', background: '#fee2e2', color: '#dc2626', borderRadius: '4px', border: '1px solid #f87171', cursor: 'pointer' }} title="Delete User">
+                      <Trash2 size={16} />
+                    </button>
+                  </td>
                 </tr>
               ))
             )}
@@ -218,7 +259,15 @@ export const AdminCustomers = () => {
                 <div><strong>Name:</strong> <br/>{selectedCustomer.name}</div>
                 <div><strong>Email:</strong> <br/>{selectedCustomer.email}</div>
                 <div><strong>Phone:</strong> <br/>{selectedCustomer.phone || 'N/A'}</div>
-                <div><strong>Role:</strong> <br/>{selectedCustomer.isAdmin ? 'Admin' : 'Customer'}</div>
+                <div>
+                  <strong>Role:</strong> <br/>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    {selectedCustomer.isAdmin ? 'Admin' : 'Customer'}
+                    <button onClick={() => handleToggleAdmin(selectedCustomer._id, selectedCustomer.isAdmin)} style={{ padding: '4px 8px', fontSize: '0.8rem', background: selectedCustomer.isAdmin ? '#fee2e2' : '#dcfce7', color: selectedCustomer.isAdmin ? '#dc2626' : '#166534', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+                      {selectedCustomer.isAdmin ? 'Remove Admin' : 'Make Admin'}
+                    </button>
+                  </div>
+                </div>
                 <div>
                   <strong>Verified:</strong> <br/>
                   {selectedCustomer.isVerified ? (

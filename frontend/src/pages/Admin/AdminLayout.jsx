@@ -35,7 +35,7 @@ const AdminLayout = () => {
             <ShoppingCart size={20} /> Orders
           </Link>
           <Link to="/admin/customers" onClick={() => setSidebarOpen(false)} className={`${styles.navItem} ${location.pathname.includes('/customers') ? styles.active : ''}`}>
-            <Users size={20} /> Customers
+            <Users size={20} /> User Management
           </Link>
           <Link to="/admin/marketing" onClick={() => setSidebarOpen(false)} className={`${styles.navItem} ${location.pathname.includes('/marketing') ? styles.active : ''}`}>
             <Sparkles size={20} /> Marketing & AI
