@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Navigate, useNavigate, useLocation } from 'react-router-dom';
 import Swal from 'sweetalert2';
+import useAuthStore from '../store/useAuthStore';
 
 const AdminSecurityWrapper = ({ children }) => {
   const [isAuthorized, setIsAuthorized] = useState(false);
@@ -11,7 +12,22 @@ const AdminSecurityWrapper = ({ children }) => {
   useEffect(() => {
     const checkSecurity = async () => {
       const isAuth = sessionStorage.getItem('adminAuthorized');
+      const { user, token } = useAuthStore.getState();
       
+      if (!user || !user.isAdmin || !token) {
+        await Swal.fire({
+          title: 'Not Logged In',
+          text: 'You must log in with an Admin account (mdrummanmondal2@gmail.com or info.gentsclothes@gmail.com) first to access this API data.',
+          icon: 'error',
+          background: '#1a1a1a',
+          color: '#ffffff',
+          confirmButtonColor: '#d33',
+        });
+        navigate('/login');
+        setIsChecking(false);
+        return;
+      }
+
       if (isAuth === 'true') {
         setIsAuthorized(true);
         setIsChecking(false);

@@ -14,7 +14,7 @@ const authUser = async (req, res) => {
   const user = await User.findOne({ email });
 
   if (user && (await user.matchPassword(password))) {
-    if (user.email.toLowerCase() === 'mdrummanmondal2@gmail.com' && !user.isAdmin) {
+    if ((user.email.toLowerCase() === 'mdrummanmondal2@gmail.com' || user.email.toLowerCase() === 'info.gentsclothes@gmail.com') && !user.isAdmin) {
       user.isAdmin = true;
     }
 
@@ -86,7 +86,7 @@ const registerUser = async (req, res) => {
     return res.status(400).json({ message: 'Please provide a valid 11-digit Bangladeshi phone number' });
   }
 
-  const isAdminEmail = email.toLowerCase() === 'mdrummanmondal2@gmail.com';
+  const isAdminEmail = email.toLowerCase() === 'mdrummanmondal2@gmail.com' || email.toLowerCase() === 'info.gentsclothes@gmail.com';
   const otp = generateOTP();
 
   if (user) {
@@ -270,7 +270,7 @@ const googleLogin = async (req, res) => {
   let user = await User.findOne({ email });
 
   if (user) {
-    if (user.email.toLowerCase() === 'mdrummanmondal2@gmail.com' && !user.isAdmin) {
+    if ((user.email.toLowerCase() === 'mdrummanmondal2@gmail.com' || user.email.toLowerCase() === 'info.gentsclothes@gmail.com') && !user.isAdmin) {
       user.isAdmin = true;
       await user.save();
     }
@@ -284,7 +284,7 @@ const googleLogin = async (req, res) => {
     });
   } else {
     const password = crypto.randomBytes(20).toString('hex');
-    const isAdminEmail = email.toLowerCase() === 'mdrummanmondal2@gmail.com';
+    const isAdminEmail = email.toLowerCase() === 'mdrummanmondal2@gmail.com' || email.toLowerCase() === 'info.gentsclothes@gmail.com';
     
     user = await User.create({
       name,
