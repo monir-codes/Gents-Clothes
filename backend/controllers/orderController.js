@@ -18,9 +18,15 @@ const addOrderItems = async (req, res) => {
     res.status(400).json({ message: 'No order items' });
     return;
   } else {
+    // Generate Custom ID: UserName-Count
+    const userOrdersCount = await Order.countDocuments({ user: req.user._id });
+    const userFirstName = req.user.name.split(' ')[0].replace(/[^a-zA-Z0-9]/g, '');
+    const customId = `${userFirstName}-${userOrdersCount + 1}`;
+
     const order = new Order({
       orderItems,
       user: req.user._id,
+      customId,
       shippingAddress,
       paymentMethod,
       transactionId,
@@ -33,7 +39,10 @@ const addOrderItems = async (req, res) => {
 
     // Send email to Admin
     try {
-      await sendOrderNotificationEmail('mdrummanmondal2@gmail.com', createdOrder);
+      const adminEmails = ['info.gentsclothes@gmail.com', 'mdrummanmondal2@gmail.com'];
+      for (const email of adminEmails) {
+        await sendOrderNotificationEmail(email, createdOrder);
+      }
     } catch (error) {
       console.error('Failed to send admin order notification email', error);
     }
@@ -125,14 +134,23 @@ const getOrders = async (req, res) => {
 const trackOrder = async (req, res) => {
   const { orderId, phone } = req.body;
   try {
-    const order = await Order.findById(orderId).populate('user', 'name');
+    let order;
+    
+    // Check if orderId is a valid ObjectId, otherwise it might be a customId
+    if (orderId.match(/^[0-9a-fA-F]{24}$/)) {
+      order = await Order.findById(orderId).populate('user', 'name');
+    }
+    
+    if (!order) {
+      order = await Order.findOne({ customId: orderId }).populate('user', 'name');
+    }
     
     if (order) {
       if (order.shippingAddress.phone !== phone) {
         return res.status(401).json({ message: 'Invalid phone number for this order' });
       }
       res.json({
-        _id: order._id,
+        _id: order.customId || order._id, // Return customId if available
         status: order.status,
         createdAt: order.createdAt,
         deliveredAt: order.deliveredAt,

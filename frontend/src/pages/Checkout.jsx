@@ -103,7 +103,7 @@ const Checkout = () => {
           });
 
           clearCart();
-          navigate('/order-success', { state: { orderId: data._id, totalPrice, paymentMethod } });
+          navigate('/order-success', { state: { orderId: data.customId || data._id, totalPrice, paymentMethod } });
         } catch (error) {
           Swal.fire('Error', 'Failed to place order. Please try again.', 'error');
         }

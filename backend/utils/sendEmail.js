@@ -71,20 +71,20 @@ const sendOrderNotificationEmail = async (adminEmail, orderData) => {
   const mailOptions = {
     from: '"Gents Clothes" <noreply@gentsclothes.com>',
     to: adminEmail,
-    subject: `New Order Received! #${orderData._id}`,
+    subject: `New Order Received! #${orderData.customId || orderData._id}`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
         <h2 style="color: #333;">New Order Notification</h2>
         <p style="color: #555; font-size: 16px;">A new order has been placed on Gents Clothes.</p>
         <ul style="color: #555; font-size: 14px; line-height: 1.6;">
-          <li><strong>Order ID:</strong> ${orderData._id}</li>
+          <li><strong>Order ID:</strong> ${orderData.customId || orderData._id}</li>
           <li><strong>Total Amount:</strong> ৳${orderData.totalPrice}</li>
           <li><strong>Payment Method:</strong> ${orderData.paymentMethod}</li>
         </ul>
         <p style="color: #777; font-size: 14px; margin-top: 20px;">Please check the admin dashboard for more details.</p>
       </div>
     `,
-    text: `New Order Received. Order ID: ${orderData._id}, Total: ৳${orderData.totalPrice}`,
+    text: `New Order Received. Order ID: ${orderData.customId || orderData._id}, Total: ৳${orderData.totalPrice}`,
   };
   await sendEmailWrapper(mailOptions);
 };

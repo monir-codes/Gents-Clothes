@@ -122,7 +122,7 @@ const Dashboard = () => {
                   <tbody>
                     {orders.map(order => (
                       <tr key={order._id} style={{ borderBottom: '1px solid var(--color-border)' }}>
-                        <td style={{ padding: '12px' }}>#{order._id.substring(0, 8).toUpperCase()}</td>
+                        <td style={{ padding: '12px' }}>#{order.customId ? order.customId : order._id.substring(0, 8).toUpperCase()}</td>
                         <td style={{ padding: '12px' }}>{new Date(order.createdAt).toLocaleDateString()}</td>
                         <td style={{ padding: '12px', fontWeight: 600 }}>৳{order.totalPrice}</td>
                         <td style={{ padding: '12px' }}>

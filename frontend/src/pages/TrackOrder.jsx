@@ -72,7 +72,7 @@ const TrackOrder = () => {
             <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.9rem', fontWeight: 500 }}>Order ID</label>
             <input 
               type="text" 
-              placeholder="e.g. 64d9f7..."
+              placeholder="e.g. Rumman-1 or 64d9f7..."
               value={orderId}
               onChange={(e) => setOrderId(e.target.value)}
               style={{ width: '100%', padding: '12px', border: '1px solid var(--color-border)', borderRadius: '4px' }}
