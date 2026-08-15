@@ -8,7 +8,6 @@ const orderSchema = new mongoose.Schema({
   },
   customId: {
     type: String,
-    unique: true,
     sparse: true
   },
   orderItems: [

@@ -96,7 +96,7 @@ const AdminDashboard = () => {
           <tbody>
             {Array.isArray(stats?.recentOrders) && stats.recentOrders.length > 0 ? stats.recentOrders.map((order) => (
               <tr key={order._id}>
-                <td>{order.customId ? order.customId : order._id?.substring(0, 8)}</td>
+                <td>{order.customId ? order.customId : (order._id ? String(order._id).substring(0, 8) : 'N/A')}</td>
                 <td>{new Date(order.createdAt).toLocaleDateString()}</td>
                 <td>৳{order.totalPrice}</td>
                 <td>

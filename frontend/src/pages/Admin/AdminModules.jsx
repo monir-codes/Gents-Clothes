@@ -84,7 +84,7 @@ const AdminOrders = () => {
             ) : (
               orders.map(order => (
                 <tr key={order._id}>
-                  <td>#{order.customId ? order.customId : order._id?.substring(0, 8).toUpperCase()}</td>
+                  <td>#{order.customId ? order.customId : (order._id ? String(order._id).substring(0, 8).toUpperCase() : 'N/A')}</td>
                   <td>{order.user?.name || 'Unknown'}</td>
                   <td>{order.orderItems?.length || 0}</td>
                   <td>৳{order.totalPrice}</td>
