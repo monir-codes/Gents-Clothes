@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Mail } from 'lucide-react';
+import { Mail, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import axios from 'axios';
 import styles from './Footer.module.css';
 
@@ -8,6 +8,8 @@ const Footer = () => {
   const [socialLinks, setSocialLinks] = useState({
     facebook: '#', instagram: '#', tiktok: '#', youtube: '#'
   });
+  const [email, setEmail] = useState('');
+  const [status, setStatus] = useState({ loading: false, message: '', error: false });
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -23,13 +25,48 @@ const Footer = () => {
     fetchSettings();
   }, []);
 
+  const handleNewsletterSubmit = async (e) => {
+    e.preventDefault();
+    if (!email || !email.includes('@')) return;
+
+    setStatus({ loading: true, message: '', error: false });
+    try {
+      const { data } = await axios.post('/api/settings/newsletter/subscribe', { email: email.trim() });
+      setStatus({ 
+        loading: false, 
+        message: data.message || 'ধন্যবাদ! আপনি সফলভাবে রঙবতী নিউজলেটারে যুক্ত হয়েছেন।', 
+        error: false 
+      });
+      setEmail('');
+    } catch (error) {
+      setStatus({
+        loading: false,
+        message: error.response?.data?.message || 'সাবস্ক্রাইব করতে ব্যর্থ হয়েছে। পরে আবার চেষ্টা করুন।',
+        error: true
+      });
+    }
+  };
+
   return (
     <footer className={styles.footer}>
       <div className={`container ${styles.footerContent}`}>
         <div className={styles.footerSection}>
-          <h2 className={styles.brand}>Gents Clothes</h2>
+          <Link to="/" className={styles.footerLogoLink} aria-label="রঙবতী Home">
+            <img 
+              src="/images/ronggoboti-logo.png" 
+              alt="রঙবতী" 
+              className={styles.footerLogoImg}
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+                if (e.currentTarget.nextElementSibling) {
+                  e.currentTarget.nextElementSibling.style.display = 'block';
+                }
+              }}
+            />
+            <h2 className={styles.brand} style={{ display: 'none' }}>রঙবতী</h2>
+          </Link>
           <p className={styles.description}>
-            Redefining luxury men's fashion in Bangladesh. Premium fabrics, flawless tailoring, and timeless designs for the modern gentleman.
+            Redefining luxury fashion in Bangladesh. Premium fabrics, flawless tailoring, and timeless designs for the modern woman.
           </p>
           <div className={styles.socialLinks}>
             {socialLinks.facebook && (
@@ -60,8 +97,9 @@ const Footer = () => {
           <ul className={styles.linkList}>
             <li className={styles.linkItem}><Link to="/shop?category=New+Arrivals">New Arrivals</Link></li>
             <li className={styles.linkItem}><Link to="/shop?category=Premium">Premium Collection</Link></li>
-            <li className={styles.linkItem}><Link to="/shop?category=Panjabis">Panjabis</Link></li>
-            <li className={styles.linkItem}><Link to="/shop?category=Shirts">Shirts</Link></li>
+            <li className={styles.linkItem}><Link to="/shop?category=Sarees">Sarees</Link></li>
+            <li className={styles.linkItem}><Link to="/shop?category=Salwar+Kameez">Salwar Kameez</Link></li>
+            <li className={styles.linkItem}><Link to="/shop?category=Kurtis">Kurtis</Link></li>
             <li className={styles.linkItem}><Link to="/shop?category=Sale">Sale</Link></li>
           </ul>
         </div>
@@ -79,17 +117,38 @@ const Footer = () => {
 
         <div className={styles.footerSection}>
           <h3 className={styles.sectionTitle}>Newsletter</h3>
-          <p className={styles.description}>Subscribe to get special offers, free giveaways, and once-in-a-lifetime deals.</p>
-          <form className={styles.newsletterForm}>
-            <input type="email" placeholder="Enter your email" className={styles.newsletterInput} required />
-            <button type="submit" className={styles.newsletterBtn}><Mail size={18} /></button>
+          <p className={styles.description}>Subscribe to get exclusive collections, special offers, and early-bird deals.</p>
+          <form className={styles.newsletterForm} onSubmit={handleNewsletterSubmit}>
+            <input 
+              type="email" 
+              placeholder="Enter your email" 
+              className={styles.newsletterInput} 
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={status.loading}
+              required 
+            />
+            <button 
+              type="submit" 
+              className={styles.newsletterBtn} 
+              disabled={status.loading}
+              aria-label="Subscribe"
+            >
+              {status.loading ? <Loader2 size={18} className={styles.spinner} /> : <Mail size={18} />}
+            </button>
           </form>
+          {status.message && (
+            <div className={`${styles.feedbackMsg} ${status.error ? styles.feedbackError : styles.feedbackSuccess}`}>
+              {status.error ? <AlertCircle size={15} /> : <CheckCircle size={15} />}
+              <span>{status.message}</span>
+            </div>
+          )}
         </div>
       </div>
 
       <div className={styles.bottomBar}>
         <div className={`container ${styles.bottomBarInner}`}>
-          <p>&copy; {new Date().getFullYear()} Gents Clothes. All Rights Reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Ronggoboti. All Rights Reserved.</p>
           <div className={styles.legalLinks}>
             <Link to="/privacy">Privacy Policy</Link>
             <Link to="/terms">Terms of Service</Link>

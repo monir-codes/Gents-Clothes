@@ -3,9 +3,9 @@ import { motion } from 'framer-motion';
 
 const BlogPreview = () => {
   const articles = [
-    { title: "How to Style a Linen Shirt", date: "Aug 12, 2026", img: "https://images.unsplash.com/photo-1596755094514-f87e32f6b717?auto=format&fit=crop&q=80&w=600" },
-    { title: "The Ultimate Guide to Men's Accessories", date: "Jul 28, 2026", img: "https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&q=80&w=600" },
-    { title: "Choosing the Right Panjabi for Eid", date: "Jun 15, 2026", img: "https://images.unsplash.com/photo-1601056637651-789a74a161ed?auto=format&fit=crop&q=80&w=600" }
+    { title: "The Art of Draping Jamdani & Muslin Sarees", date: "Oct 02, 2026", img: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&q=80&w=600" },
+    { title: "Styling Contemporary Kurtis & Co-ord Sets", date: "Sep 25, 2026", img: "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&q=80&w=600" },
+    { title: "Festive Trends: Salwar Kameez & Silk Edit", date: "Sep 18, 2026", img: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?auto=format&fit=crop&q=80&w=600" }
   ];
 
   return (

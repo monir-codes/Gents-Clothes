@@ -1,87 +1,88 @@
 const products = [
   {
-    name: 'Premium Cotton T-Shirt',
-    image: '/images/category-tshirt.png',
-    hoverImage: '/images/category-tshirt.png',
+    name: 'Royal Heritage Jamdani Saree',
+    image: '/images/hero-banner.jpg',
+    hoverImage: '/images/hero-banner.jpg',
     description:
-      'Luxurious 100% combed cotton t-shirt with a modern fit. Perfect for layering or wearing on its own.',
-    brand: 'Gents Clothes',
-    category: 'T-Shirts',
-    price: 1200,
-    oldPrice: 1500,
-    countInStock: 10,
-    rating: 4.5,
-    numReviews: 12,
-    colors: ['Black', 'White', 'Navy'],
-    sizes: ['S', 'M', 'L', 'XL'],
-    fabricDetails: {
-      material: '100% Combed Cotton',
-      gsm: '180 GSM',
-      washInstruction: 'Machine wash cold, tumble dry low'
-    },
-    sku: 'TS-BLK-001'
-  },
-  {
-    name: 'Signature Polo Shirt',
-    image: '/images/category-tshirt.png',
-    hoverImage: '/images/category-tshirt.png',
-    description:
-      'Elevate your casual look with our signature polo shirt, crafted from premium pique cotton.',
-    brand: 'Gents Clothes',
-    category: 'Polos',
-    price: 1800,
-    countInStock: 7,
-    rating: 4.8,
-    numReviews: 8,
-    colors: ['Navy', 'Burgundy'],
-    sizes: ['M', 'L', 'XL'],
-    fabricDetails: {
-      material: '95% Cotton, 5% Spandex',
-      gsm: '220 GSM',
-      washInstruction: 'Hand wash recommended'
-    },
-    sku: 'PL-NVY-002'
-  },
-  {
-    name: 'Classic Linen Panjabi',
-    image: '/images/category-tshirt.png',
-    description:
-      'A timeless classic for festive occasions. Made with breathable linen for ultimate comfort.',
-    brand: 'Gents Clothes',
-    category: 'Panjabis',
-    price: 3500,
-    oldPrice: 4000,
-    countInStock: 0,
+      'Masterfully handwoven Dhakai Jamdani saree featuring intricate floral motifs and royal maroon hues with metallic gold zari borders.',
+    brand: 'রঙবতী',
+    category: 'Sarees',
+    price: 6500,
+    oldPrice: 7800,
+    countInStock: 12,
     rating: 4.9,
-    numReviews: 24,
-    colors: ['White', 'Beige'],
-    sizes: ['40', '42', '44'],
+    numReviews: 18,
+    colors: ['Maroon', 'Blush Rose', 'Ivory'],
+    sizes: ['Free Size'],
     fabricDetails: {
-      material: '100% Linen',
-      gsm: '160 GSM',
+      material: '100% Fine Cotton & Gold Zari',
+      gsm: '80 GSM',
       washInstruction: 'Dry clean only'
     },
-    sku: 'PJ-WHT-003'
+    sku: 'RGB-SAR-001'
   },
   {
-    name: 'Essential Winter Hoodie',
-    image: '/images/category-tshirt.png',
+    name: 'Embroidered Georgette Salwar Kameez',
+    image: '/images/hero-banner.jpg',
+    hoverImage: '/images/hero-banner.jpg',
     description:
-      'Stay warm without sacrificing style. Heavyweight fleece fabric for maximum heat retention.',
-    brand: 'Gents Clothes',
-    category: 'Hoodies',
-    price: 2500,
+      'Elegant three-piece luxury suit with exquisite tonal thread embroidery and organza dupatta. Designed for festive charm and timeless grace.',
+    brand: 'রঙবতী',
+    category: 'Salwar Kameez',
+    price: 4800,
+    oldPrice: 5500,
+    countInStock: 8,
+    rating: 4.8,
+    numReviews: 14,
+    colors: ['Rose Gold', 'Wine', 'Champagne'],
+    sizes: ['S', 'M', 'L', 'XL'],
+    fabricDetails: {
+      material: 'Pure Viscose Georgette with Silk Dupatta',
+      gsm: '120 GSM',
+      washInstruction: 'Gentle dry clean'
+    },
+    sku: 'RGB-SK-002'
+  },
+  {
+    name: 'Contemporary Silk Kurti & Co-ord Set',
+    image: '/images/hero-banner.jpg',
+    description:
+      'Modern silhouette combining traditional craftsmanship with a chic western aesthetic. Breathable, flattering, and effortless to style.',
+    brand: 'রঙবতী',
+    category: 'Kurtis & Tunics',
+    price: 2800,
+    oldPrice: 3400,
     countInStock: 15,
     rating: 4.7,
-    numReviews: 15,
-    colors: ['Black', 'Grey Melange'],
-    sizes: ['M', 'L', 'XL', 'XXL'],
+    numReviews: 22,
+    colors: ['Burgundy', 'Dusty Rose', 'Emerald'],
+    sizes: ['S', 'M', 'L', 'XL'],
     fabricDetails: {
-      material: '80% Cotton, 20% Polyester Fleece',
-      gsm: '320 GSM',
-      washInstruction: 'Machine wash cold'
+      material: 'Mulberry Silk Blend',
+      gsm: '140 GSM',
+      washInstruction: 'Hand wash cold or gentle machine wash'
     },
-    sku: 'HD-BLK-004'
+    sku: 'RGB-KRT-003'
+  },
+  {
+    name: 'Velvet Festive Shawl & Party Wrap',
+    image: '/images/hero-banner.jpg',
+    description:
+      'Ultra-soft micro velvet festive shawl with hand-embroidered borders. The perfect accessory to complete your celebratory look.',
+    brand: 'রঙবতী',
+    category: 'Western Wear',
+    price: 3200,
+    countInStock: 10,
+    rating: 5.0,
+    numReviews: 9,
+    colors: ['Deep Wine', 'Midnight Black'],
+    sizes: ['Free Size'],
+    fabricDetails: {
+      material: 'Micro Velvet with Zari Trim',
+      gsm: '260 GSM',
+      washInstruction: 'Dry clean only'
+    },
+    sku: 'RGB-SHW-004'
   }
 ];
 

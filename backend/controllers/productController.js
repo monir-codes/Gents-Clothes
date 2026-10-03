@@ -78,7 +78,7 @@ const createProduct = async (req, res) => {
       oldPrice: oldPrice || null,
       image: image || '/images/sample.jpg',
       hoverImage: hoverImage || '',
-      brand: brand || 'Gents Clothes',
+      brand: brand || 'রঙবতী',
       category: category || 'Sample category',
       countInStock: countInStock || 0,
       numReviews: numReviews || 0,

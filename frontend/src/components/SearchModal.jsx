@@ -61,9 +61,10 @@ const SearchModal = ({ isOpen, onClose }) => {
             <div className={styles.suggestions}>
               <h3>Popular Searches</h3>
               <div className={styles.tags}>
-                <span className={styles.tag}>Premium Panjabis</span>
-                <span className={styles.tag}>Black T-Shirts</span>
-                <span className={styles.tag}>Winter Hoodies</span>
+                <span className={styles.tag}>Jamdani Sarees</span>
+                <span className={styles.tag}>Silk Salwar Kameez</span>
+                <span className={styles.tag}>Designer Kurtis</span>
+                <span className={styles.tag}>Party Wear</span>
               </div>
               
               <h3 style={{ marginTop: '24px' }}>AI Recommended for You</h3>

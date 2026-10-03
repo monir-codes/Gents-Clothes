@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 
 const PressMentions = () => {
   const logos = [
-    "VOGUE", "GQ", "HYPEBEAST", "ESQUIRE", "FORBES"
+    "VOGUE", "ELLE", "HARPER'S BAZAAR", "GRAZIA", "FORBES"
   ];
 
   return (

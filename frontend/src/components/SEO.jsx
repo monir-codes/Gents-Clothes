@@ -1,8 +1,8 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
 
-const SEO = ({ title, description, keywords, type = 'website', name = 'Gents Clothes', canonical, schemaMarkup }) => {
-  const defaultKeywords = "Gents Clothes, gents clothes bd, gents clothes bangladesh, buy panjabi online dhaka, premium mens clothing bd, best panjabi brand in bangladesh, panjabi for men, stylish panjabi collection, mens fashion bangladesh, premium t-shirts bd, buy casual shirts online bd, mens polo shirts bd, formal shirts for men dhaka, eid panjabi collection 2024, best menswear brand in dhaka, gents fashion bd, buy mens clothes online bangladesh cash on delivery, mens lifestyle clothing, luxury menswear bangladesh, exclusive panjabi dhaka, online shopping for men in bangladesh, ছেলেদের পোশাক, পাঞ্জাবি ডিজাইন, ছেলেদের শার্ট, ছেলেদের টিশার্ট, men's clothing store dhaka, top clothing brands for men in bd";
+const SEO = ({ title, description, keywords, type = 'website', name = 'রঙবতী', canonical, schemaMarkup }) => {
+  const defaultKeywords = "রঙবতী, Ronggoboti, ronggoboti bd, buy saree online bd, premium womens clothing bd, best saree brand in bangladesh, salwar kameez online, stylish kurti collection, womens fashion bangladesh, exclusive lehenga dhaka, ladies boutique bd, online shopping for women in bangladesh, মেয়েদের পোশাক, শাড়ি কালেকশন, সালোয়ার কামিজ, কুর্তি ডিজাইন, women's clothing store dhaka, top clothing brands for women in bd";
   
   return (
     <Helmet>

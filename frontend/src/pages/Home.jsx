@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import { Shield, Truck, RefreshCw } from 'lucide-react';
+import { Shield, Truck, RefreshCw, Sparkles, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Autoplay, EffectFade } from 'swiper/modules';
 import 'swiper/css';
@@ -13,41 +13,33 @@ import CategoryCard from '../components/CategoryCard';
 import ProductCard from '../components/ProductCard';
 import SEO from '../components/SEO';
 import Loader from '../components/Loader';
-import StyleQuizModal from '../components/StyleQuizModal';
-import FlashSaleBanner from '../components/FlashSaleBanner';
-import Lookbook from '../components/Lookbook';
-import FAQSection from '../components/FAQSection';
-import OurProcess from '../components/OurProcess';
-import PressMentions from '../components/PressMentions';
 import styles from './Home.module.css';
 
 const Home = () => {
   const [settings, setSettings] = useState({
     heroVideo: null,
     heroSlideshow: [],
-    heroTitle: 'ELEVATE YOUR STYLE',
-    heroSubtitle: 'Premium Men\'s Fashion',
+    heroTitle: 'রঙবতী',
+    heroSubtitle: 'Redefining Luxury Fashion in Bangladesh',
     announcementText: '',
     announcementList: [],
     featuredCategories: [],
     featuredCollections: [],
     limitedEdition: null,
-    shopTheLook: [],
+    shopTheLook: null,
     premiumCollection: null,
     features: [],
     brandStory: null,
-    featuredVideoSection: null,
     reviews: [],
     instagramImages: [],
     newsletter: null,
-    marqueeText: '',
+    marqueeText: [],
     whatsappNumber: '',
   });
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [isQuizOpen, setIsQuizOpen] = useState(false);
-  const { scrollY } = useScroll();
-  const y1 = useTransform(scrollY, [0, 500], [0, 150]); // Parallax effect
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [newsletterStatus, setNewsletterStatus] = useState({ loading: false, message: '', error: false });
 
   useEffect(() => {
     const fetchSettingsAndProducts = async () => {
@@ -67,10 +59,6 @@ const Home = () => {
         settingsData.features = ensureArray(settingsData.features);
         settingsData.reviews = ensureArray(settingsData.reviews);
         
-        if (settingsData.featuredVideoSection && settingsData.featuredVideoSection.slideshow) {
-           settingsData.featuredVideoSection.slideshow = ensureArray(settingsData.featuredVideoSection.slideshow);
-        }
-
         setSettings(settingsData);
 
         const prodData = productsRes.data.products ?? productsRes.data;
@@ -84,15 +72,38 @@ const Home = () => {
     fetchSettingsAndProducts();
   }, []);
 
+  const handleNewsletterSubmit = async (e) => {
+    e.preventDefault();
+    if (!newsletterEmail || !newsletterEmail.includes('@')) return;
+
+    setNewsletterStatus({ loading: true, message: '', error: false });
+    try {
+      const { data } = await axios.post('/api/settings/newsletter/subscribe', { email: newsletterEmail.trim() });
+      setNewsletterStatus({ 
+        loading: false, 
+        message: data.message || 'ধন্যবাদ! আপনি সফলভাবে রঙবতী নিউজলেটারে যুক্ত হয়েছেন।', 
+        error: false 
+      });
+      setNewsletterEmail('');
+    } catch (error) {
+      setNewsletterStatus({
+        loading: false,
+        message: error.response?.data?.message || 'সাবস্ক্রাইব করতে ব্যর্থ হয়েছে।',
+        error: true
+      });
+    }
+  };
+
   if (loading) return <Loader fullScreen />;
 
   return (
     <div style={{ overflowX: 'hidden' }}>
       <SEO 
-        title="Home" 
-        description="Gents Clothes - Redefining luxury men's fashion in Bangladesh. Shop premium Panjabis, Shirts, and T-Shirts." 
+        title="রঙবতী - Luxury Women's Fashion & Lifestyle" 
+        description="রঙবতী - Explore handcrafted sarees, premium salwar suits, luxury kurtis, and contemporary women's fashion in Bangladesh." 
       />
-      {/* Hero Section */}
+
+      {/* Fixed Hero Section (No parallax scroll displacement) */}
       <section className={styles.hero}>
         {settings.heroVideo ? (
           <video 
@@ -101,7 +112,7 @@ const Home = () => {
             muted 
             playsInline
             className={styles.heroVideo}
-            style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: -2 }}
+            style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 1 }}
           >
             <source src={settings.heroVideo} type="video/mp4" />
           </video>
@@ -118,126 +129,73 @@ const Home = () => {
               >
                 {settings.heroSlideshow.map((imgUrl, idx) => (
                   <SwiperSlide key={idx}>
-                    <motion.div 
-                      style={{ y: y1, width: '100%', height: '100%' }}
-                    >
-                      <div 
-                        className={styles.heroBackground} 
-                        style={{ backgroundImage: `url(${imgUrl})` }} 
-                      />
-                    </motion.div>
+                    <div 
+                      className={styles.heroBackground} 
+                      style={{ backgroundImage: `url(${imgUrl})` }} 
+                    />
                   </SwiperSlide>
                 ))}
               </Swiper>
             </div>
           ) : (
-            <motion.div 
+            <div 
               className={styles.heroBackgroundStatic} 
-              style={{ 
-                backgroundImage: `url(${settings.heroSlideshow[0]})`,
-                y: y1 
-              }} 
+              style={{ backgroundImage: `url(${settings.heroSlideshow[0]})` }} 
             />
           )
         ) : (
-          <motion.div 
+          <div 
             className={styles.heroBackgroundStatic} 
-            style={{ 
-              backgroundImage: `url(${settings.heroImage || '/images/hero-banner.jpg'})`,
-              y: y1 
-            }} 
+            style={{ backgroundImage: `url(${settings.heroImage || '/images/ronggoboti-banner.png'})` }} 
           />
         )}
-        <div className={styles.heroOverlay} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.4)', zIndex: -1 }} />
         
+        {/* Hero Call to Action Buttons */}
         <div className={`container ${styles.heroContent}`}>
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
+            transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
           >
-            <h1 className={styles.heroTitle}>{settings.heroTitle}</h1>
-            <p className={styles.heroSubtitle}>
-              {settings.heroSubtitle}
-            </p>
             <div className={styles.ctaContainer}>
               <Link to="/shop">
                 <button className={styles.btnPrimary}>Shop Now</button>
               </Link>
               <Link to="/collections">
-                <button className={styles.btnOutline}>Explore Collection</button>
+                <button className={styles.btnOutline}>Explore Collections</button>
               </Link>
             </div>
           </motion.div>
         </div>
       </section>
 
-      <StyleQuizModal isOpen={isQuizOpen} onClose={() => setIsQuizOpen(false)} />
-
-      {/* AI Style Quiz Banner */}
-      <section className={styles.quizBanner}>
-        <div className="container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: 'var(--space-4) 0' }}>
-          <motion.div 
-            className={styles.quizBannerContent}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            style={{ 
-              background: 'var(--color-surface)', 
-              padding: 'var(--space-4) var(--space-6)', 
-              borderRadius: 'var(--radius-full)', 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: 'var(--space-4)',
-              boxShadow: 'var(--shadow-md)',
-              cursor: 'pointer'
-            }}
-            onClick={() => setIsQuizOpen(true)}
-            whileHover={{ scale: 1.02 }}
-          >
-            <div style={{ background: 'var(--color-accent)', padding: '10px', borderRadius: '50%', color: '#fff', display: 'flex' }}>
-              <Shield size={24} /> {/* Placeholder icon, could use Sparkles */}
-            </div>
-            <div>
-              <h3 style={{ fontSize: '1.2rem', fontWeight: 600, margin: 0 }}>Not sure what to buy?</h3>
-              <p style={{ margin: 0, color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>Take our AI Style Quiz to find your perfect match.</p>
-            </div>
-            <button className={styles.btnPrimary} style={{ padding: '8px 20px', marginLeft: 'auto' }}>Take Quiz</button>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Marquee */}
+      {/* Marquee Banner */}
       {settings.marqueeText && settings.marqueeText.length > 0 && (
         <div className={styles.marqueeContainer}>
           <div className={styles.marqueeText}>
             {settings.marqueeText.map((text, i) => <span key={i}>{text}</span>)}
-            {/* Duplicate for infinite loop illusion */}
             {settings.marqueeText.map((text, i) => <span key={`dup-${i}`}>{text}</span>)}
           </div>
         </div>
       )}
-
-      {/* Flash Sale Banner */}
-      <FlashSaleBanner />
 
       {/* Featured Categories */}
       {settings.featuredCategories && settings.featuredCategories.length > 0 && (
         <section className="container" style={{ padding: 'var(--space-8) var(--space-4)' }}>
           <motion.h2 
             className={styles.sectionTitle}
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.6 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.5 }}
           >
             Featured Categories
           </motion.h2>
           <motion.div 
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.6 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.5 }}
           >
             <Swiper
               modules={[Navigation, Pagination, Autoplay]}
@@ -248,7 +206,7 @@ const Home = () => {
                 768: { slidesPerView: 3 },
                 1024: { slidesPerView: 4 },
               }}
-              autoplay={{ delay: 3000, disableOnInteraction: false }}
+              autoplay={{ delay: 3500, disableOnInteraction: false }}
               navigation
             >
               {settings.featuredCategories.map((cat, i) => (
@@ -261,47 +219,52 @@ const Home = () => {
         </section>
       )}
 
-      {/* New Arrivals */}
-      <motion.section 
-        className="container" style={{ padding: 'var(--space-8) var(--space-4)' }}
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.6 }}
-      >
-        <h2 className={styles.sectionTitle}>New Arrivals</h2>
+      {/* New Arrivals Grid */}
+      <section className="container" style={{ padding: 'var(--space-8) var(--space-4)' }}>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.5 }}
+          style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 'var(--space-6)' }}
+        >
+          <h2 className={styles.sectionTitle} style={{ margin: 0 }}>New Arrivals</h2>
+          <Link to="/new-arrival" style={{ color: 'var(--color-accent)', fontWeight: 600, fontSize: '0.95rem', textDecoration: 'underline' }}>
+            View All &rarr;
+          </Link>
+        </motion.div>
         <div className={styles.productGrid}>
-          {products.slice(0, 4).map((p, i) => (
+          {products.slice(0, 8).map((p, i) => (
             <motion.div 
               key={p._id} 
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: i * 0.1, duration: 0.5 }}
+              transition={{ delay: (i % 4) * 0.1, duration: 0.4 }}
             >
               <ProductCard product={p} />
             </motion.div>
           ))}
         </div>
-      </motion.section>
+      </section>
 
-      {/* Featured Collections */}
+      {/* Featured Collections / Curated Showcase */}
       {settings.featuredCollections && settings.featuredCollections.length > 0 && (
         <section className="container" style={{ padding: 'var(--space-8) var(--space-4)' }}>
           <motion.h2 
             className={styles.sectionTitle}
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.6 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.5 }}
           >
-            Featured Collections
+            Curated Collections
           </motion.h2>
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8 }}
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.6 }}
           >
             <Swiper
               modules={[Pagination]}
@@ -319,7 +282,7 @@ const Home = () => {
                     <img src={col.image} alt={col.title} />
                     <div className={styles.collectionContent}>
                       <h3>{col.title}</h3>
-                      <Link to={col.link} style={{ color: '#fff', textDecoration: 'underline' }}>Shop Now</Link>
+                      <Link to={col.link || '/shop'} style={{ color: '#fff', textDecoration: 'underline' }}>Shop Now</Link>
                     </div>
                   </div>
                 </SwiperSlide>
@@ -329,75 +292,37 @@ const Home = () => {
         </section>
       )}
 
-
-
-      {/* Limited Edition Banner */}
-      {settings.limitedEdition && (
-        <motion.section 
-          className={styles.banner}
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-        >
-          <img src={settings.limitedEdition.image} alt={settings.limitedEdition.title} />
-          <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.5)', zIndex: 2 }} />
-          <motion.div 
-            className={styles.bannerContent}
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2, duration: 0.6 }}
-          >
-            <h2>{settings.limitedEdition.title}</h2>
-            <p style={{ marginBottom: 'var(--space-4)', fontSize: '1.2rem' }}>{settings.limitedEdition.subtitle}</p>
-            <Link to={settings.limitedEdition.link}>
-              <button className={styles.btnPrimary}>Discover Now</button>
-            </Link>
-          </motion.div>
-        </motion.section>
-      )}
-
-      {/* Shop the Look */}
-      {settings.shopTheLook && (
+      {/* Shop the Look / Editorial Spotlight */}
+      {settings.shopTheLook && settings.shopTheLook.image && (
         <section className="container" style={{ padding: 'var(--space-8) var(--space-4)' }}>
-          <motion.h2 
-            className={styles.sectionTitle}
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            Shop the Look
-          </motion.h2>
           <div className={styles.shopTheLook}>
             <motion.div 
               className={styles.lookImage}
-              initial={{ opacity: 0, x: -30 }}
+              initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
+              transition={{ duration: 0.5 }}
             >
               <img src={settings.shopTheLook.image} alt={settings.shopTheLook.title} style={{ width: '100%', borderRadius: 'var(--radius-lg)' }} />
             </motion.div>
             <motion.div
-              initial={{ opacity: 0, x: 30 }}
+              initial={{ opacity: 0, x: 20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
             >
               <h3 style={{ fontSize: '2rem', marginBottom: 'var(--space-4)' }}>{settings.shopTheLook.title}</h3>
-              <p style={{ color: 'var(--color-text-secondary)', marginBottom: 'var(--space-4)' }}>
+              <p style={{ color: 'var(--color-text-secondary)', marginBottom: 'var(--space-4)', lineHeight: 1.6 }}>
                 {settings.shopTheLook.subtitle}
               </p>
               <div className={styles.productGrid} style={{ gridTemplateColumns: '1fr 1fr' }}>
                 {products.slice(0, 2).map((p, i) => (
                   <motion.div 
                     key={p._id+'stl'}
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 15 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ delay: i * 0.1, duration: 0.5 }}
+                    transition={{ delay: i * 0.1, duration: 0.4 }}
                   >
                     <ProductCard product={p} />
                   </motion.div>
@@ -408,61 +333,41 @@ const Home = () => {
         </section>
       )}
 
-      {/* Interactive Lookbook */}
-      <Lookbook />
-
-      {/* Premium Collection Banner */}
-      {settings.premiumCollection && (
-        <motion.section 
-          className={styles.banner} style={{ height: '40vh', marginTop: 'var(--space-8)' }}
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-        >
-          <img src={settings.premiumCollection.image} alt={settings.premiumCollection.title} />
-          <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.6)', zIndex: 2 }} />
-          <motion.div 
-            className={styles.bannerContent}
+      {/* Customer Reviews */}
+      {settings.reviews && settings.reviews.length > 0 && (
+        <section className="container" style={{ padding: 'var(--space-8) var(--space-4)' }}>
+          <motion.h2 
+            className={styles.sectionTitle}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.2, duration: 0.6 }}
+            transition={{ duration: 0.5 }}
           >
-            <h2>{settings.premiumCollection.title}</h2>
-            <Link to={settings.premiumCollection.link}>
-              <button className={styles.btnOutline}>View Collection</button>
-            </Link>
-          </motion.div>
-        </motion.section>
+            What Our Customers Say
+          </motion.h2>
+          <div className={styles.reviewsGrid}>
+            {settings.reviews.slice(0, 3).map((review, i) => (
+              <motion.div 
+                key={i} 
+                className={styles.reviewCard}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1, duration: 0.4 }}
+                whileHover={{ y: -5, boxShadow: "0 10px 30px rgba(0,0,0,0.08)" }}
+              >
+                <div className={styles.reviewStars}>
+                  {'★'.repeat(review.rating || 5)}{'☆'.repeat(5 - (review.rating || 5))}
+                </div>
+                <p className={styles.reviewText}>"{review.text}"</p>
+                <h4 style={{ fontWeight: 600 }}>- {review.author}</h4>
+              </motion.div>
+            ))}
+          </div>
+        </section>
       )}
 
-      {/* Trending Products */}
-      <motion.section 
-        className="container" style={{ padding: 'var(--space-8) var(--space-4)' }}
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.6 }}
-      >
-        <h2 className={styles.sectionTitle}>Trending Now</h2>
-        <div className={styles.productGrid}>
-          {products.slice(0, 4).map((p, i) => (
-            <motion.div 
-              key={p._id+'tp'}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1, duration: 0.5 }}
-            >
-              <ProductCard product={p} />
-            </motion.div>
-          ))}
-        </div>
-      </motion.section>
-
-
-      {/* Why Choose Us */}
+      {/* Trust & Quality Features */}
       {settings.features && settings.features.length > 0 && (
         <section className="container" style={{ padding: 'var(--space-8) var(--space-4)' }}>
           <div className={styles.featuresGrid}>
@@ -473,14 +378,14 @@ const Home = () => {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.15, duration: 0.5 }}
-                whileHover={{ y: -5 }}
+                transition={{ delay: i * 0.1, duration: 0.4 }}
+                whileHover={{ y: -4 }}
               >
-                {feature.icon === 'Truck' && <Truck size={40} className={styles.featureIcon} />}
-                {feature.icon === 'Shield' && <Shield size={40} className={styles.featureIcon} />}
-                {feature.icon === 'RefreshCw' && <RefreshCw size={40} className={styles.featureIcon} />}
-                {!['Truck', 'Shield', 'RefreshCw'].includes(feature.icon) && <Shield size={40} className={styles.featureIcon} />}
-                <h3 style={{ marginBottom: '8px' }}>{feature.title}</h3>
+                {feature.icon === 'Truck' && <Truck size={36} className={styles.featureIcon} />}
+                {feature.icon === 'Shield' && <Shield size={36} className={styles.featureIcon} />}
+                {feature.icon === 'RefreshCw' && <RefreshCw size={36} className={styles.featureIcon} />}
+                {!['Truck', 'Shield', 'RefreshCw'].includes(feature.icon) && <Shield size={36} className={styles.featureIcon} />}
+                <h3 style={{ marginBottom: '6px', fontSize: '1.1rem' }}>{feature.title}</h3>
                 <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>{feature.subtitle}</p>
               </motion.div>
             ))}
@@ -488,161 +393,46 @@ const Home = () => {
         </section>
       )}
 
-      {/* Brand Story */}
-      {settings.brandStory && (
-        <section className="container" style={{ padding: 'var(--space-8) var(--space-4)' }}>
-          <div className={styles.storySection}>
-            <motion.div 
-              className={styles.storyContent}
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-            >
-              <h2 className={styles.sectionTitle} style={{ textAlign: 'left' }}>{settings.brandStory.title}</h2>
-              <p style={{ color: 'var(--color-text-secondary)', lineHeight: 1.6, marginBottom: 'var(--space-4)' }}>
-                {settings.brandStory.text}
-              </p>
-              <Link to="/about">
-                <button className={styles.btnPrimary} style={{ background: 'var(--color-text-primary)', color: 'var(--color-background)' }}>Read Our Story</button>
-              </Link>
-            </motion.div>
-            <motion.div 
-              className={styles.storyImage}
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-            >
-              <img src={settings.brandStory.image} alt={settings.brandStory.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-            </motion.div>
-          </div>
-        </section>
-      )}
-
-      {/* Our Process */}
-      <OurProcess />
-
-      {/* Featured Video */}
-      {settings.featuredVideoSection && (
-        <motion.section 
-          className={styles.banner} style={{ height: '70vh' }}
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-        >
-          {settings.featuredVideoSection.videoUrl ? (
-            <video 
-              autoPlay 
-              loop 
-              muted 
-              playsInline
-              style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 1 }}
-            >
-              <source src={settings.featuredVideoSection.videoUrl} type="video/mp4" />
-            </video>
-          ) : settings.featuredVideoSection.slideshow && settings.featuredVideoSection.slideshow.length > 0 ? (
-            settings.featuredVideoSection.slideshow.length > 1 ? (
-              <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 1 }}>
-                <Swiper
-                  modules={[Autoplay, EffectFade]}
-                  effect="fade"
-                  speed={2000}
-                  autoplay={{ delay: 3500, disableOnInteraction: false }}
-                  allowTouchMove={false}
-                  style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 1 }}
-                >
-                  {settings.featuredVideoSection.slideshow.map((imgUrl, idx) => (
-                    <SwiperSlide key={idx}>
-                      <img src={imgUrl} alt={`Slideshow ${idx}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    </SwiperSlide>
-                  ))}
-                </Swiper>
-              </div>
-            ) : (
-              <img src={settings.featuredVideoSection.slideshow[0]} alt="Video fallback" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 1 }} />
-            )
-          ) : (
-            <img src={settings.featuredVideoSection.fallbackImage} alt="Video fallback" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 1 }} />
+      {/* Newsletter Section */}
+      <motion.section 
+        className={styles.newsletterSection}
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+      >
+        <div className="container">
+          <h2 style={{ fontSize: '2rem', marginBottom: 'var(--space-2)' }}>
+            {settings.newsletter?.title || 'Join the রঙবতী Inner Circle'}
+          </h2>
+          <p style={{ marginBottom: 'var(--space-6)', color: 'rgba(255,255,255,0.85)' }}>
+            {settings.newsletter?.subtitle || 'Subscribe to receive priority access to new saree collections, luxury pret launches, and private offers.'}
+          </p>
+          <form className={styles.newsletterInputGroup} onSubmit={handleNewsletterSubmit}>
+            <input 
+              type="email" 
+              placeholder="Enter your email address" 
+              value={newsletterEmail}
+              onChange={(e) => setNewsletterEmail(e.target.value)}
+              disabled={newsletterStatus.loading}
+              required 
+            />
+            <button type="submit" disabled={newsletterStatus.loading}>
+              {newsletterStatus.loading ? 'Subscribing...' : 'Subscribe'}
+            </button>
+          </form>
+          {newsletterStatus.message && (
+            <p style={{ 
+              marginTop: '12px', 
+              color: newsletterStatus.error ? '#fca5a5' : '#86efac', 
+              fontWeight: 500,
+              fontSize: '0.95rem'
+            }}>
+              {newsletterStatus.message}
+            </p>
           )}
-          <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.4)', zIndex: 2 }} />
-          <motion.div 
-            className={styles.bannerContent}
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.3, duration: 0.5 }}
-          >
-            <h2>{settings.featuredVideoSection.title}</h2>
-            <p>{settings.featuredVideoSection.subtitle}</p>
-          </motion.div>
-        </motion.section>
-      )}
-
-
-      {/* Customer Reviews */}
-      {settings.reviews && settings.reviews.length > 0 && (
-        <section className="container" style={{ padding: 'var(--space-8) 0' }}>
-          <motion.h2 
-            className={styles.sectionTitle}
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            What Our Customers Say
-          </motion.h2>
-          <div className={styles.reviewsGrid}>
-            {settings.reviews.map((review, i) => (
-              <motion.div 
-                key={i} 
-                className={styles.reviewCard}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1, duration: 0.5 }}
-                whileHover={{ y: -5, boxShadow: "0 10px 30px rgba(0,0,0,0.08)" }}
-              >
-                <div className={styles.reviewStars}>
-                  {'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}
-                </div>
-                <p className={styles.reviewText}>"{review.text}"</p>
-                <h4 style={{ fontWeight: 600 }}>- {review.author}</h4>
-              </motion.div>
-            ))}
-          </div>
-        </section>
-      )}
-
-
-
-      {/* FAQ Section */}
-      <FAQSection />
-
-      {/* Press Mentions */}
-      <PressMentions />
-
-
-      {/* Newsletter */}
-      {settings.newsletter && (
-        <motion.section 
-          className={styles.newsletterSection}
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.6 }}
-        >
-          <div className="container">
-            <h2 style={{ fontSize: '2rem', marginBottom: 'var(--space-2)' }}>{settings.newsletter.title}</h2>
-            <p style={{ marginBottom: 'var(--space-6)', color: 'rgba(255,255,255,0.8)' }}>{settings.newsletter.subtitle}</p>
-            <form className={styles.newsletterInputGroup} onSubmit={(e) => e.preventDefault()}>
-              <input type="email" placeholder="Enter your email address" required />
-              <button type="submit">Subscribe</button>
-            </form>
-          </div>
-        </motion.section>
-      )}
+        </div>
+      </motion.section>
     </div>
   );
 };

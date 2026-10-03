@@ -51,7 +51,7 @@ app.use('/sitemap.xml', sitemapRoutes);
 
 // Health check
 app.get('/', (req, res) => {
-  res.json({ status: 'Gents Clothes API is running', timestamp: new Date().toISOString() });
+  res.json({ status: 'Ronggoboti API is running', timestamp: new Date().toISOString() });
 });
 
 // Global Error Handler Middleware

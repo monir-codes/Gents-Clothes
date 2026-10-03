@@ -564,6 +564,12 @@ export const AdminSettings = () => {
       <div style={sectionStyle}>
         <h3>Global & Announcements</h3>
         
+        <label style={labelStyle}>Admin Notification Email (For Orders & Newsletter Alerts)</label>
+        <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginBottom: '8px' }}>
+          Emails for new orders and newsletter subscriptions will be sent here directly via Nodemailer.
+        </p>
+        <input type="email" name="adminEmail" value={settings.adminEmail || ''} onChange={handleChange} style={inputStyle} placeholder="mdrummanmondal2@gmail.com" />
+
         <label style={labelStyle}>WhatsApp Number</label>
         <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginBottom: '8px' }}>Enter the number with country code, e.g., 8801700000000</p>
         <input type="text" name="whatsappNumber" value={settings.whatsappNumber || ''} onChange={handleChange} style={inputStyle} />
@@ -593,6 +599,92 @@ export const AdminSettings = () => {
             <input type="text" value={settings.socialLinks?.youtube || ''} onChange={(e) => handleNestedChange('socialLinks', 'youtube', e.target.value)} style={inputStyle} />
           </div>
         </div>
+      </div>
+
+      <div style={sectionStyle}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+          <div>
+            <h3 style={{ margin: 0 }}>Coupon Codes & Percentage Discounts</h3>
+            <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', margin: '4px 0 0 0' }}>
+              Set active coupon codes and discount percentages. Only coupons active here will work at checkout.
+            </p>
+          </div>
+          <button 
+            type="button" 
+            onClick={() => handleAddObject('coupons', { code: '', discountPercentage: 10, isActive: true, minOrderAmount: 0, description: 'Special Discount' })}
+            style={{ padding: '8px 16px', background: 'var(--color-brand-maroon, #5e0f2b)', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem' }}
+          >
+            + Add New Coupon
+          </button>
+        </div>
+
+        {(!settings.coupons || settings.coupons.length === 0) ? (
+          <p style={{ color: 'var(--color-text-secondary)', fontStyle: 'italic' }}>No coupon codes configured. Click "+ Add New Coupon" above.</p>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {settings.coupons.map((coupon, idx) => (
+              <div key={idx} style={{ background: 'var(--color-background)', border: '1px solid var(--color-border)', borderRadius: '6px', padding: '16px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1fr auto', gap: '12px', alignItems: 'center' }}>
+                  <div>
+                    <label style={{ fontSize: '0.8rem', fontWeight: 600, display: 'block', marginBottom: '4px' }}>Coupon Code</label>
+                    <input 
+                      type="text" 
+                      value={coupon.code || ''} 
+                      onChange={(e) => handleObjectArrayChange('coupons', idx, 'code', e.target.value.toUpperCase())}
+                      placeholder="e.g. EID20"
+                      style={{ ...inputStyle, marginBottom: 0, fontWeight: 700, letterSpacing: '1px' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '0.8rem', fontWeight: 600, display: 'block', marginBottom: '4px' }}>Discount (%)</label>
+                    <input 
+                      type="number" 
+                      min="1" 
+                      max="100"
+                      value={coupon.discountPercentage ?? 10} 
+                      onChange={(e) => handleObjectArrayChange('coupons', idx, 'discountPercentage', Number(e.target.value))}
+                      placeholder="10"
+                      style={{ ...inputStyle, marginBottom: 0 }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '0.8rem', fontWeight: 600, display: 'block', marginBottom: '4px' }}>Min Order (৳)</label>
+                    <input 
+                      type="number" 
+                      min="0"
+                      value={coupon.minOrderAmount ?? 0} 
+                      onChange={(e) => handleObjectArrayChange('coupons', idx, 'minOrderAmount', Number(e.target.value))}
+                      placeholder="0"
+                      style={{ ...inputStyle, marginBottom: 0 }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '0.8rem', fontWeight: 600, display: 'block', marginBottom: '4px' }}>Status</label>
+                    <select 
+                      value={coupon.isActive ? 'active' : 'inactive'} 
+                      onChange={(e) => handleObjectArrayChange('coupons', idx, 'isActive', e.target.value === 'active')}
+                      style={{ ...inputStyle, marginBottom: 0, color: coupon.isActive ? '#16a34a' : '#ef4444', fontWeight: 600 }}
+                    >
+                      <option value="active">Active</option>
+                      <option value="inactive">Inactive</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '0.8rem', fontWeight: 600, display: 'block', marginBottom: '4px' }}>&nbsp;</label>
+                    <button 
+                      type="button" 
+                      onClick={() => handleRemoveObject('coupons', idx)}
+                      style={{ padding: '8px 12px', background: '#fee2e2', color: '#dc2626', border: '1px solid #fca5a5', borderRadius: '4px', cursor: 'pointer' }}
+                      title="Delete Coupon"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <div style={sectionStyle}>

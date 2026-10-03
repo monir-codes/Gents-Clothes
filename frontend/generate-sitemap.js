@@ -2,8 +2,8 @@ import fs from 'fs';
 import path from 'path';
 
 // Using the production API URL to fetch products during build
-const API_URL = 'https://gents-clothes-server.vercel.app/api';
-const BASE_URL = 'https://gents-clothes.vercel.app';
+const API_URL = 'https://ronggoboti-server.vercel.app/api';
+const BASE_URL = 'https://ronggoboti.vercel.app';
 
 async function generateSitemap() {
   console.log('Generating sitemap...');

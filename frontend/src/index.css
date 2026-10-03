@@ -1,13 +1,17 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap');
 
 :root {
-  /* Colors */
+  /* Colors - Inspired by Ronggoboti Banner & Identity */
   --color-background: #ffffff;
-  --color-surface: #f9f9f9;
-  --color-text-primary: #000000;
-  --color-text-secondary: #555555;
-  --color-accent: #c9a265; /* A luxurious gold/sand color */
-  --color-border: #e0e0e0;
+  --color-surface: #faf6f1;
+  --color-surface-card: #ffffff;
+  --color-text-primary: #220e14;
+  --color-text-secondary: #6c5a60;
+  --color-brand-maroon: #5e0f2b;
+  --color-brand-rose: #d8a49b;
+  --color-accent: #c9a265; /* Luxurious Champagne Gold */
+  --color-accent-hover: #b48c50;
+  --color-border: #ebdcd0;
   --color-error: #d9534f;
   --color-success: #28a745;
   
@@ -22,7 +26,7 @@
   --space-12: 96px;
 
   /* Typography */
-  --font-family-primary: 'Outfit', sans-serif;
+  --font-family-primary: 'Outfit', 'Hind Siliguri', sans-serif;
   
   /* Radii */
   --radius-sm: 4px;

@@ -21,13 +21,13 @@ router.post('/generate', async (req, res) => {
     let prompt = '';
     
     if (type === 'description') {
-      prompt = `Act as an expert luxury fashion copywriter. I will provide you with either a product name, details, or an existing product description. Your task is to generate or rewrite it into a highly engaging, premium product description. The tone MUST ALWAYS be elegant, professional, and persuasive, suited for a high-end menswear brand named Gents Clothes. Maintain this exact tone regardless of the input. Do not include markdown formatting or asterisks, just plain text in paragraphs.\n\nInput: "${context}"`;
+      prompt = `Act as an expert luxury fashion copywriter. I will provide you with either a product name, details, or an existing product description. Your task is to generate or rewrite it into a highly engaging, premium product description. The tone MUST ALWAYS be elegant, professional, and persuasive, suited for a high-end fashion brand named রঙবতী (Ronggoboti). Maintain this exact tone regardless of the input. Do not include markdown formatting or asterisks, just plain text in paragraphs.\n\nInput: "${context}"`;
     } else if (type === 'product_details') {
-      prompt = `Act as an expert luxury fashion copywriter and product specialist for a menswear brand named Gents Clothes. I will provide a basic product name or description. You need to generate a complete product profile in JSON format ONLY. Do NOT include markdown code block formatting (like \`\`\`json). Return a valid JSON object with the following keys:
+      prompt = `Act as an expert luxury fashion copywriter and product specialist for a fashion brand named রঙবতী (Ronggoboti). I will provide a basic product name or description. You need to generate a complete product profile in JSON format ONLY. Do NOT include markdown code block formatting (like \`\`\`json). Return a valid JSON object with the following keys:
       - "description": A highly engaging, elegant, meaningful, and SHORT product description (strictly 2-3 concise sentences maximum).
-      - "material": e.g., "100% Premium Egyptian Cotton"
+      - "material": e.g., "100% Pure Silk / Premium Cotton"
       - "gsm": e.g., "160 GSM" or "N/A" if not applicable
-      - "washInstruction": e.g., "Machine wash cold, tumble dry low"
+      - "washInstruction": e.g., "Dry clean or gentle hand wash"
       
       Input: "${context}"`;
     } else if (type === 'seo') {
@@ -36,7 +36,7 @@ router.post('/generate', async (req, res) => {
       prompt = `Act as an expert data-entry assistant for an eCommerce store. I will give you a raw, messy block of text containing various product details. Parse it and extract the data into a valid JSON object ONLY. Do NOT include markdown formatting or backticks (e.g. no \`\`\`json). The JSON must have these exact keys (leave as empty string or 0 if missing):
       - "name": String (Product Title)
       - "price": Number (Numeric value only)
-      - "category": String (E.g. T-Shirts, Shirts, Panjabis, Pants)
+      - "category": String (E.g. Sarees, Salwar Kameez, Kurtis & Tunics, Lehengas, Western Wear, Co-ord Sets)
       - "sizes": String (Comma separated, e.g. "S, M, L, XL")
       - "colors": String (Comma separated, e.g. "Black, White, Navy")
       - "description": String (A neat 2-3 sentence summary)

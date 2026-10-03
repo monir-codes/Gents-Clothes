@@ -2,8 +2,8 @@ import fs from 'fs';
 import path from 'path';
 import https from 'https';
 
-const API_URL = 'https://gents-clothes-server.vercel.app/api/products';
-const BASE_URL = 'https://gentsclothes.vercel.app';
+const API_URL = 'https://ronggoboti-server.vercel.app/api/products';
+const BASE_URL = 'https://ronggoboti.vercel.app';
 
 console.log('Generating dynamic sitemap...');
 
@@ -26,9 +26,9 @@ https.get(API_URL, (res) => {
   <url><loc>${BASE_URL}/shop</loc><changefreq>daily</changefreq><priority>0.9</priority></url>
   
   <!-- Categories -->
-  <url><loc>${BASE_URL}/shop?category=tshirts</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>${BASE_URL}/shop?category=panjabis</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>${BASE_URL}/shop?category=shirts</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>${BASE_URL}/shop?category=sarees</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>${BASE_URL}/shop?category=salwar-kameez</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>${BASE_URL}/shop?category=kurtis</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
   
   <!-- Support & Brand Pages -->
   <url><loc>${BASE_URL}/about</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>

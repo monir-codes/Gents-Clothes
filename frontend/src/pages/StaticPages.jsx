@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
+import { Sparkles, Heart, Feather, ShieldCheck, ArrowRight } from 'lucide-react';
 import axios from 'axios';
 import SEO from '../components/SEO';
 
-const StaticPageTemplate = ({ title, children, contentKey }) => {
+const StaticPageTemplate = ({ title, subtitle, children, contentKey }) => {
   const [settings, setSettings] = useState(null);
 
   useEffect(() => {
@@ -19,14 +21,52 @@ const StaticPageTemplate = ({ title, children, contentKey }) => {
   }, []);
 
   return (
-    <div className="container" style={{ paddingTop: '60px', paddingBottom: '60px', minHeight: '60vh', maxWidth: '800px' }}>
-      <h1 style={{ fontSize: 'clamp(1.8rem, 5vw, 2.5rem)', marginBottom: '32px', textAlign: 'center' }}>{title}</h1>
-      <div style={{ lineHeight: 1.8, color: 'var(--color-text-secondary)', fontSize: '1.05rem' }}>
-        {contentKey && settings?.staticPages?.[contentKey] ? (
-          <div dangerouslySetInnerHTML={{ __html: settings.staticPages[contentKey] }} />
-        ) : (
-          children
-        )}
+    <div style={{ background: 'var(--color-background)', minHeight: '80vh', paddingBottom: '80px' }}>
+      {/* Header Banner */}
+      <div style={{
+        background: 'linear-gradient(180deg, var(--color-surface, #faf6f1) 0%, var(--color-background, #ffffff) 100%)',
+        padding: '60px 20px 40px',
+        textAlign: 'center',
+        borderBottom: '1px solid var(--color-border, #ebdcd0)'
+      }}>
+        <div className="container" style={{ maxWidth: '800px', margin: '0 auto' }}>
+          <div style={{ fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '2px', color: 'var(--color-accent, #c9a265)', marginBottom: '12px' }}>
+            <Link to="/" style={{ color: 'var(--color-text-secondary)' }}>Home</Link> / {title}
+          </div>
+          <h1 style={{ 
+            fontSize: 'clamp(2rem, 5vw, 2.8rem)', 
+            fontWeight: 700, 
+            color: 'var(--color-brand-maroon, #5e0f2b)', 
+            marginBottom: subtitle ? '12px' : '0' 
+          }}>
+            {title}
+          </h1>
+          {subtitle && (
+            <p style={{ color: 'var(--color-text-secondary)', fontSize: '1.05rem', margin: 0 }}>
+              {subtitle}
+            </p>
+          )}
+        </div>
+      </div>
+
+      {/* Content Container */}
+      <div className="container" style={{ maxWidth: '860px', margin: '40px auto 0', padding: '0 20px' }}>
+        <div style={{
+          background: '#ffffff',
+          borderRadius: 'var(--radius-lg, 16px)',
+          padding: 'clamp(24px, 5vw, 48px)',
+          boxShadow: '0 4px 25px rgba(0,0,0,0.04)',
+          border: '1px solid var(--color-border, #ebdcd0)',
+          lineHeight: 1.85,
+          color: 'var(--color-text-secondary, #6c5a60)',
+          fontSize: '1.05rem'
+        }}>
+          {contentKey && settings?.staticPages?.[contentKey] ? (
+            <div dangerouslySetInnerHTML={{ __html: settings.staticPages[contentKey] }} />
+          ) : (
+            children
+          )}
+        </div>
       </div>
     </div>
   );
@@ -48,71 +88,326 @@ export const About = () => {
   }, []);
 
   return (
-  <div>
-    <SEO title="About Us - Our Story" description="Discover the heritage and craftsmanship behind Gents Clothes." />
-    {/* Cinematic Hero */}
-    <div style={{ position: 'relative', height: '60vh', width: '100%', overflow: 'hidden' }}>
-      <img src={settings?.staticPages?.about?.heroImage || '/images/hero-banner.jpg'} alt="Craftsmanship" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-      <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <motion.h1 
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          style={{ color: '#fff', fontSize: 'clamp(2.5rem, 8vw, 4rem)', fontWeight: 700, letterSpacing: '4px', textTransform: 'uppercase' }}
-        >
-          Our Story
-        </motion.h1>
-      </div>
-    </div>
+    <div style={{ background: 'var(--color-background)', overflowX: 'hidden' }}>
+      <SEO 
+        title="About Us | Our Story" 
+        description="Discover the heritage, artistry, and philosophy behind রঙবতী (Ronggoboti) — Bangladesh's premier luxury women's fashion house." 
+      />
 
-    {/* Split Section */}
-    <div className="container" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '60px', alignItems: 'center', marginBottom: '80px' }}>
-        <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
-          <h2 style={{ fontSize: 'clamp(1.8rem, 5vw, 2.5rem)', marginBottom: '20px' }}>A Legacy of Elegance</h2>
-          <p style={{ color: 'var(--color-text-secondary)', lineHeight: 1.8, fontSize: '1.1rem' }}>
-            {settings?.staticPages?.about?.storyText || 'Gents Clothes was founded with a singular, uncompromising vision: to redefine luxury menswear in Bangladesh. We believe that true elegance lies in the details—from the meticulous selection of premium fabrics to the flawless precision of our tailoring.'}
-          </p>
-        </motion.div>
-        <motion.img 
-          src={settings?.staticPages?.about?.materialsImage1 || '/images/hero-banner.jpg'} 
-          alt="Tailoring" 
-          initial={{ opacity: 0, x: 30 }} 
-          whileInView={{ opacity: 1, x: 0 }} 
-          viewport={{ once: true }}
-          style={{ width: '100%', aspectRatio: '4/5', objectFit: 'cover', borderRadius: '4px' }} 
-        />
-      </div>
+      {/* Hero Section */}
+      <section style={{
+        background: 'linear-gradient(180deg, var(--color-surface, #faf6f1) 0%, var(--color-background, #ffffff) 100%)',
+        padding: '70px 20px 50px',
+        textAlign: 'center',
+        borderBottom: '1px solid var(--color-border, #ebdcd0)'
+      }}>
+        <div className="container" style={{ maxWidth: '900px', margin: '0 auto' }}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <span style={{ 
+              display: 'inline-block',
+              fontSize: '0.85rem', 
+              fontWeight: 600,
+              textTransform: 'uppercase', 
+              letterSpacing: '3px', 
+              color: 'var(--color-accent, #c9a265)', 
+              marginBottom: '16px',
+              padding: '6px 16px',
+              borderRadius: '20px',
+              background: 'rgba(201, 162, 101, 0.12)'
+            }}>
+              The Art of Elegance
+            </span>
+            <h1 style={{ 
+              fontSize: 'clamp(2.2rem, 6vw, 3.6rem)', 
+              fontWeight: 700, 
+              color: 'var(--color-brand-maroon, #5e0f2b)', 
+              lineHeight: 1.2,
+              marginBottom: '20px',
+              fontFamily: 'var(--font-family-primary)'
+            }}>
+              Crafting Timeless Grace for Every Woman
+            </h1>
+            <p style={{ 
+              color: 'var(--color-text-secondary, #6c5a60)', 
+              fontSize: 'clamp(1rem, 2.5vw, 1.25rem)', 
+              maxWidth: '720px', 
+              margin: '0 auto 28px',
+              lineHeight: 1.7 
+            }}>
+              {settings?.staticPages?.about?.storyText || 
+                'রঙবতী (Ronggoboti) was born from an unwavering passion to celebrate the timeless beauty of Bengali heritage and modern feminine elegance. Every silhouette is a canvas of craftsmanship, emotion, and individuality.'}
+            </p>
+          </motion.div>
+        </div>
+      </section>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '60px', alignItems: 'center' }}>
-        <motion.img 
-          src={settings?.staticPages?.about?.materialsImage2 || '/images/hero-banner.jpg'} 
-          alt="Fabrics" 
-          initial={{ opacity: 0, x: -30 }} 
-          whileInView={{ opacity: 1, x: 0 }} 
-          viewport={{ once: true }}
-          style={{ width: '100%', aspectRatio: '4/5', objectFit: 'cover', borderRadius: '4px' }} 
-        />
-        <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
-          <h2 style={{ fontSize: 'clamp(1.8rem, 5vw, 2.5rem)', marginBottom: '20px' }}>The Finest Materials</h2>
-          <p style={{ color: 'var(--color-text-secondary)', lineHeight: 1.8, fontSize: '1.1rem' }}>
-            {settings?.staticPages?.about?.materialsText || 'We source only the highest grade Egyptian cottons, pure silks, and rich wools. Every garment is constructed to not only look breathtaking but to stand the test of time, adapting to the modern gentleman\'s lifestyle.'}
+      {/* Story Split Section */}
+      <section className="container" style={{ padding: '80px 20px' }}>
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', 
+          gap: '50px', 
+          alignItems: 'center' 
+        }}>
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7 }}
+          >
+            <h2 style={{ 
+              fontSize: 'clamp(1.8rem, 4vw, 2.4rem)', 
+              color: 'var(--color-brand-maroon, #5e0f2b)', 
+              fontWeight: 700, 
+              marginBottom: '20px' 
+            }}>
+              A Legacy of Fine Artistry
+            </h2>
+            <p style={{ color: 'var(--color-text-secondary)', lineHeight: 1.85, fontSize: '1.05rem', marginBottom: '20px' }}>
+              From the delicate threads of authentic Dhakai Jamdani to luxurious pure silks and fluid georgettes, we bring together Bangladesh's master weavers and modern designers under one visionary atelier.
+            </p>
+            <p style={{ color: 'var(--color-text-secondary)', lineHeight: 1.85, fontSize: '1.05rem', marginBottom: '30px' }}>
+              {settings?.staticPages?.about?.materialsText || 
+                'We handpick each fabric with uncompromising standards. Our designs honor our cultural roots while empowering the contemporary woman to express herself boldly and beautifully.'}
+            </p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+              <div style={{ 
+                padding: '20px', 
+                background: 'var(--color-surface, #faf6f1)', 
+                borderRadius: 'var(--radius-md, 8px)',
+                border: '1px solid var(--color-border, #ebdcd0)' 
+              }}>
+                <h3 style={{ fontSize: '1.6rem', fontWeight: 700, color: 'var(--color-brand-maroon)', margin: '0 0 4px' }}>100%</h3>
+                <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--color-text-secondary)' }}>Authentic Fabrics</p>
+              </div>
+              <div style={{ 
+                padding: '20px', 
+                background: 'var(--color-surface, #faf6f1)', 
+                borderRadius: 'var(--radius-md, 8px)',
+                border: '1px solid var(--color-border, #ebdcd0)' 
+              }}>
+                <h3 style={{ fontSize: '1.6rem', fontWeight: 700, color: 'var(--color-brand-maroon)', margin: '0 0 4px' }}>10K+</h3>
+                <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--color-text-secondary)' }}>Delighted Muses</p>
+              </div>
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7 }}
+            style={{ position: 'relative' }}
+          >
+            <div style={{
+              borderRadius: 'var(--radius-lg, 16px)',
+              overflow: 'hidden',
+              boxShadow: '0 20px 40px rgba(94, 15, 43, 0.12)',
+              border: '1px solid var(--color-border, #ebdcd0)'
+            }}>
+              <img 
+                src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&q=80&w=800" 
+                alt="রঙবতী Heritage Craftsmanship" 
+                style={{ width: '100%', height: '480px', objectFit: 'cover' }}
+              />
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Values & Pillars */}
+      <section style={{ 
+        background: 'var(--color-surface, #faf6f1)', 
+        padding: '80px 20px',
+        borderTop: '1px solid var(--color-border, #ebdcd0)',
+        borderBottom: '1px solid var(--color-border, #ebdcd0)'
+      }}>
+        <div className="container">
+          <div style={{ textAlign: 'center', maxWidth: '700px', margin: '0 auto 60px' }}>
+            <span style={{ fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '2px', color: 'var(--color-accent, #c9a265)', fontWeight: 600 }}>
+              Our Values
+            </span>
+            <h2 style={{ fontSize: 'clamp(2rem, 4vw, 2.6rem)', color: 'var(--color-brand-maroon, #5e0f2b)', marginTop: '8px', fontWeight: 700 }}>
+              The Pillars of রঙবতী
+            </h2>
+          </div>
+
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
+            gap: '30px' 
+          }}>
+            {[
+              {
+                icon: Feather,
+                title: "Artisanal Heritage",
+                desc: "We work directly with traditional weaving communities across Bengal, sustaining generational artistry and empowering local artisans."
+              },
+              {
+                icon: Sparkles,
+                title: "Modern Glamour",
+                desc: "Every creation is infused with chic contemporary cuts, opulent hues, and flattering draping suited for grand celebrations and everyday luxury."
+              },
+              {
+                icon: ShieldCheck,
+                title: "Uncompromising Quality",
+                desc: "From the finest pure silk threads to precise hand-finished hemlines, we never cut corners on quality, comfort, or endurance."
+              }
+            ].map((pillar, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.15, duration: 0.5 }}
+                whileHover={{ y: -6 }}
+                style={{
+                  background: '#ffffff',
+                  padding: '40px 30px',
+                  borderRadius: 'var(--radius-lg, 16px)',
+                  boxShadow: '0 8px 30px rgba(0,0,0,0.04)',
+                  border: '1px solid var(--color-border, #ebdcd0)',
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                <div style={{
+                  width: '60px',
+                  height: '60px',
+                  borderRadius: '50%',
+                  background: 'rgba(201, 162, 101, 0.15)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'var(--color-brand-maroon, #5e0f2b)',
+                  marginBottom: '20px'
+                }}>
+                  <pillar.icon size={28} />
+                </div>
+                <h3 style={{ fontSize: '1.35rem', fontWeight: 600, color: 'var(--color-brand-maroon, #5e0f2b)', marginBottom: '12px' }}>
+                  {pillar.title}
+                </h3>
+                <p style={{ color: 'var(--color-text-secondary)', lineHeight: 1.7, margin: 0, fontSize: '0.98rem' }}>
+                  {pillar.desc}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Visual Gallery Grid */}
+      <section className="container" style={{ padding: '80px 20px' }}>
+        <div style={{ textAlign: 'center', marginBottom: '50px' }}>
+          <h2 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.4rem)', color: 'var(--color-brand-maroon, #5e0f2b)', fontWeight: 700 }}>
+            Every Thread Tells a Story
+          </h2>
+          <p style={{ color: 'var(--color-text-secondary)', marginTop: '8px' }}>
+            A glimpse into the elegance, fabrics, and craft behind রঙবতী.
           </p>
-        </motion.div>
-      </div>
+        </div>
+
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
+          gap: '24px' 
+        }}>
+          {[
+            { img: 'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&q=80&w=800', title: 'Royal Silk Weaves' },
+            { img: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&q=80&w=800', title: 'Contemporary Silhouettes' },
+            { img: 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?auto=format&fit=crop&q=80&w=800', title: 'Festive Allure' }
+          ].map((item, idx) => (
+            <motion.div
+              key={idx}
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: idx * 0.15, duration: 0.5 }}
+              style={{
+                borderRadius: 'var(--radius-lg, 16px)',
+                overflow: 'hidden',
+                height: '340px',
+                position: 'relative',
+                boxShadow: '0 10px 25px rgba(0,0,0,0.06)'
+              }}
+            >
+              <img src={item.img} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <div style={{
+                position: 'absolute',
+                bottom: 0,
+                left: 0,
+                width: '100%',
+                padding: '20px',
+                background: 'linear-gradient(to top, rgba(34, 14, 20, 0.85) 0%, transparent 100%)',
+                color: '#ffffff'
+              }}>
+                <h4 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 600 }}>{item.title}</h4>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* CTA Footer Card */}
+        <div style={{
+          marginTop: '60px',
+          padding: '50px 30px',
+          borderRadius: 'var(--radius-lg, 16px)',
+          background: 'linear-gradient(135deg, var(--color-brand-maroon, #5e0f2b) 0%, #2a0814 100%)',
+          color: '#ffffff',
+          textAlign: 'center',
+          boxShadow: '0 15px 40px rgba(94, 15, 43, 0.25)'
+        }}>
+          <h3 style={{ fontSize: 'clamp(1.6rem, 3.5vw, 2.2rem)', fontWeight: 700, marginBottom: '14px' }}>
+            Experience the Magic of রঙবতী
+          </h3>
+          <p style={{ color: 'rgba(255,255,255,0.85)', maxWidth: '600px', margin: '0 auto 28px', fontSize: '1.05rem' }}>
+            Explore our curated collections of sarees, salwar kameez, and contemporary festive wear designed for your special moments.
+          </p>
+          <Link to="/shop">
+            <button style={{
+              padding: '14px 36px',
+              background: '#ffffff',
+              color: 'var(--color-brand-maroon, #5e0f2b)',
+              fontWeight: 700,
+              fontSize: '0.95rem',
+              letterSpacing: '1px',
+              textTransform: 'uppercase',
+              borderRadius: 'var(--radius-sm, 4px)',
+              cursor: 'pointer',
+              boxShadow: '0 4px 15px rgba(0,0,0,0.15)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}>
+              Shop All Collections <ArrowRight size={18} />
+            </button>
+          </Link>
+        </div>
+      </section>
     </div>
-  </div>
   );
 };
 
 export const FAQ = () => (
-  <StaticPageTemplate title="Frequently Asked Questions" contentKey="faq">
+  <StaticPageTemplate 
+    title="Frequently Asked Questions" 
+    subtitle="Got questions? We're here to help with orders, styling, deliveries, and more."
+    contentKey="faq"
+  >
     <p>Loading FAQ...</p>
   </StaticPageTemplate>
 );
 
 export const Contact = () => (
-  <StaticPageTemplate title="Contact Us" contentKey="contact">
+  <StaticPageTemplate 
+    title="Contact Us" 
+    subtitle="We would love to hear from you. Reach out to our customer care team anytime."
+    contentKey="contact"
+  >
     <p>Loading contact info...</p>
   </StaticPageTemplate>
 );
@@ -126,7 +421,11 @@ export const LegalPage = ({ title }) => {
   if (title === 'Terms of Service') contentKey = 'terms';
 
   return (
-    <StaticPageTemplate title={title} contentKey={contentKey}>
+    <StaticPageTemplate 
+      title={title} 
+      subtitle="Important terms, policies, and guidance regarding your shopping experience."
+      contentKey={contentKey}
+    >
       <p>Loading document...</p>
     </StaticPageTemplate>
   );

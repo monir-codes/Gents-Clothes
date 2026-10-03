@@ -103,7 +103,7 @@ const Shop = ({ hideHeader }) => {
 
   return (
     <>
-    <SEO title="Shop All Collections" description="Browse all premium luxury products from Gents Clothes." />
+    <SEO title="Shop All Collections" description="Browse all premium luxury products from রঙবতী." />
     <div className={`container ${styles.shopContainer}`}>
       {/* Sidebar Filters */}
       {!hideHeader && (
@@ -128,7 +128,7 @@ const Shop = ({ hideHeader }) => {
           <div className={styles.filterGroup}>
             <h3 className={styles.filterTitle}>Categories</h3>
             <div className={styles.filterList}>
-              {['T-Shirts', 'Polos', 'Shirts', 'Panjabis', 'Hoodies'].map(cat => (
+              {['Sarees', 'Salwar Kameez', 'Kurtis & Tunics', 'Lehengas', 'Western Wear', 'Modest Wear', 'Co-ord Sets'].map(cat => (
                 <label key={cat} className={styles.filterLabel}>
                   <input 
                     type="checkbox" 

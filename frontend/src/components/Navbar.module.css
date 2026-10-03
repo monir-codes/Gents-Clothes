@@ -25,6 +25,46 @@
   height: 80px;
 }
 
+.logoLink {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 4px 0;
+  opacity: 1;
+}
+
+.logoLink:hover {
+  transform: translateY(-1px) scale(1.04);
+}
+
+.logoImg {
+  height: 48px;
+  width: auto;
+  max-width: 180px;
+  object-fit: contain;
+  display: block;
+  opacity: 1;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  filter: contrast(106%) brightness(98%);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.logoLink:hover .logoImg {
+  filter: contrast(110%) brightness(102%) drop-shadow(0 4px 12px rgba(94, 15, 43, 0.22));
+}
+
+.logoText {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--color-text-primary);
+  text-transform: uppercase;
+}
+
 .logo {
   font-size: 1.5rem;
   font-weight: 700;
@@ -203,6 +243,11 @@
 }
 
 @media (max-width: 768px) {
+  .logoImg {
+    height: 44px;
+    max-width: 170px;
+  }
+
   .logo {
     font-size: 1.2rem;
     letter-spacing: 1px;

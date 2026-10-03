@@ -1,9 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="120" fill="#0a0a0a"/>
-  <!-- Left Wing -->
-  <path d="M120 180 C130 180 230 236 230 256 C230 276 130 332 120 332 C100 332 100 312 100 256 C100 200 100 180 120 180 Z" fill="#c9a265" />
-  <!-- Right Wing -->
-  <path d="M392 180 C382 180 282 236 282 256 C282 276 382 332 392 332 C412 332 412 312 412 256 C412 200 412 180 392 180 Z" fill="#c9a265" />
-  <!-- Center Knot -->
-  <rect x="226" y="230" width="60" height="52" rx="12" fill="#e8c38a" />
+  <defs>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f5d77f"/>
+      <stop offset="50%" stop-color="#c9a265"/>
+      <stop offset="100%" stop-color="#9a7035"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="128" fill="#0d0d0d"/>
+  <circle cx="256" cy="256" r="210" fill="none" stroke="url(#goldGrad)" stroke-width="12" stroke-opacity="0.6"/>
+  <text x="256" y="325" font-family="'Hind Siliguri', 'Georgia', 'Outfit', serif" font-size="240" font-weight="700" fill="url(#goldGrad)" text-anchor="middle">র</text>
 </svg>

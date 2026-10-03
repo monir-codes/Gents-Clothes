@@ -27,9 +27,9 @@ const sendVerificationEmail = async (email, token) => {
   });
 
   const mailOptions = {
-    from: '"Gents Clothes" <noreply@gentsclothes.com>',
+    from: '"রঙবতী" <noreply@ronggoboti.com>',
     to: email,
-    subject: 'Verify your Gents Clothes account',
+    subject: 'Verify your রঙবতী account',
     html: `<p>Please click the link below to verify your email address:</p>
            <a href="${verificationLink}">${verificationLink}</a>`,
   };

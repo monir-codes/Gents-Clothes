@@ -49,7 +49,7 @@ const TrackOrder = () => {
 
   return (
     <div className="container" style={{ padding: '60px 0', minHeight: '80vh', maxWidth: '600px', margin: '0 auto' }}>
-      <SEO title="Track Order" description="Track your Gents Clothes delivery status." />
+      <SEO title="Track Order" description="Track your রঙবতী delivery status." />
       
       <motion.div 
         initial={{ opacity: 0, y: 20 }}

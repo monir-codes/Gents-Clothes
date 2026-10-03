@@ -135,7 +135,7 @@ const useAuthStore = create(
       clearError: () => set({ error: null })
     }),
     {
-      name: 'gentsclothes-auth',
+      name: 'ronggoboti-auth',
     }
   )
 );

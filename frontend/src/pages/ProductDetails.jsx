@@ -10,7 +10,6 @@ import Loader from '../components/Loader';
 import SEO from '../components/SEO';
 import ProductCard from '../components/ProductCard';
 import RecentlyViewed from '../components/RecentlyViewed';
-import AISizeRecommender from '../components/AISizeRecommender';
 import { generateProductKeywords } from '../utils/seoHelpers';
 import styles from './ProductDetails.module.css';
 
@@ -29,7 +28,6 @@ const ProductDetails = () => {
   const searchParams = new URLSearchParams(location.search);
   const initialTab = searchParams.get('tab') || 'description';
   const [activeTab, setActiveTab] = useState(initialTab);
-  const [isSizeRecommenderOpen, setIsSizeRecommenderOpen] = useState(false);
   
   // Review state
   const [rating, setRating] = useState(5);
@@ -117,7 +115,7 @@ const ProductDetails = () => {
   if (loading) return <Loader fullScreen />;
   if (!product) return <div className="container" style={{padding: '50px 0'}}>Product not found</div>;
 
-  const productUrl = `https://gents-clothes.vercel.app/product/${product._id}`;
+  const productUrl = `https://ronggoboti.vercel.app/product/${product._id}`;
   
   const productSchema = {
     "@context": "https://schema.org/",
@@ -147,7 +145,7 @@ const ProductDetails = () => {
     <>
     <SEO 
       title={product.name} 
-      description={product.description?.substring(0, 160) || "Premium luxury clothing from Gents Clothes"} 
+      description={product.description?.substring(0, 160) || "Premium luxury clothing from রঙবতী"} 
       keywords={generateProductKeywords(product)}
       type="product" 
       canonical={productUrl}
@@ -226,12 +224,12 @@ const ProductDetails = () => {
               <div className={styles.optionGroup}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <span className={styles.optionLabel}>Size: <strong>{selectedSize}</strong></span>
-                  <button 
-                    onClick={() => setIsSizeRecommenderOpen(true)}
-                    style={{ fontSize: '0.85rem', color: 'var(--color-accent)', background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 600 }}
+                  <Link 
+                    to="/size-guide"
+                    style={{ fontSize: '0.85rem', color: 'var(--color-accent)', textDecoration: 'underline', fontWeight: 500 }}
                   >
-                    <Sparkles size={14} /> AI Size Match
-                  </button>
+                    Size Guide
+                  </Link>
                 </div>
                 <div className={styles.sizeSelector}>
                   {product.sizes.map(size => (
@@ -418,12 +416,6 @@ const ProductDetails = () => {
 
       {/* Recently Viewed Section */}
       <RecentlyViewed currentProductId={product._id} />
-
-      <AISizeRecommender 
-        isOpen={isSizeRecommenderOpen} 
-        onClose={() => setIsSizeRecommenderOpen(false)} 
-        onSelectSize={(size) => setSelectedSize(size)} 
-      />
     </div>
     </>
   );

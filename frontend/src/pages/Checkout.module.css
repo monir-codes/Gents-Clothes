@@ -10,19 +10,20 @@
 }
 
 .orderSummary {
-  flex: 1;
+  flex: 1.2;
   background-color: var(--color-surface);
-  padding: var(--space-4);
+  padding: var(--space-5);
   border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
   height: fit-content;
   position: sticky;
   top: 100px;
 }
 
 .sectionTitle {
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   font-weight: 600;
-  margin-bottom: var(--space-3);
+  margin-bottom: var(--space-4);
   padding-bottom: var(--space-2);
   border-bottom: 1px solid var(--color-border);
 }
@@ -61,11 +62,142 @@
   flex: 1;
 }
 
+/* Coupon Section */
+.couponSection {
+  background: var(--color-background);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.couponLabel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  color: var(--color-text-primary);
+}
+
+.couponForm {
+  display: flex;
+  gap: 8px;
+}
+
+.couponInput {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.couponInput:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+.couponInputError {
+  border-color: #ef4444;
+}
+
+.applyCouponBtn {
+  padding: 10px 18px;
+  background-color: var(--color-text-primary);
+  color: var(--color-background);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.2s ease;
+}
+
+.applyCouponBtn:hover:not(:disabled) {
+  background-color: var(--color-brand-maroon, #5e0f2b);
+}
+
+.applyCouponBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.appliedCouponBadge {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+}
+
+.appliedCouponInfo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #15803d;
+  font-size: 0.9rem;
+}
+
+.couponSuccessIcon {
+  color: #16a34a;
+}
+
+.couponDiscountText {
+  color: #16a34a;
+  font-weight: 600;
+}
+
+.removeCouponBtn {
+  background: none;
+  border: none;
+  color: #ef4444;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+}
+
+.removeCouponBtn:hover {
+  background-color: #fee2e2;
+}
+
+.couponErrorText {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #dc2626;
+  font-size: 0.8rem;
+  margin-top: 6px;
+  font-weight: 500;
+}
+
+/* Pricing Breakdown */
 .summaryItem {
   display: flex;
   justify-content: space-between;
   margin-bottom: var(--space-2);
   font-size: 0.95rem;
+  color: var(--color-text-secondary);
+}
+
+.discountItem {
+  color: #16a34a;
+  font-weight: 500;
 }
 
 .totalRow {
@@ -73,8 +205,8 @@
   justify-content: space-between;
   margin-top: var(--space-3);
   padding-top: var(--space-3);
-  border-top: 1px solid var(--color-border);
-  font-size: 1.25rem;
+  border-top: 2px solid var(--color-border);
+  font-size: 1.3rem;
   font-weight: 700;
 }
 
@@ -85,7 +217,7 @@
 .radioLabel {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-3);
   padding: 16px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
@@ -101,18 +233,23 @@
 .placeOrderBtn {
   width: 100%;
   padding: 16px;
-  background-color: var(--color-text-primary);
-  color: var(--color-background);
-  font-size: 1.1rem;
+  background-color: var(--color-brand-maroon, #5e0f2b);
+  color: #ffffff;
+  font-size: 1.05rem;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 1.5px;
+  border: none;
   border-radius: var(--radius-sm);
   margin-top: var(--space-4);
+  cursor: pointer;
+  transition: all 0.25s ease;
 }
 
 .placeOrderBtn:hover {
-  background-color: var(--color-accent);
+  opacity: 0.92;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(94, 15, 43, 0.25);
 }
 
 @media (max-width: 768px) {

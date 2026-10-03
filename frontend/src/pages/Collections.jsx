@@ -7,7 +7,7 @@ import styles from './Shop.module.css';
 const Collections = () => {
   return (
     <div className="container" style={{ paddingTop: '60px', paddingBottom: '60px', minHeight: '80vh' }}>
-      <SEO title="Collections" description="Explore Gents Clothes exclusive collections" />
+      <SEO title="Collections" description="Explore রঙবতী exclusive collections" />
       
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
@@ -24,10 +24,10 @@ const Collections = () => {
         animate={{ opacity: 1 }}
         transition={{ staggerChildren: 0.2 }}
       >
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}><CategoryCard title="Summer Edition 2026" image="/images/hero-banner.png" link="/shop?collection=summer" /></motion.div>
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}><CategoryCard title="Eid Exclusive" image="/images/hero-banner.png" link="/shop?collection=eid" /></motion.div>
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}><CategoryCard title="Winter Essentials" image="/images/hero-banner.png" link="/shop?collection=winter" /></motion.div>
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}><CategoryCard title="Premium Minimal" image="/images/hero-banner.png" link="/shop?collection=minimal" /></motion.div>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}><CategoryCard title="The Festive & Bridal Edit" image="https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&q=80&w=800" link="/shop?collection=festive" /></motion.div>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}><CategoryCard title="Royal Jamdani Heritage" image="https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&q=80&w=800" link="/shop?collection=jamdani" /></motion.div>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}><CategoryCard title="Contemporary Silk & Kurtis" image="https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&q=80&w=800" link="/shop?collection=kurtis" /></motion.div>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}><CategoryCard title="Modern Elegance & Co-ords" image="https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?auto=format&fit=crop&q=80&w=800" link="/shop?collection=coords" /></motion.div>
       </motion.div>
     </div>
   );

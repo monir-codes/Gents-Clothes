@@ -5,7 +5,7 @@
   justify-content: center;
   width: 100%;
   padding: 50px 0;
-  min-height: 200px;
+  min-height: 240px;
 }
 
 .fullScreen {
@@ -14,30 +14,70 @@
   position: fixed;
   top: 0;
   left: 0;
-  background-color: var(--color-background);
+  background: radial-gradient(circle at center, #ffffff 0%, var(--color-surface, #faf6f1) 100%);
   z-index: 9999;
 }
 
-.spinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid rgba(0, 0, 0, 0.1);
-  border-top: 3px solid var(--color-text-primary);
+.logoWrapper {
+  position: relative;
+  width: 110px;
+  height: 110px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.pulseRing {
+  position: absolute;
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
-  margin-bottom: 16px;
+  border: 2px solid var(--color-accent, #c9a265);
+  box-shadow: 0 0 20px rgba(201, 162, 101, 0.35);
+  pointer-events: none;
 }
 
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .spinner {
-    border: 3px solid rgba(255, 255, 255, 0.1);
-    border-top: 3px solid #fff;
-  }
+.logoImage {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 8px 24px rgba(94, 15, 43, 0.15), 0 0 0 2px rgba(201, 162, 101, 0.3);
 }
 
-.text {
-  font-size: 1rem;
-  letter-spacing: 4px;
+.brandTitle {
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: var(--color-brand-maroon, #5e0f2b);
+  margin-bottom: 4px;
+  font-family: var(--font-family-primary);
+}
+
+.tagline {
+  font-size: 0.75rem;
   font-weight: 600;
-  color: var(--color-text-primary);
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--color-text-secondary, #6c5a60);
+  margin-bottom: 18px;
+}
+
+.progressBar {
+  width: 140px;
+  height: 2px;
+  background: rgba(201, 162, 101, 0.2);
+  border-radius: 2px;
+  position: relative;
+  overflow: hidden;
+}
+
+.progressLine {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, #c9a265, #5e0f2b, #c9a265);
+  position: absolute;
+  top: 0;
+  left: 0;
 }

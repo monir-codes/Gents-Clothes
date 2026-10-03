@@ -27,13 +27,13 @@ export const generateProductKeywords = (product) => {
   }
 
   // Delivery & Service Intent
-  keywords.add('cash on delivery mens clothing BD');
+  keywords.add('cash on delivery womens clothing BD');
   keywords.add('online shopping BD home delivery');
 
   // Colors & Sizes
   if (product.colors && Array.isArray(product.colors)) {
     product.colors.forEach(color => {
-      keywords.add(`${color} ${product.category || 'menswear'}`);
+      keywords.add(`${color} ${product.category || 'womens fashion'}`);
     });
   }
 

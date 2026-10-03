@@ -23,7 +23,7 @@ const AdminProducts = () => {
     name: '',
     price: 0,
     category: '',
-    brand: 'Gents Clothes',
+    brand: 'রঙবতী',
     countInStock: 0,
     description: '',
     image: '',
@@ -199,7 +199,7 @@ const AdminProducts = () => {
   const openAddModal = () => {
     setEditingId(null);
     setMagicText('');
-    setFormData({ name: '', price: 0, oldPrice: '', category: '', brand: 'Gents Clothes', countInStock: 0, description: '', image: '', hoverImage: '', sku: '', sizes: '', colors: '', fabricDetails: { material: '', gsm: '', washInstruction: '' } });
+    setFormData({ name: '', price: 0, oldPrice: '', category: '', brand: 'রঙবতী', countInStock: 0, description: '', image: '', hoverImage: '', sku: '', sizes: '', colors: '', fabricDetails: { material: '', gsm: '', washInstruction: '' } });
     setIsModalOpen(true);
   };
 
@@ -409,17 +409,14 @@ const AdminProducts = () => {
                   <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '5px', fontWeight: 600 }}>Category</label>
                   <select name="category" value={formData.category} onChange={handleInputChange} required style={{ width: '100%', padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px' }}>
                     <option value="" disabled>Select Category</option>
-                    <option value="T-Shirts">T-Shirts</option>
-                    <option value="Polos">Polos</option>
-                    <option value="Shirts">Shirts</option>
-                    <option value="Panjabis">Panjabis</option>
-                    <option value="Pants">Pants</option>
-                    <option value="Jeans">Jeans</option>
-                    <option value="Jackets">Jackets</option>
-                    <option value="Hoodies">Hoodies</option>
-                    <option value="Suits">Suits</option>
-                    <option value="Combos">Combos</option>
-                    <option value="Accessories">Accessories</option>
+                    <option value="Sarees">Sarees</option>
+                    <option value="Salwar Kameez">Salwar Kameez</option>
+                    <option value="Kurtis & Tunics">Kurtis & Tunics</option>
+                    <option value="Lehengas & Gowns">Lehengas & Gowns</option>
+                    <option value="Western Wear">Western Wear</option>
+                    <option value="Modest Wear">Modest Wear & Abayas</option>
+                    <option value="Co-ord Sets">Co-ord Sets</option>
+                    <option value="Jewelry & Accessories">Jewelry & Accessories</option>
                   </select>
                 </div>
                 <div style={{ flex: '1 1 200px' }}>

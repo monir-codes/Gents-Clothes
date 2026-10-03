@@ -21,9 +21,9 @@ const Lookbook = () => {
         gap: 'var(--space-4)'
       }}>
         {[
-          { img: 'https://images.unsplash.com/photo-1594938298596-eb5fd3f6b3b0?auto=format&fit=crop&q=80&w=800', title: 'The Modern Classic' },
-          { img: 'https://images.unsplash.com/photo-1617137968427-85924c800a22?auto=format&fit=crop&q=80&w=800', title: 'Summer Essence' },
-          { img: 'https://images.unsplash.com/photo-1593030761757-71fae45fa0e7?auto=format&fit=crop&q=80&w=800', title: 'Evening Elegance' }
+          { img: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&q=80&w=800', title: 'Royal Jamdani Splendor' },
+          { img: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&q=80&w=800', title: 'Contemporary Silk Muse' },
+          { img: 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?auto=format&fit=crop&q=80&w=800', title: 'Festive Velvet & Zari' }
         ].map((look, i) => (
           <motion.div 
             key={i}

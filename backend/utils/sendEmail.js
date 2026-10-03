@@ -29,9 +29,9 @@ const sendEmailWrapper = async (mailOptions) => {
 
 const sendOtpEmail = async (email, otp, type = 'Verification') => {
   const mailOptions = {
-    from: '"Gents Clothes" <noreply@gentsclothes.com>',
+    from: '"রঙবতী" <noreply@ronggoboti.com>',
     to: email,
-    subject: `${type} OTP - Gents Clothes`,
+    subject: `${type} OTP - রঙবতী`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
         <h2 style="color: #333; text-align: center;">${type} OTP</h2>
@@ -49,9 +49,9 @@ const sendOtpEmail = async (email, otp, type = 'Verification') => {
 
 const sendPasswordResetEmail = async (email, otp) => {
   const mailOptions = {
-    from: '"Gents Clothes" <noreply@gentsclothes.com>',
+    from: '"রঙবতী" <noreply@ronggoboti.com>',
     to: email,
-    subject: `Password Reset OTP - Gents Clothes`,
+    subject: `Password Reset OTP - রঙবতী`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
         <h2 style="color: #333; text-align: center;">Password Reset</h2>
@@ -69,13 +69,13 @@ const sendPasswordResetEmail = async (email, otp) => {
 
 const sendOrderNotificationEmail = async (adminEmail, orderData) => {
   const mailOptions = {
-    from: '"Gents Clothes" <noreply@gentsclothes.com>',
+    from: '"রঙবতী" <noreply@ronggoboti.com>',
     to: adminEmail,
     subject: `New Order Received! #${orderData.customId || orderData._id}`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
         <h2 style="color: #333;">New Order Notification</h2>
-        <p style="color: #555; font-size: 16px;">A new order has been placed on Gents Clothes.</p>
+        <p style="color: #555; font-size: 16px;">A new order has been placed on রঙবতী.</p>
         <ul style="color: #555; font-size: 14px; line-height: 1.6;">
           <li><strong>Order ID:</strong> ${orderData.customId || orderData._id}</li>
           <li><strong>Total Amount:</strong> ৳${orderData.totalPrice}</li>
@@ -89,8 +89,41 @@ const sendOrderNotificationEmail = async (adminEmail, orderData) => {
   await sendEmailWrapper(mailOptions);
 };
 
+const sendNewsletterNotificationEmail = async (subscriberEmail, adminEmail) => {
+  const targetEmail = adminEmail || 'mdrummanmondal2@gmail.com';
+  const mailOptions = {
+    from: '"রঙবতী" <noreply@ronggoboti.com>',
+    to: targetEmail,
+    subject: `New Newsletter Subscriber: ${subscriberEmail} - রঙবতী`,
+    html: `
+      <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 25px; border: 1px solid #eaeaea; border-radius: 10px; background-color: #fafafa;">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <h1 style="color: #6d1b29; margin: 0; font-size: 26px; font-weight: 700; letter-spacing: 1px;">রঙবতী</h1>
+          <p style="color: #888; font-size: 13px; margin-top: 4px; text-transform: uppercase; letter-spacing: 2px;">Luxury Fashion eCommerce</p>
+        </div>
+        <div style="background-color: #ffffff; border: 1px solid #eee; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+          <h2 style="color: #222; font-size: 18px; margin-top: 0; margin-bottom: 12px;">🎉 New Subscriber Alert</h2>
+          <p style="color: #555; font-size: 15px; line-height: 1.6; margin: 0 0 16px 0;">
+            A visitor just subscribed to the <strong>রঙবতী</strong> newsletter from the website footer.
+          </p>
+          <div style="background-color: #f7f1f2; border-left: 4px solid #6d1b29; padding: 12px 16px; border-radius: 4px;">
+            <p style="margin: 0; font-size: 13px; color: #666;">Subscriber Email:</p>
+            <p style="margin: 4px 0 0 0; font-size: 17px; font-weight: bold; color: #111;">${subscriberEmail}</p>
+          </div>
+        </div>
+        <p style="color: #999; font-size: 12px; text-align: center; margin: 0;">
+          This email was sent automatically from your website system.
+        </p>
+      </div>
+    `,
+    text: `New newsletter subscriber on রঙবতী: ${subscriberEmail}`,
+  };
+  await sendEmailWrapper(mailOptions);
+};
+
 module.exports = {
   sendOtpEmail,
   sendPasswordResetEmail,
-  sendOrderNotificationEmail
+  sendOrderNotificationEmail,
+  sendNewsletterNotificationEmail
 };

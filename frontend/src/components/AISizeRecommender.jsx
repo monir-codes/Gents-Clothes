@@ -4,23 +4,23 @@ import { X, Ruler, ArrowRight } from 'lucide-react';
 
 const AISizeRecommender = ({ isOpen, onClose, onSelectSize }) => {
   const [step, setStep] = useState(1);
-  const [height, setHeight] = useState('175');
-  const [weight, setWeight] = useState('70');
+  const [height, setHeight] = useState('158');
+  const [weight, setWeight] = useState('54');
   const [fit, setFit] = useState('Regular');
   const [isCalculating, setIsCalculating] = useState(false);
   const [recommendedSize, setRecommendedSize] = useState(null);
 
   const calculateSize = () => {
     setIsCalculating(true);
-    // Mock algorithm based on standard Asian/BD sizing
+    // Algorithm based on standard women's South Asian / BD apparel sizing
     setTimeout(() => {
       let size = 'M';
       const h = parseInt(height);
       const w = parseInt(weight);
 
-      if (h > 180 || w > 85) size = 'XL';
-      else if (h > 175 || w > 75) size = 'L';
-      else if (h < 165 || w < 60) size = 'S';
+      if (h > 166 || w > 68) size = 'XL';
+      else if (h > 160 || w > 58) size = 'L';
+      else if (h < 152 || w < 48) size = 'S';
       else size = 'M';
 
       if (fit === 'Loose' && size !== 'XL') {
@@ -88,7 +88,7 @@ const AISizeRecommender = ({ isOpen, onClose, onSelectSize }) => {
               <div style={{ marginBottom: 'var(--space-4)' }}>
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '8px', textTransform: 'uppercase' }}>Height (cm)</label>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <input type="range" min="150" max="200" value={height} onChange={(e) => setHeight(e.target.value)} style={{ flex: 1 }} />
+                  <input type="range" min="140" max="185" value={height} onChange={(e) => setHeight(e.target.value)} style={{ flex: 1 }} />
                   <span style={{ fontWeight: 600, width: '50px', textAlign: 'right' }}>{height}</span>
                 </div>
               </div>
@@ -96,7 +96,7 @@ const AISizeRecommender = ({ isOpen, onClose, onSelectSize }) => {
               <div style={{ marginBottom: 'var(--space-4)' }}>
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '8px', textTransform: 'uppercase' }}>Weight (kg)</label>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <input type="range" min="40" max="120" value={weight} onChange={(e) => setWeight(e.target.value)} style={{ flex: 1 }} />
+                  <input type="range" min="38" max="105" value={weight} onChange={(e) => setWeight(e.target.value)} style={{ flex: 1 }} />
                   <span style={{ fontWeight: 600, width: '50px', textAlign: 'right' }}>{weight}</span>
                 </div>
               </div>

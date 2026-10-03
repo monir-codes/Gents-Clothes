@@ -75,8 +75,19 @@ const Navbar = () => {
       </div>
       
       <div className={`container ${styles.navContainer}`}>
-        <Link to="/" className={styles.logo}>
-          Gents Clothes
+        <Link to="/" className={styles.logoLink} aria-label="রঙবতী Home">
+          <img 
+            src="/images/ronggoboti-logo.png" 
+            alt="রঙবতী" 
+            className={styles.logoImg}
+            onError={(e) => {
+              e.currentTarget.style.display = 'none';
+              if (e.currentTarget.nextElementSibling) {
+                e.currentTarget.nextElementSibling.style.display = 'inline-block';
+              }
+            }}
+          />
+          <span className={styles.logoText} style={{ display: 'none' }}>রঙবতী</span>
         </Link>
         
         <nav className={styles.navLinks}>
@@ -84,7 +95,6 @@ const Navbar = () => {
           <Link to="/collections" className={styles.navLink}>Collections</Link>
           <Link to="/new-arrival" className={styles.navLink}>New Arrival</Link>
           <Link to="/sale" className={styles.navLink}>Sale</Link>
-          <Link to="/track-order" className={styles.navLink}>Track Order</Link>
           <Link to="/about" className={styles.navLink}>About</Link>
         </nav>
         
@@ -179,7 +189,6 @@ const Navbar = () => {
             <Link to="/collections" className={styles.mobileNavLink} onClick={() => setIsMobileMenuOpen(false)}>Collections</Link>
             <Link to="/new-arrival" className={styles.mobileNavLink} onClick={() => setIsMobileMenuOpen(false)}>New Arrival</Link>
             <Link to="/sale" className={styles.mobileNavLink} onClick={() => setIsMobileMenuOpen(false)}>Sale</Link>
-            <Link to="/track-order" className={styles.mobileNavLink} onClick={() => setIsMobileMenuOpen(false)}>Track Order</Link>
             <Link to="/about" className={styles.mobileNavLink} onClick={() => setIsMobileMenuOpen(false)}>About</Link>
           </motion.div>
         )}

@@ -14,9 +14,9 @@ const UGCSection = () => {
         >
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
             <Camera size={24} />
-            <span style={{ fontWeight: 600, letterSpacing: '1px' }}>@GENTS CLOTHES</span>
+            <span style={{ fontWeight: 600, letterSpacing: '1px' }}>@RONGGOBOTI</span>
           </div>
-          <h2 style={{ fontSize: '2rem', fontWeight: 600, textTransform: 'uppercase' }}>Spotted in Gents Clothes</h2>
+          <h2 style={{ fontSize: '2rem', fontWeight: 600, textTransform: 'uppercase' }}>Spotted in রঙবতী</h2>
           <p style={{ color: 'var(--color-text-secondary)' }}>Tag us to get featured on our official page.</p>
         </motion.div>
 
@@ -26,10 +26,10 @@ const UGCSection = () => {
           gap: '16px' 
         }}>
           {[
-            'https://images.unsplash.com/photo-1592878904946-b3cd8ae243d0?auto=format&fit=crop&q=80&w=600',
-            'https://images.unsplash.com/photo-1550614000-4b95d4ebf5eb?auto=format&fit=crop&q=80&w=600',
-            'https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&q=80&w=600',
-            'https://images.unsplash.com/photo-1620012253295-c15c54e0ad8f?auto=format&fit=crop&q=80&w=600'
+            'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&q=80&w=600',
+            'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&q=80&w=600',
+            'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?auto=format&fit=crop&q=80&w=600',
+            'https://images.unsplash.com/photo-1566737236500-c8ac43014a67?auto=format&fit=crop&q=80&w=600'
           ].map((img, i) => (
             <motion.div 
               key={i}

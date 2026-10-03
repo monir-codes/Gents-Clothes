@@ -1,4 +1,5 @@
 const Order = require('../models/Order');
+const Settings = require('../models/Settings');
 const { sendOrderNotificationEmail } = require('../utils/sendEmail');
 // @desc    Create new order
 // @route   POST /api/orders
@@ -10,6 +11,8 @@ const addOrderItems = async (req, res) => {
     paymentMethod,
     transactionId,
     itemsPrice,
+    discountAmount,
+    couponCode,
     shippingPrice,
     totalPrice,
   } = req.body;
@@ -31,6 +34,8 @@ const addOrderItems = async (req, res) => {
       paymentMethod,
       transactionId,
       itemsPrice,
+      discountAmount: discountAmount || 0,
+      couponCode: couponCode || '',
       shippingPrice,
       totalPrice,
     });
@@ -39,10 +44,9 @@ const addOrderItems = async (req, res) => {
 
     // Send email to Admin
     try {
-      const adminEmails = ['info.gentsclothes@gmail.com', 'mdrummanmondal2@gmail.com'];
-      for (const email of adminEmails) {
-        await sendOrderNotificationEmail(email, createdOrder);
-      }
+      const settings = await Settings.findOne();
+      const adminEmail = settings?.adminEmail || 'mdrummanmondal2@gmail.com';
+      await sendOrderNotificationEmail(adminEmail, createdOrder);
     } catch (error) {
       console.error('Failed to send admin order notification email', error);
     }
