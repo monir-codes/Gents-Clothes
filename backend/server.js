@@ -17,13 +17,19 @@ const statsRoutes = require('./routes/statsRoutes');
 const aiRoutes = require('./routes/aiRoutes');
 const sitemapRoutes = require('./routes/sitemapRoutes');
 
-// CORS
-const allowedOrigins = [
-  process.env.FRONTEND_URL,
-  'http://localhost:5173',
-  'https://gents-clothes.vercel.app'
-].filter(Boolean);
-app.use(cors({ origin: allowedOrigins, credentials: true }));
+// Universal CORS for Vercel, localhost, and custom domains
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow server-to-server, mobile, localhost, or any vercel.app / custom domain
+    if (!origin || origin.includes('localhost') || origin.includes('127.0.0.1') || origin.includes('.vercel.app') || origin.includes('ronggoboti')) {
+      return callback(null, true);
+    }
+    return callback(null, true);
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+}));
 app.use(express.json());
 
 // Middleware: ensure DB is connected before every request.

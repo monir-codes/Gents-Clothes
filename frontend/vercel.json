@@ -1,5 +1,6 @@
 {
   "rewrites": [
+    { "source": "/api/(.*)", "destination": "https://gents-clothes-server.vercel.app/api/$1" },
     { "source": "/sitemap.xml", "destination": "https://gents-clothes-server.vercel.app/sitemap.xml" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]

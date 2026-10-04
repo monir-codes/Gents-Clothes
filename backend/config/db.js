@@ -1,10 +1,6 @@
 const mongoose = require('mongoose');
 
-const MONGO_URI = process.env.MONGO_URI;
-
-if (!MONGO_URI) {
-  console.warn("WARNING: MONGO_URI is missing. Database connection will fail.");
-}
+const FALLBACK_MONGO_URI = 'mongodb+srv://gents_clothes:PmNDv7XfjaCW5Riw@simple-crud-cluster.0hdbxiy.mongodb.net/gentsclothes?appName=Simple-crud-cluster';
 
 // Cache the connection promise so Vercel serverless reuses it across invocations.
 let cached = global.__mongoConnection;
@@ -14,19 +10,26 @@ if (!cached) {
 
 const connectDB = async () => {
   // Already connected — reuse.
-  if (cached.conn) return cached.conn;
+  if (cached.conn && mongoose.connection.readyState === 1) {
+    return cached.conn;
+  }
+
+  const uri = process.env.MONGO_URI || FALLBACK_MONGO_URI;
 
   // Connection in progress — wait for it.
   if (!cached.promise) {
     console.log('Connecting to MongoDB...');
     cached.promise = mongoose
-      .connect(MONGO_URI, { serverSelectionTimeoutMS: 5000 })
+      .connect(uri, { 
+        serverSelectionTimeoutMS: 8000,
+        connectTimeoutMS: 10000 
+      })
       .then((conn) => {
         console.log(`MongoDB Connected: ${conn.connection.host}`);
+        cached.conn = conn;
         return conn;
       })
       .catch((err) => {
-        // Log but DO NOT call process.exit — let individual routes handle missing DB.
         console.error(`MongoDB connection error: ${err.message}`);
         cached.promise = null; // allow retry on next request
         throw err;
