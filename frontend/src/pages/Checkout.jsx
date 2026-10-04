@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Tag, CheckCircle2, XCircle, X, ShieldCheck } from 'lucide-react';
+import { 
+  Tag, CheckCircle2, XCircle, X, ShieldCheck, 
+  Copy, Check, CreditCard, Smartphone, AlertCircle 
+} from 'lucide-react';
 import useCartStore from '../store/useCartStore';
 import useAuthStore from '../store/useAuthStore';
 import styles from './Checkout.module.css';
@@ -23,6 +26,7 @@ const Checkout = () => {
     Mymensingh: ['Jamalpur', 'Mymensingh', 'Netrokona', 'Sherpur']
   };
 
+  const [settings, setSettings] = useState(null);
   const [address, setAddress] = useState({
     fullName: user?.name || '',
     phone: user?.phone || '',
@@ -32,38 +36,64 @@ const Checkout = () => {
     city: user?.addresses?.[0]?.city || ''
   });
 
+  const [selectedZone, setSelectedZone] = useState('inside-dhaka');
+  
+  // Payment State
+  const [paymentType, setPaymentType] = useState('COD'); // 'COD' | 'ADVANCE'
+  const [selectedAdvanceIndex, setSelectedAdvanceIndex] = useState(0);
+  const [senderNumber, setSenderNumber] = useState('');
+  const [transactionId, setTransactionId] = useState('');
+  const [copiedNumber, setCopiedNumber] = useState(false);
+
+  // Coupon State
+  const [couponInput, setCouponInput] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [couponError, setCouponError] = useState('');
+
+  // Fetch Settings on Mount
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const { data } = await axios.get('/api/settings');
+        setSettings(data);
+      } catch (error) {
+        console.error('Failed to fetch settings for checkout', error);
+      }
+    };
+    fetchSettings();
+  }, []);
+
+  useEffect(() => {
+    if (!user) {
+      navigate('/login?redirect=/checkout');
+    }
+  }, [user, navigate]);
+
+  // Delivery Charges & Zones derived from settings
   const deliveryZones = [
     { 
       id: 'inside-dhaka', 
       name: 'ঢাকা সিটির মধ্যে', 
       nameEn: 'Inside Dhaka City', 
-      charge: 70, 
+      charge: settings?.paymentSettings?.deliveryChargeInsideDhaka ?? 70, 
       deliveryTime: '২-৩ কার্যদিবস' 
     },
     { 
       id: 'sub-dhaka', 
       name: 'সাব ঢাকা (সাভার, গাজীপুর, নারায়ণগঞ্জ, কেরানীগঞ্জ)', 
       nameEn: 'Sub Dhaka (Gazipur, Savar, Narayanganj, Keraniganj)', 
-      charge: 100, 
+      charge: settings?.paymentSettings?.deliveryChargeSubDhaka ?? 100, 
       deliveryTime: '২-৪ কার্যদিবস' 
     },
     { 
       id: 'outside-dhaka', 
       name: 'ঢাকার বাহিরে (সারা বাংলাদেশ)', 
       nameEn: 'Outside Dhaka (All over Bangladesh)', 
-      charge: 120, 
+      charge: settings?.paymentSettings?.deliveryChargeOutsideDhaka ?? 120, 
       deliveryTime: '৩-৫ কার্যদিবস' 
     }
   ];
-
-  const [selectedZone, setSelectedZone] = useState('inside-dhaka');
-  const [paymentMethod, setPaymentMethod] = useState('COD');
-
-  // Coupon State
-  const [couponInput, setCouponInput] = useState('');
-  const [appliedCoupon, setAppliedCoupon] = useState(null); // { code, discountPercentage, description }
-  const [couponLoading, setCouponLoading] = useState(false);
-  const [couponError, setCouponError] = useState('');
 
   const activeZone = deliveryZones.find(z => z.id === selectedZone) || deliveryZones[0];
   const itemsPrice = cartItems.reduce((acc, item) => acc + item.price * item.qty, 0);
@@ -71,14 +101,17 @@ const Checkout = () => {
     ? Math.round((itemsPrice * appliedCoupon.discountPercentage) / 100) 
     : 0;
   const discountedItemsPrice = Math.max(0, itemsPrice - discountAmount);
-  const shippingPrice = itemsPrice > 5000 ? 0 : activeZone.charge;
+  
+  const freeShippingThreshold = settings?.paymentSettings?.freeShippingThreshold ?? 5000;
+  const shippingPrice = (freeShippingThreshold > 0 && itemsPrice >= freeShippingThreshold) ? 0 : activeZone.charge;
   const totalPrice = discountedItemsPrice + shippingPrice;
 
-  useEffect(() => {
-    if (!user) {
-      navigate('/login?redirect=/checkout');
-    }
-  }, [user, navigate]);
+  // Active advance payment methods configured by admin
+  const configuredAdvanceMethods = (settings?.paymentSettings?.advancePaymentMethods || []).filter(m => m.isActive && m.number);
+  const isAdvanceEnabled = settings?.paymentSettings?.isAdvancePaymentEnabled !== false;
+  const hasAdvanceMethods = isAdvanceEnabled && configuredAdvanceMethods.length > 0;
+
+  const currentAdvanceMethod = configuredAdvanceMethods[selectedAdvanceIndex] || configuredAdvanceMethods[0];
 
   const handleRegionChange = (e) => {
     const newRegion = e.target.value;
@@ -102,6 +135,13 @@ const Checkout = () => {
     } else {
       setSelectedZone('outside-dhaka');
     }
+  };
+
+  const handleCopyNumber = (num) => {
+    if (!num) return;
+    navigator.clipboard.writeText(num);
+    setCopiedNumber(true);
+    setTimeout(() => setCopiedNumber(false), 2000);
   };
 
   const handleApplyCoupon = async (e) => {
@@ -160,12 +200,28 @@ const Checkout = () => {
       return;
     }
 
+    // If advance payment is chosen, require sender number and transaction ID
+    if (paymentType === 'ADVANCE' && hasAdvanceMethods) {
+      if (!senderNumber.trim() || !transactionId.trim()) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Payment Details Required',
+          text: 'Please enter the Sender Phone Number and Transaction ID (TrxID).'
+        });
+        return;
+      }
+    }
+
+    const finalPaymentMethod = (paymentType === 'ADVANCE' && hasAdvanceMethods && currentAdvanceMethod) 
+      ? currentAdvanceMethod.name 
+      : 'COD';
+
     Swal.fire({
       title: 'Confirm Order?',
-      text: `Total Amount: ৳${totalPrice}${appliedCoupon ? ` (Includes ${appliedCoupon.discountPercentage}% coupon discount)` : ''}`,
+      text: `Total Amount: ৳${totalPrice} (${finalPaymentMethod})`,
       icon: 'question',
       showCancelButton: true,
-      confirmButtonColor: '#6d1b29',
+      confirmButtonColor: '#5e0f2b',
       cancelButtonColor: '#d33',
       confirmButtonText: 'Yes, Confirm Order'
     }).then(async (result) => {
@@ -183,7 +239,18 @@ const Checkout = () => {
               postalCode: '1000',
               country: 'Bangladesh'
             },
-            paymentMethod,
+            paymentMethod: finalPaymentMethod,
+            transactionId: paymentType === 'ADVANCE' ? transactionId.trim() : '',
+            senderNumber: paymentType === 'ADVANCE' ? senderNumber.trim() : '',
+            advanceAmount: paymentType === 'ADVANCE' ? (shippingPrice > 0 ? shippingPrice : totalPrice) : 0,
+            paymentDetails: paymentType === 'ADVANCE' && currentAdvanceMethod ? {
+              method: currentAdvanceMethod.name,
+              accountNumber: currentAdvanceMethod.number,
+              accountType: currentAdvanceMethod.type,
+              senderNumber: senderNumber.trim(),
+              transactionId: transactionId.trim(),
+              advanceAmount: shippingPrice > 0 ? shippingPrice : totalPrice
+            } : {},
             itemsPrice,
             discountAmount,
             couponCode: appliedCoupon ? appliedCoupon.code : '',
@@ -202,12 +269,15 @@ const Checkout = () => {
             state: { 
               orderId: data.customId || data._id, 
               totalPrice, 
-              paymentMethod,
+              paymentMethod: finalPaymentMethod,
+              transactionId: orderData.transactionId,
+              senderNumber: orderData.senderNumber,
               discountAmount,
               couponCode: appliedCoupon?.code
             } 
           });
         } catch (error) {
+          console.error(error);
           Swal.fire('Error', 'Failed to place order. Please try again.', 'error');
         }
       }
@@ -273,6 +343,7 @@ const Checkout = () => {
             <input required type="text" className={styles.input} value={address.city} onChange={e => setAddress({...address, city: e.target.value})} placeholder="e.g. Dhanmondi, Mirpur, Uttara, etc." />
           </div>
 
+          {/* Delivery Charges Section */}
           <h2 className={styles.sectionTitle} style={{ marginTop: '30px' }}>Delivery Charge & Zone</h2>
           <div className={styles.deliveryZoneGroup}>
             {deliveryZones.map(zone => {
@@ -298,7 +369,7 @@ const Checkout = () => {
                     </div>
                   </div>
                   <div className={styles.zonePrice}>
-                    {itemsPrice > 5000 ? (
+                    {freeShippingThreshold > 0 && itemsPrice >= freeShippingThreshold ? (
                       <span style={{ color: '#16a34a', fontSize: '0.95rem' }}>FREE</span>
                     ) : (
                       `৳${zone.charge}`
@@ -309,27 +380,172 @@ const Checkout = () => {
             })}
           </div>
 
+          {/* Payment Methods Section */}
           <h2 className={styles.sectionTitle} style={{ marginTop: '30px' }}>Payment Method</h2>
           <div className={styles.paymentMethod}>
-            <label className={styles.radioLabel}>
-              <input 
-                type="radio" 
-                name="payment" 
-                value="COD" 
-                checked={paymentMethod === 'COD'}
-                onChange={() => setPaymentMethod('COD')}
-              />
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <span style={{ fontWeight: 600 }}>Cash on Delivery (COD)</span>
-                <span style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>Pay cash upon receiving your parcel at your doorstep.</span>
+            
+            {/* Cash On Delivery Card */}
+            <div 
+              className={`${styles.paymentOptionCard} ${paymentType === 'COD' ? styles.paymentOptionCardActive : ''}`}
+              onClick={() => setPaymentType('COD')}
+            >
+              <div className={styles.paymentHeader}>
+                <input 
+                  type="radio" 
+                  name="paymentOption" 
+                  value="COD" 
+                  checked={paymentType === 'COD'}
+                  onChange={() => setPaymentType('COD')}
+                  className={styles.zoneRadio}
+                />
+                <div>
+                  <div style={{ fontWeight: 700, fontSize: '1rem' }}>Cash on Delivery (ক্যাশ অন ডেলিভারি)</div>
+                  <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginTop: '2px' }}>
+                    পণ্য হাতে পেয়ে সর্বমোট <strong>৳{totalPrice}</strong> পরিশোধ করুন।
+                  </div>
+                </div>
               </div>
-            </label>
+            </div>
+
+            {/* Advance Payment Card (Only shown if configured by admin) */}
+            {hasAdvanceMethods && (
+              <div 
+                className={`${styles.paymentOptionCard} ${paymentType === 'ADVANCE' ? styles.paymentOptionCardActive : ''}`}
+                onClick={() => setPaymentType('ADVANCE')}
+              >
+                <div className={styles.paymentHeader}>
+                  <input 
+                    type="radio" 
+                    name="paymentOption" 
+                    value="ADVANCE" 
+                    checked={paymentType === 'ADVANCE'}
+                    onChange={() => setPaymentType('ADVANCE')}
+                    className={styles.zoneRadio}
+                  />
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      Advance Payment (অগ্রিম পেমেন্ট)
+                      <span style={{ fontSize: '0.75rem', background: '#dcfce7', color: '#166534', padding: '2px 8px', borderRadius: '4px', fontWeight: 600 }}>
+                        Fast Processing
+                      </span>
+                    </div>
+                    <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginTop: '2px' }}>
+                      bKash, Nagad, Rocket ইত্যাদির মাধ্যমে অগ্রিম পরিশোধ করুন।
+                    </div>
+                  </div>
+                </div>
+
+                {/* Expanded Advance Payment Details when Active */}
+                {paymentType === 'ADVANCE' && (
+                  <div style={{ marginTop: '16px', borderTop: '1px solid var(--color-border)', paddingTop: '14px' }} onClick={(e) => e.stopPropagation()}>
+                    <div style={{ fontSize: '0.85rem', fontWeight: 600, marginBottom: '8px' }}>
+                      Select Payment Method:
+                    </div>
+
+                    {/* Method Selection Badges */}
+                    <div className={styles.advanceMethodsGrid}>
+                      {configuredAdvanceMethods.map((method, idx) => {
+                        const isMethodSelected = selectedAdvanceIndex === idx;
+                        const mName = method.name?.toLowerCase() || '';
+                        let brandColor = 'var(--color-brand-maroon, #5e0f2b)';
+                        if (mName.includes('bkash')) brandColor = '#db2777';
+                        else if (mName.includes('nagad')) brandColor = '#ea580c';
+                        else if (mName.includes('rocket')) brandColor = '#9333ea';
+
+                        return (
+                          <div 
+                            key={idx}
+                            className={`${styles.advanceMethodItem} ${isMethodSelected ? styles.advanceMethodItemActive : ''}`}
+                            onClick={() => setSelectedAdvanceIndex(idx)}
+                          >
+                            <div className={styles.methodName} style={{ color: brandColor }}>
+                              {method.name}
+                            </div>
+                            <div className={styles.methodTypeTag}>
+                              {method.type || 'Personal'}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Active Method Info & Copy Number */}
+                    {currentAdvanceMethod && (
+                      <div className={styles.paymentInstructionsBox}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span style={{ fontWeight: 600, color: 'var(--color-text-primary)' }}>
+                            {currentAdvanceMethod.name} ({currentAdvanceMethod.type || 'Personal'}):
+                          </span>
+                          <span style={{ fontSize: '0.8rem', color: '#16a34a', fontWeight: 600 }}>
+                            অগ্রিম প্রদেয়: ৳{shippingPrice > 0 ? shippingPrice : totalPrice} {shippingPrice > 0 ? '(ডেলিভারি চার্জ)' : ''}
+                          </span>
+                        </div>
+
+                        <div className={styles.accountNumberRow}>
+                          <span className={styles.accountNumberText}>{currentAdvanceMethod.number}</span>
+                          <button 
+                            type="button" 
+                            className={styles.copyNumberBtn}
+                            onClick={() => handleCopyNumber(currentAdvanceMethod.number)}
+                          >
+                            {copiedNumber ? <Check size={14} color="#16a34a" /> : <Copy size={14} />}
+                            {copiedNumber ? 'Copied!' : 'Copy Number'}
+                          </button>
+                        </div>
+
+                        {currentAdvanceMethod.instructions && (
+                          <div style={{ color: 'var(--color-text-secondary)', fontSize: '0.8rem', marginTop: '4px' }}>
+                            {currentAdvanceMethod.instructions}
+                          </div>
+                        )}
+
+                        {/* Customer Transaction Input Fields */}
+                        <div className={styles.paymentInputsRow}>
+                          <div>
+                            <label className={styles.label} style={{ fontSize: '0.8rem' }}>
+                              আপনার ফোন / একাউন্ট নাম্বার <span style={{ color: '#ef4444' }}>*</span>
+                            </label>
+                            <input 
+                              type="tel" 
+                              required={paymentType === 'ADVANCE'}
+                              placeholder="01XXXXXXXXX" 
+                              value={senderNumber}
+                              onChange={(e) => setSenderNumber(e.target.value)}
+                              className={styles.input}
+                              style={{ padding: '8px 12px', fontSize: '0.9rem' }}
+                            />
+                          </div>
+                          <div>
+                            <label className={styles.label} style={{ fontSize: '0.8rem' }}>
+                              Transaction ID (TrxID) <span style={{ color: '#ef4444' }}>*</span>
+                            </label>
+                            <input 
+                              type="text" 
+                              required={paymentType === 'ADVANCE'}
+                              placeholder="e.g. 9J8A7K6L" 
+                              value={transactionId}
+                              onChange={(e) => setTransactionId(e.target.value.toUpperCase())}
+                              className={styles.input}
+                              style={{ padding: '8px 12px', fontSize: '0.9rem', textTransform: 'uppercase', fontFamily: 'monospace', fontWeight: 600 }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
           </div>
 
-          <button type="submit" className={styles.placeOrderBtn}>Place Order (৳{totalPrice})</button>
+          <button type="submit" className={styles.placeOrderBtn}>
+            Place Order (৳{totalPrice})
+          </button>
         </form>
       </div>
 
+      {/* Order Summary Column */}
       <div className={styles.orderSummary}>
         <h2 className={styles.sectionTitle}>Order Summary</h2>
         <div style={{ marginBottom: '20px', maxHeight: '280px', overflowY: 'auto' }}>

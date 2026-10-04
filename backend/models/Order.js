@@ -42,6 +42,22 @@ const orderSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  senderNumber: {
+    type: String,
+    default: ''
+  },
+  advanceAmount: {
+    type: Number,
+    default: 0
+  },
+  paymentDetails: {
+    method: { type: String },
+    accountNumber: { type: String },
+    accountType: { type: String },
+    senderNumber: { type: String },
+    transactionId: { type: String },
+    advanceAmount: { type: Number }
+  },
   paymentResult: {
     id: { type: String },
     status: { type: String },

@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 
 const OrderSuccess = () => {
   const location = useLocation();
-  const { orderId, totalPrice, paymentMethod } = location.state || {};
+  const { orderId, totalPrice, paymentMethod, transactionId, senderNumber } = location.state || {};
 
   return (
     <div className="container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', textAlign: 'center', padding: '60px 20px' }}>
@@ -29,6 +29,18 @@ const OrderSuccess = () => {
             <span style={{ color: 'var(--color-text-secondary)' }}>Payment Method:</span>
             <span style={{ fontWeight: 600 }}>{paymentMethod}</span>
           </p>
+          {senderNumber && (
+            <p style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+              <span style={{ color: 'var(--color-text-secondary)' }}>Sender Number:</span>
+              <span style={{ fontWeight: 600 }}>{senderNumber}</span>
+            </p>
+          )}
+          {transactionId && (
+            <p style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+              <span style={{ color: 'var(--color-text-secondary)' }}>Transaction ID:</span>
+              <span style={{ fontWeight: 700, fontFamily: 'monospace', color: 'var(--color-brand-maroon, #5e0f2b)' }}>{transactionId}</span>
+            </p>
+          )}
           <p style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
             <span style={{ color: 'var(--color-text-secondary)' }}>Total Amount:</span>
             <span style={{ fontWeight: 600 }}>৳{totalPrice}</span>

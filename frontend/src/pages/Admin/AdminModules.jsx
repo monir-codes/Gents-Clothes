@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import styles from './Admin.module.css';
-import { Upload, X, Trash2 } from 'lucide-react';
+import { Upload, X, Trash2, CreditCard, Plus, Eye, Phone, MapPin, CheckCircle, Info, ShieldCheck } from 'lucide-react';
 import Loader from '../../components/Loader';
 import ImageCropperModal from '../../components/ImageCropperModal';
 import useAuthStore from '../../store/useAuthStore';
@@ -18,6 +18,7 @@ const getAuthConfig = () => {
 const AdminOrders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedOrder, setSelectedOrder] = useState(null);
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -61,10 +62,57 @@ const AdminOrders = () => {
 
   if (loading) return <Loader />;
 
+  const getPaymentBadge = (method, trxId, sender) => {
+    const m = (method || 'COD').toLowerCase();
+    let bg = '#f3f4f6';
+    let color = '#374151';
+    let border = '#e5e7eb';
+
+    if (m.includes('bkash')) {
+      bg = '#fdf2f8'; color = '#db2777'; border = '#fbcfe8';
+    } else if (m.includes('nagad')) {
+      bg = '#fff7ed'; color = '#ea580c'; border = '#ffedd5';
+    } else if (m.includes('rocket')) {
+      bg = '#faf5ff'; color = '#9333ea'; border = '#f3e8ff';
+    } else if (m.includes('upay')) {
+      bg = '#eff6ff'; color = '#2563eb'; border = '#bfdbfe';
+    }
+
+    return (
+      <div>
+        <span style={{ 
+          padding: '3px 8px', 
+          borderRadius: '4px', 
+          background: bg, 
+          color: color, 
+          border: `1px solid ${border}`,
+          fontSize: '0.8rem', 
+          fontWeight: 700,
+          display: 'inline-block'
+        }}>
+          {method || 'COD'}
+        </span>
+        {trxId && (
+          <div style={{ marginTop: '4px', fontSize: '0.75rem', fontFamily: 'monospace', color: 'var(--color-accent, #5e0f2b)', fontWeight: 600 }}>
+            TrxID: {trxId}
+          </div>
+        )}
+        {sender && (
+          <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)' }}>
+            From: {sender}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div>
       <div className={styles.dashboardHeader}>
         <h1 className={styles.dashboardTitle}>Order Management</h1>
+        <div style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)' }}>
+          Total Orders: <strong>{orders.length}</strong>
+        </div>
       </div>
       <div className={styles.tableContainer}>
         <table className={styles.table}>
@@ -72,7 +120,7 @@ const AdminOrders = () => {
             <tr>
               <th>Order ID</th>
               <th>Customer</th>
-              <th>Items</th>
+              <th>Payment & TrxID</th>
               <th>Total</th>
               <th>Status</th>
               <th>Action</th>
@@ -84,49 +132,83 @@ const AdminOrders = () => {
             ) : (
               orders.map(order => (
                 <tr key={order._id}>
-                  <td>#{order.customId ? order.customId : (order._id ? String(order._id).substring(0, 8).toUpperCase() : 'N/A')}</td>
-                  <td>{order.user?.name || 'Unknown'}</td>
-                  <td>{order.orderItems?.length || 0}</td>
-                  <td>৳{order.totalPrice}</td>
+                  <td>
+                    <strong>#{order.customId ? order.customId : (order._id ? String(order._id).substring(0, 8).toUpperCase() : 'N/A')}</strong>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)' }}>
+                      {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : ''}
+                    </div>
+                  </td>
+                  <td>
+                    <div style={{ fontWeight: 600 }}>{order.shippingAddress?.fullName || order.user?.name || 'Customer'}</div>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>
+                      {order.shippingAddress?.phone || order.user?.phone || 'No phone'}
+                    </div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)' }}>
+                      {order.shippingAddress?.district || ''}{order.shippingAddress?.city ? `, ${order.shippingAddress.city}` : ''}
+                    </div>
+                  </td>
+                  <td>
+                    {getPaymentBadge(order.paymentMethod, order.transactionId, order.senderNumber)}
+                  </td>
+                  <td>
+                    <div style={{ fontWeight: 700, fontSize: '0.95rem' }}>৳{order.totalPrice}</div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)' }}>
+                      {order.orderItems?.length || 0} items
+                    </div>
+                  </td>
                   <td>
                     <span style={{ 
-                      color: order.status === 'Delivered' ? 'var(--color-success)' : 'var(--color-text-secondary)', 
-                      fontWeight: 600 
+                      display: 'inline-block',
+                      padding: '2px 8px',
+                      borderRadius: '4px',
+                      fontSize: '0.8rem',
+                      fontWeight: 600,
+                      marginBottom: '4px',
+                      background: order.status === 'Delivered' ? '#dcfce7' : order.status === 'Cancelled' ? '#fee2e2' : '#fef9c3',
+                      color: order.status === 'Delivered' ? '#166534' : order.status === 'Cancelled' ? '#991b1b' : '#854d0e',
                     }}>
                       {order.status || (order.isPaid ? 'Paid' : 'Pending')}
                     </span>
                   </td>
                   <td>
-                    <select 
-                      value={order.status || 'Pending'} 
-                      onChange={async (e) => {
-                        const newStatus = e.target.value;
-                        try {
-                          await axios.put(`/api/orders/${order._id}/status`, { status: newStatus }, getAuthConfig());
-                          Swal.fire('Success', 'Order status updated', 'success');
-                          // update local state
-                          setOrders(orders.map(o => o._id === order._id ? { ...o, status: newStatus } : o));
-                        } catch (error) {
-                          Swal.fire('Error', 'Failed to update status', 'error');
-                        }
-                      }}
-                      style={{ padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', outline: 'none', cursor: 'pointer' }}
-                    >
-                      <option value="Pending">Pending</option>
-                      <option value="Confirmed">Confirmed</option>
-                      <option value="Processing">Processing</option>
-                      <option value="Shipped">Shipped</option>
-                      <option value="Delivered">Delivered</option>
-                      <option value="Cancelled">Cancelled</option>
-                      <option value="Returned">Returned</option>
-                    </select>
-                    <button 
-                      onClick={() => handleDeleteOrder(order._id)}
-                      style={{ padding: '6px', marginLeft: '10px', background: '#fee2e2', color: '#dc2626', borderRadius: '4px', border: '1px solid #f87171', cursor: 'pointer', display: 'inline-flex', alignItems: 'center' }}
-                      title="Delete Order"
-                    >
-                      <Trash2 size={16} />
-                    </button>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <select 
+                        value={order.status || 'Pending'} 
+                        onChange={async (e) => {
+                          const newStatus = e.target.value;
+                          try {
+                            await axios.put(`/api/orders/${order._id}/status`, { status: newStatus }, getAuthConfig());
+                            Swal.fire({ title: 'Success', text: 'Order status updated', icon: 'success', timer: 1500, showConfirmButton: false });
+                            setOrders(orders.map(o => o._id === order._id ? { ...o, status: newStatus } : o));
+                          } catch (error) {
+                            Swal.fire('Error', 'Failed to update status', 'error');
+                          }
+                        }}
+                        style={{ padding: '6px', borderRadius: '4px', border: '1px solid var(--color-border)', outline: 'none', cursor: 'pointer', fontSize: '0.85rem' }}
+                      >
+                        <option value="Pending">Pending</option>
+                        <option value="Confirmed">Confirmed</option>
+                        <option value="Processing">Processing</option>
+                        <option value="Shipped">Shipped</option>
+                        <option value="Delivered">Delivered</option>
+                        <option value="Cancelled">Cancelled</option>
+                        <option value="Returned">Returned</option>
+                      </select>
+                      <button 
+                        onClick={() => setSelectedOrder(order)}
+                        style={{ padding: '6px 8px', background: 'var(--color-surface-hover, #f3f4f6)', color: 'var(--color-text-primary)', borderRadius: '4px', border: '1px solid var(--color-border)', cursor: 'pointer', display: 'inline-flex', alignItems: 'center' }}
+                        title="View Full Details"
+                      >
+                        <Eye size={15} />
+                      </button>
+                      <button 
+                        onClick={() => handleDeleteOrder(order._id)}
+                        style={{ padding: '6px 8px', background: '#fee2e2', color: '#dc2626', borderRadius: '4px', border: '1px solid #f87171', cursor: 'pointer', display: 'inline-flex', alignItems: 'center' }}
+                        title="Delete Order"
+                      >
+                        <Trash2 size={15} />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))
@@ -134,6 +216,127 @@ const AdminOrders = () => {
           </tbody>
         </table>
       </div>
+
+      {/* Order Details Modal */}
+      {selectedOrder && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          zIndex: 1000, padding: '20px'
+        }}>
+          <div style={{
+            background: 'var(--color-background, #fff)',
+            borderRadius: '10px',
+            maxWidth: '650px',
+            width: '100%',
+            maxHeight: '90vh',
+            overflowY: 'auto',
+            padding: '24px',
+            boxShadow: '0 20px 25px -5px rgba(0,0,0,0.2)'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--color-border)', paddingBottom: '14px', marginBottom: '16px' }}>
+              <div>
+                <h2 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0 }}>
+                  Order #{selectedOrder.customId || selectedOrder._id}
+                </h2>
+                <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginTop: '4px' }}>
+                  Placed on {new Date(selectedOrder.createdAt).toLocaleString()}
+                </div>
+              </div>
+              <button onClick={() => setSelectedOrder(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}>
+                <X size={22} />
+              </button>
+            </div>
+
+            {/* Payment & Transaction Card */}
+            <div style={{ background: 'var(--color-surface, #f9fafb)', padding: '16px', borderRadius: '8px', marginBottom: '18px', border: '1px solid var(--color-border)' }}>
+              <h3 style={{ fontSize: '0.95rem', fontWeight: 600, marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <CreditCard size={18} color="var(--color-accent, #5e0f2b)" /> Payment Information
+              </h3>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '10px', fontSize: '0.85rem' }}>
+                <div>
+                  <span style={{ color: 'var(--color-text-secondary)' }}>Method: </span>
+                  <strong>{selectedOrder.paymentMethod || 'COD'}</strong>
+                </div>
+                {selectedOrder.senderNumber && (
+                  <div>
+                    <span style={{ color: 'var(--color-text-secondary)' }}>Sender Number: </span>
+                    <strong style={{ color: '#2563eb' }}>{selectedOrder.senderNumber}</strong>
+                  </div>
+                )}
+                {selectedOrder.transactionId && (
+                  <div>
+                    <span style={{ color: 'var(--color-text-secondary)' }}>TrxID: </span>
+                    <strong style={{ color: '#db2777', fontFamily: 'monospace' }}>{selectedOrder.transactionId}</strong>
+                  </div>
+                )}
+                {selectedOrder.advanceAmount > 0 && (
+                  <div>
+                    <span style={{ color: 'var(--color-text-secondary)' }}>Advance Paid: </span>
+                    <strong style={{ color: '#16a34a' }}>৳{selectedOrder.advanceAmount}</strong>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Customer & Shipping */}
+            <div style={{ background: 'var(--color-surface, #f9fafb)', padding: '16px', borderRadius: '8px', marginBottom: '18px', border: '1px solid var(--color-border)' }}>
+              <h3 style={{ fontSize: '0.95rem', fontWeight: 600, marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <MapPin size={18} color="var(--color-accent, #5e0f2b)" /> Customer & Delivery Address
+              </h3>
+              <div style={{ fontSize: '0.85rem', lineHeight: '1.6' }}>
+                <div><strong>Name:</strong> {selectedOrder.shippingAddress?.fullName || selectedOrder.user?.name}</div>
+                <div><strong>Phone:</strong> {selectedOrder.shippingAddress?.phone || selectedOrder.user?.phone}</div>
+                <div><strong>Address:</strong> {selectedOrder.shippingAddress?.street}, {selectedOrder.shippingAddress?.city}, {selectedOrder.shippingAddress?.district}, {selectedOrder.shippingAddress?.region}</div>
+              </div>
+            </div>
+
+            {/* Ordered Items */}
+            <div style={{ marginBottom: '18px' }}>
+              <h3 style={{ fontSize: '0.95rem', fontWeight: 600, marginBottom: '10px' }}>Items ({selectedOrder.orderItems?.length || 0})</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxHeight: '200px', overflowY: 'auto' }}>
+                {selectedOrder.orderItems?.map((item, idx) => (
+                  <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '8px', background: 'var(--color-surface, #f9fafb)', borderRadius: '6px' }}>
+                    <img src={item.image} alt={item.name} style={{ width: '45px', height: '55px', objectFit: 'cover', borderRadius: '4px' }} />
+                    <div style={{ flex: 1, fontSize: '0.85rem' }}>
+                      <div style={{ fontWeight: 600 }}>{item.name}</div>
+                      <div style={{ color: 'var(--color-text-secondary)', fontSize: '0.8rem' }}>
+                        {item.color && `Color: ${item.color}`} {item.size && ` | Size: ${item.size}`}
+                      </div>
+                    </div>
+                    <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>
+                      {item.qty} × ৳{item.price} = ৳{item.qty * item.price}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Financial Summary */}
+            <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: '12px', fontSize: '0.85rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                <span>Subtotal:</span>
+                <span>৳{selectedOrder.itemsPrice}</span>
+              </div>
+              {selectedOrder.discountAmount > 0 && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', color: '#16a34a' }}>
+                  <span>Discount {selectedOrder.couponCode ? `(${selectedOrder.couponCode})` : ''}:</span>
+                  <span>-৳{selectedOrder.discountAmount}</span>
+                </div>
+              )}
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                <span>Shipping Charge:</span>
+                <span>৳{selectedOrder.shippingPrice}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700, fontSize: '1.05rem', marginTop: '6px', borderTop: '1px dashed var(--color-border)', paddingTop: '6px' }}>
+                <span>Grand Total:</span>
+                <span style={{ color: 'var(--color-brand-maroon, #5e0f2b)' }}>৳{selectedOrder.totalPrice}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -459,6 +662,43 @@ export const AdminSettings = () => {
     setSettings({ ...settings, [field]: newArray });
   };
 
+  const handlePaymentMethodChange = (index, key, value) => {
+    const methods = [...(settings.paymentSettings?.advancePaymentMethods || [])];
+    methods[index] = { ...methods[index], [key]: value };
+    handleNestedChange('paymentSettings', 'advancePaymentMethods', methods);
+  };
+
+  const handleAddPaymentMethod = (preset = 'bKash') => {
+    const methods = [...(settings.paymentSettings?.advancePaymentMethods || [])];
+    let defaultType = 'Personal (Send Money)';
+    let defaultInstructions = `Send Money to this ${preset} number and enter your Transaction ID below.`;
+    
+    if (preset === 'Nagad') {
+      defaultInstructions = 'Send Money to this Nagad number and enter your Transaction ID below.';
+    } else if (preset === 'Rocket') {
+      defaultInstructions = 'Send Money to this Rocket number and enter your Transaction ID below.';
+    } else if (preset === 'Bank Transfer') {
+      defaultType = 'Bank Account';
+      defaultInstructions = 'Transfer to this Bank Account and provide Transaction / Reference ID.';
+    }
+
+    const newMethod = {
+      id: 'method_' + Date.now(),
+      name: preset,
+      number: '',
+      type: defaultType,
+      instructions: defaultInstructions,
+      isActive: true
+    };
+    handleNestedChange('paymentSettings', 'advancePaymentMethods', [...methods, newMethod]);
+  };
+
+  const handleRemovePaymentMethod = (index) => {
+    const methods = [...(settings.paymentSettings?.advancePaymentMethods || [])];
+    methods.splice(index, 1);
+    handleNestedChange('paymentSettings', 'advancePaymentMethods', methods);
+  };
+
   const handleImageUpload = (e, field, isNested = false, parent = null) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -688,16 +928,209 @@ export const AdminSettings = () => {
       </div>
 
       <div style={sectionStyle}>
-        <h3>Payment Settings</h3>
-        <label style={labelStyle}>Advance Payment Method</label>
-        <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginBottom: '8px' }}>E.g. bKash (Send Money), Nagad (Cash Out)</p>
-        <input type="text" value={settings.paymentSettings?.advancePaymentMethod || ''} onChange={(e) => handleNestedChange('paymentSettings', 'advancePaymentMethod', e.target.value)} style={inputStyle} />
-        
-        <label style={labelStyle}>Advance Payment Number (If Applicable)</label>
-        <input type="text" value={settings.paymentSettings?.advancePaymentNumber || ''} onChange={(e) => handleNestedChange('paymentSettings', 'advancePaymentNumber', e.target.value)} style={inputStyle} />
-        
-        <label style={labelStyle}>Delivery Charge (৳)</label>
-        <input type="number" value={settings.paymentSettings?.deliveryCharge ?? 120} onChange={(e) => handleNestedChange('paymentSettings', 'deliveryCharge', Number(e.target.value))} style={inputStyle} />
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+          <div>
+            <h3 style={{ margin: 0 }}>Payment Settings & Advance Payment Methods</h3>
+            <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', margin: '4px 0 0 0' }}>
+              Control Delivery Charges, Free Delivery threshold, and dynamic Advance Payment accounts (bKash, Nagad, Rocket, etc.).
+            </p>
+          </div>
+        </div>
+
+        {/* Zone Delivery Charges */}
+        <h4 style={{ margin: '15px 0 10px 0', fontSize: '1rem', borderBottom: '1px solid var(--color-border)', paddingBottom: '6px' }}>
+          Delivery Charges by Zone (৳)
+        </h4>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px', marginBottom: '20px' }}>
+          <div>
+            <label style={labelStyle}>Inside Dhaka (৳)</label>
+            <input 
+              type="number" 
+              value={settings.paymentSettings?.deliveryChargeInsideDhaka ?? 70} 
+              onChange={(e) => handleNestedChange('paymentSettings', 'deliveryChargeInsideDhaka', Number(e.target.value))} 
+              style={{ ...inputStyle, marginBottom: 0 }} 
+            />
+          </div>
+          <div>
+            <label style={labelStyle}>Sub Dhaka (৳)</label>
+            <input 
+              type="number" 
+              value={settings.paymentSettings?.deliveryChargeSubDhaka ?? 100} 
+              onChange={(e) => handleNestedChange('paymentSettings', 'deliveryChargeSubDhaka', Number(e.target.value))} 
+              style={{ ...inputStyle, marginBottom: 0 }} 
+            />
+          </div>
+          <div>
+            <label style={labelStyle}>Outside Dhaka (৳)</label>
+            <input 
+              type="number" 
+              value={settings.paymentSettings?.deliveryChargeOutsideDhaka ?? 120} 
+              onChange={(e) => handleNestedChange('paymentSettings', 'deliveryChargeOutsideDhaka', Number(e.target.value))} 
+              style={{ ...inputStyle, marginBottom: 0 }} 
+            />
+          </div>
+          <div>
+            <label style={labelStyle}>Free Shipping Threshold (৳)</label>
+            <input 
+              type="number" 
+              value={settings.paymentSettings?.freeShippingThreshold ?? 5000} 
+              onChange={(e) => handleNestedChange('paymentSettings', 'freeShippingThreshold', Number(e.target.value))} 
+              style={{ ...inputStyle, marginBottom: 0 }} 
+            />
+          </div>
+        </div>
+
+        {/* Advance Payment Options Manager */}
+        <h4 style={{ margin: '20px 0 10px 0', fontSize: '1rem', borderBottom: '1px solid var(--color-border)', paddingBottom: '6px' }}>
+          Advance Payment Methods Management
+        </h4>
+
+        <div style={{ display: 'flex', gap: '20px', alignItems: 'center', marginBottom: '16px', background: 'var(--color-background)', padding: '12px 16px', borderRadius: '6px', border: '1px solid var(--color-border)' }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontWeight: 600, fontSize: '0.95rem' }}>
+            <input 
+              type="checkbox" 
+              checked={settings.paymentSettings?.isAdvancePaymentEnabled !== false} 
+              onChange={(e) => handleNestedChange('paymentSettings', 'isAdvancePaymentEnabled', e.target.checked)}
+              style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+            />
+            <span>Enable Advance Payment Options</span>
+          </label>
+          <span style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>
+            (When enabled, customers can choose between Advance Payment and Cash on Delivery)
+          </span>
+        </div>
+
+        {/* Quick Add Presets */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: '14px' }}>
+          <div style={{ fontSize: '0.9rem', fontWeight: 600 }}>Active Payment Accounts:</div>
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+            <button 
+              type="button" 
+              onClick={() => handleAddPaymentMethod('bKash')} 
+              style={{ padding: '6px 12px', background: '#fdf2f8', color: '#db2777', border: '1px solid #fbcfe8', borderRadius: '4px', cursor: 'pointer', fontWeight: 600, fontSize: '0.8rem' }}
+            >
+              + Add bKash
+            </button>
+            <button 
+              type="button" 
+              onClick={() => handleAddPaymentMethod('Nagad')} 
+              style={{ padding: '6px 12px', background: '#fff7ed', color: '#ea580c', border: '1px solid #ffedd5', borderRadius: '4px', cursor: 'pointer', fontWeight: 600, fontSize: '0.8rem' }}
+            >
+              + Add Nagad
+            </button>
+            <button 
+              type="button" 
+              onClick={() => handleAddPaymentMethod('Rocket')} 
+              style={{ padding: '6px 12px', background: '#faf5ff', color: '#9333ea', border: '1px solid #f3e8ff', borderRadius: '4px', cursor: 'pointer', fontWeight: 600, fontSize: '0.8rem' }}
+            >
+              + Add Rocket
+            </button>
+            <button 
+              type="button" 
+              onClick={() => handleAddPaymentMethod('Custom')} 
+              style={{ padding: '6px 12px', background: 'var(--color-brand-maroon, #5e0f2b)', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 600, fontSize: '0.8rem' }}
+            >
+              + Custom Method
+            </button>
+          </div>
+        </div>
+
+        {/* Method Cards */}
+        {(!settings.paymentSettings?.advancePaymentMethods || settings.paymentSettings.advancePaymentMethods.length === 0) ? (
+          <div style={{ padding: '16px', background: '#fefce8', border: '1px dashed #fef08a', borderRadius: '6px', color: '#854d0e', fontSize: '0.9rem', marginBottom: '15px' }}>
+            💡 <strong>No advance payment methods active.</strong> The Checkout page will show only <strong>Cash on Delivery (COD)</strong> with the delivery charges.
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginBottom: '15px' }}>
+            {settings.paymentSettings.advancePaymentMethods.map((method, idx) => (
+              <div key={idx} style={{ background: 'var(--color-background)', border: '1px solid var(--color-border)', borderRadius: '6px', padding: '16px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ 
+                      padding: '3px 10px', 
+                      borderRadius: '4px', 
+                      background: method.name?.toLowerCase().includes('bkash') ? '#fdf2f8' : method.name?.toLowerCase().includes('nagad') ? '#fff7ed' : '#f3f4f6',
+                      color: method.name?.toLowerCase().includes('bkash') ? '#db2777' : method.name?.toLowerCase().includes('nagad') ? '#ea580c' : '#374151',
+                      fontWeight: 700, 
+                      fontSize: '0.85rem' 
+                    }}>
+                      {method.name || 'Custom Method'}
+                    </span>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>
+                      #{idx + 1}
+                    </span>
+                  </div>
+                  <button 
+                    type="button" 
+                    onClick={() => handleRemovePaymentMethod(idx)} 
+                    style={{ padding: '6px 10px', background: '#fee2e2', color: '#dc2626', border: '1px solid #fca5a5', borderRadius: '4px', cursor: 'pointer' }}
+                    title="Delete Method"
+                  >
+                    <Trash2 size={15} />
+                  </button>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px', marginBottom: '12px' }}>
+                  <div>
+                    <label style={{ fontSize: '0.8rem', fontWeight: 600, display: 'block', marginBottom: '4px' }}>Method / Provider Name</label>
+                    <input 
+                      type="text" 
+                      value={method.name || ''} 
+                      onChange={(e) => handlePaymentMethodChange(idx, 'name', e.target.value)} 
+                      placeholder="e.g. bKash, Nagad" 
+                      style={{ ...inputStyle, marginBottom: 0 }} 
+                    />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '0.8rem', fontWeight: 600, display: 'block', marginBottom: '4px' }}>Account / Phone Number</label>
+                    <input 
+                      type="text" 
+                      value={method.number || ''} 
+                      onChange={(e) => handlePaymentMethodChange(idx, 'number', e.target.value)} 
+                      placeholder="e.g. 01700000000" 
+                      style={{ ...inputStyle, marginBottom: 0, fontWeight: 600 }} 
+                    />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '0.8rem', fontWeight: 600, display: 'block', marginBottom: '4px' }}>Account Type</label>
+                    <select 
+                      value={method.type || 'Personal (Send Money)'} 
+                      onChange={(e) => handlePaymentMethodChange(idx, 'type', e.target.value)} 
+                      style={{ ...inputStyle, marginBottom: 0 }}
+                    >
+                      <option value="Personal (Send Money)">Personal (Send Money)</option>
+                      <option value="Merchant (Payment)">Merchant (Payment)</option>
+                      <option value="Agent (Cash In)">Agent (Cash In)</option>
+                      <option value="Bank Account">Bank Account</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '0.8rem', fontWeight: 600, display: 'block', marginBottom: '4px' }}>Status</label>
+                    <select 
+                      value={method.isActive ? 'active' : 'inactive'} 
+                      onChange={(e) => handlePaymentMethodChange(idx, 'isActive', e.target.value === 'active')} 
+                      style={{ ...inputStyle, marginBottom: 0, color: method.isActive ? '#16a34a' : '#ef4444', fontWeight: 600 }}
+                    >
+                      <option value="active">Active</option>
+                      <option value="inactive">Inactive</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label style={{ fontSize: '0.8rem', fontWeight: 600, display: 'block', marginBottom: '4px' }}>Customer Instructions</label>
+                  <input 
+                    type="text" 
+                    value={method.instructions || ''} 
+                    onChange={(e) => handlePaymentMethodChange(idx, 'instructions', e.target.value)} 
+                    placeholder="Instructions for customer when sending money..." 
+                    style={{ ...inputStyle, marginBottom: 0, fontSize: '0.85rem' }} 
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <div style={sectionStyle}>

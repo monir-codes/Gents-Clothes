@@ -19,19 +19,82 @@ const getSettings = async (req, res) => {
             description: '10% Discount on First Purchase',
             minOrderAmount: 0
           }
-        ]
-      });
-    } else if (!settings.coupons || settings.coupons.length === 0) {
-      settings.coupons = [
-        {
-          code: 'RONGGOBOTI10',
-          discountPercentage: 10,
-          isActive: true,
-          description: '10% Discount on First Purchase',
-          minOrderAmount: 0
+        ],
+        paymentSettings: {
+          deliveryChargeInsideDhaka: 70,
+          deliveryChargeSubDhaka: 100,
+          deliveryChargeOutsideDhaka: 120,
+          freeShippingThreshold: 5000,
+          isAdvancePaymentEnabled: true,
+          advanceChargeType: 'deliveryCharge',
+          fixedAdvanceAmount: 120,
+          advancePaymentMethods: [
+            {
+              id: 'bkash_default',
+              name: 'bKash',
+              number: '01700000000',
+              type: 'Personal (Send Money)',
+              instructions: 'Send Money to this bKash number and provide your Transaction ID below.',
+              isActive: true
+            },
+            {
+              id: 'nagad_default',
+              name: 'Nagad',
+              number: '01800000000',
+              type: 'Personal (Send Money)',
+              instructions: 'Send Money to this Nagad number and provide your Transaction ID below.',
+              isActive: true
+            }
+          ]
         }
-      ];
-      await settings.save();
+      });
+    } else {
+      let needsSave = false;
+      if (!settings.coupons || settings.coupons.length === 0) {
+        settings.coupons = [
+          {
+            code: 'RONGGOBOTI10',
+            discountPercentage: 10,
+            isActive: true,
+            description: '10% Discount on First Purchase',
+            minOrderAmount: 0
+          }
+        ];
+        needsSave = true;
+      }
+      if (!settings.paymentSettings) {
+        settings.paymentSettings = {
+          deliveryChargeInsideDhaka: 70,
+          deliveryChargeSubDhaka: 100,
+          deliveryChargeOutsideDhaka: 120,
+          freeShippingThreshold: 5000,
+          isAdvancePaymentEnabled: true,
+          advanceChargeType: 'deliveryCharge',
+          fixedAdvanceAmount: 120,
+          advancePaymentMethods: [
+            {
+              id: 'bkash_default',
+              name: 'bKash',
+              number: '01700000000',
+              type: 'Personal (Send Money)',
+              instructions: 'Send Money to this bKash number and provide your Transaction ID below.',
+              isActive: true
+            },
+            {
+              id: 'nagad_default',
+              name: 'Nagad',
+              number: '01800000000',
+              type: 'Personal (Send Money)',
+              instructions: 'Send Money to this Nagad number and provide your Transaction ID below.',
+              isActive: true
+            }
+          ]
+        };
+        needsSave = true;
+      }
+      if (needsSave) {
+        await settings.save();
+      }
     }
     res.json(settings);
   } catch (error) {

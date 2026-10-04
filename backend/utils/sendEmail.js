@@ -80,6 +80,9 @@ const sendOrderNotificationEmail = async (adminEmail, orderData) => {
           <li><strong>Order ID:</strong> ${orderData.customId || orderData._id}</li>
           <li><strong>Total Amount:</strong> ৳${orderData.totalPrice}</li>
           <li><strong>Payment Method:</strong> ${orderData.paymentMethod}</li>
+          ${orderData.senderNumber ? `<li><strong>Sender Number:</strong> ${orderData.senderNumber}</li>` : ''}
+          ${orderData.transactionId ? `<li><strong>Transaction ID (TrxID):</strong> <span style="color: #e11d48; font-weight: bold;">${orderData.transactionId}</span></li>` : ''}
+          ${orderData.advanceAmount ? `<li><strong>Advance Paid:</strong> ৳${orderData.advanceAmount}</li>` : ''}
         </ul>
         <p style="color: #777; font-size: 14px; margin-top: 20px;">Please check the admin dashboard for more details.</p>
       </div>

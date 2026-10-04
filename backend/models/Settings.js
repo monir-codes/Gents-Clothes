@@ -125,6 +125,23 @@ const settingsSchema = mongoose.Schema(
       terms: { type: String, default: '<p>This is the standard Terms of Service document. For full legal text, please refer to our official terms.</p>' }
     },
     paymentSettings: {
+      deliveryChargeInsideDhaka: { type: Number, default: 70 },
+      deliveryChargeSubDhaka: { type: Number, default: 100 },
+      deliveryChargeOutsideDhaka: { type: Number, default: 120 },
+      freeShippingThreshold: { type: Number, default: 5000 },
+      isAdvancePaymentEnabled: { type: Boolean, default: true },
+      advanceChargeType: { type: String, default: 'deliveryCharge' }, // 'deliveryCharge' | 'full' | 'fixed'
+      fixedAdvanceAmount: { type: Number, default: 120 },
+      advancePaymentMethods: [
+        {
+          id: { type: String },
+          name: { type: String, required: true }, // e.g. bKash, Nagad, Rocket, Upay, Bank Transfer
+          number: { type: String, required: true },
+          type: { type: String, default: 'Personal' }, // Personal, Merchant, Agent
+          instructions: { type: String, default: '' },
+          isActive: { type: Boolean, default: true }
+        }
+      ],
       advancePaymentMethod: { type: String, default: 'bKash (Send Money)' },
       advancePaymentNumber: { type: String, default: '01700000000' },
       deliveryCharge: { type: Number, default: 120 }
