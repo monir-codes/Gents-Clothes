@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
@@ -14,6 +14,15 @@ import ProductCard from '../components/ProductCard';
 import SEO from '../components/SEO';
 import Loader from '../components/Loader';
 import styles from './Home.module.css';
+
+// Function to find and filter the lowest price / budget-friendly products
+const getMostAffordableProducts = (productList, limit = 4) => {
+  if (!Array.isArray(productList) || productList.length === 0) return [];
+  return [...productList]
+    .filter(p => p && typeof p.price === 'number' && p.price > 0)
+    .sort((a, b) => a.price - b.price)
+    .slice(0, limit);
+};
 
 const Home = () => {
   const [settings, setSettings] = useState({
@@ -71,6 +80,11 @@ const Home = () => {
     };
     fetchSettingsAndProducts();
   }, []);
+
+  // Compute lowest priced products dynamically
+  const affordableProducts = useMemo(() => {
+    return getMostAffordableProducts(products, 4);
+  }, [products]);
 
   const handleNewsletterSubmit = async (e) => {
     e.preventDefault();
@@ -333,34 +347,36 @@ const Home = () => {
         </section>
       )}
 
-      {/* Customer Reviews */}
-      {settings.reviews && settings.reviews.length > 0 && (
+      {/* Pocket Friendly / Best Value Deals Section (Lowest Price Products) */}
+      {affordableProducts && affordableProducts.length > 0 && (
         <section className="container" style={{ padding: 'var(--space-8) var(--space-4)' }}>
-          <motion.h2 
-            className={styles.sectionTitle}
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 0.5 }}
+            style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 'var(--space-6)' }}
           >
-            What Our Customers Say
-          </motion.h2>
-          <div className={styles.reviewsGrid}>
-            {settings.reviews.slice(0, 3).map((review, i) => (
+            <div>
+              <h2 className={styles.sectionTitle} style={{ margin: '0 0 6px 0' }}>Pocket Friendly Finds</h2>
+              <p style={{ margin: 0, color: 'var(--color-text-secondary)', fontSize: '0.95rem' }}>
+                Explore our best-loved luxury styles at our most affordable prices.
+              </p>
+            </div>
+            <Link to="/shop" style={{ color: 'var(--color-accent)', fontWeight: 600, fontSize: '0.95rem', textDecoration: 'underline', whiteSpace: 'nowrap' }}>
+              View All Deals &rarr;
+            </Link>
+          </motion.div>
+          <div className={styles.productGrid}>
+            {affordableProducts.map((p, i) => (
               <motion.div 
-                key={i} 
-                className={styles.reviewCard}
+                key={p._id + '-budget'} 
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.1, duration: 0.4 }}
-                whileHover={{ y: -5, boxShadow: "0 10px 30px rgba(0,0,0,0.08)" }}
+                transition={{ delay: (i % 4) * 0.1, duration: 0.4 }}
               >
-                <div className={styles.reviewStars}>
-                  {'★'.repeat(review.rating || 5)}{'☆'.repeat(5 - (review.rating || 5))}
-                </div>
-                <p className={styles.reviewText}>"{review.text}"</p>
-                <h4 style={{ fontWeight: 600 }}>- {review.author}</h4>
+                <ProductCard product={p} />
               </motion.div>
             ))}
           </div>
