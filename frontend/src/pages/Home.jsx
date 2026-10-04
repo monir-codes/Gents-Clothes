@@ -240,10 +240,15 @@ const Home = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 0.5 }}
-          style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 'var(--space-6)' }}
+          className={styles.sectionHeader}
         >
-          <h2 className={styles.sectionTitle} style={{ margin: 0 }}>New Arrivals</h2>
-          <Link to="/new-arrival" style={{ color: 'var(--color-accent)', fontWeight: 600, fontSize: '0.95rem', textDecoration: 'underline' }}>
+          <div className={styles.sectionHeaderTitleGroup}>
+            <h2 className={styles.sectionTitleLeft}>New Arrivals</h2>
+            <p className={styles.sectionSubtitle}>
+              Freshly handcrafted additions to our signature collections.
+            </p>
+          </div>
+          <Link to="/new-arrival" className={styles.viewAllLink}>
             View All &rarr;
           </Link>
         </motion.div>
@@ -325,8 +330,8 @@ const Home = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.1 }}
             >
-              <h3 style={{ fontSize: '2rem', marginBottom: 'var(--space-4)' }}>{settings.shopTheLook.title}</h3>
-              <p style={{ color: 'var(--color-text-secondary)', marginBottom: 'var(--space-4)', lineHeight: 1.6 }}>
+              <h3 className={styles.lookTitle}>{settings.shopTheLook.title}</h3>
+              <p className={styles.lookSubtitle}>
                 {settings.shopTheLook.subtitle}
               </p>
               <div className={styles.productGrid} style={{ gridTemplateColumns: '1fr 1fr' }}>
@@ -355,15 +360,15 @@ const Home = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 0.5 }}
-            style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 'var(--space-6)' }}
+            className={styles.sectionHeader}
           >
-            <div>
-              <h2 className={styles.sectionTitle} style={{ margin: '0 0 6px 0' }}>Pocket Friendly Finds</h2>
-              <p style={{ margin: 0, color: 'var(--color-text-secondary)', fontSize: '0.95rem' }}>
+            <div className={styles.sectionHeaderTitleGroup}>
+              <h2 className={styles.sectionTitleLeft}>Pocket Friendly Finds</h2>
+              <p className={styles.sectionSubtitle}>
                 Explore our best-loved luxury styles at our most affordable prices.
               </p>
             </div>
-            <Link to="/shop" style={{ color: 'var(--color-accent)', fontWeight: 600, fontSize: '0.95rem', textDecoration: 'underline', whiteSpace: 'nowrap' }}>
+            <Link to="/shop" className={styles.viewAllLink}>
               View All Deals &rarr;
             </Link>
           </motion.div>
@@ -392,10 +397,10 @@ const Home = () => {
         transition={{ duration: 0.5 }}
       >
         <div className="container">
-          <h2 style={{ fontSize: '2rem', marginBottom: 'var(--space-2)' }}>
+          <h2 className={styles.newsletterTitle}>
             {settings.newsletter?.title || 'Join the রঙবতী Inner Circle'}
           </h2>
-          <p style={{ marginBottom: 'var(--space-6)', color: 'rgba(255,255,255,0.85)' }}>
+          <p className={styles.newsletterSubtitle}>
             {settings.newsletter?.subtitle || 'Subscribe to receive priority access to new saree collections, luxury pret launches, and private offers.'}
           </p>
           <form className={styles.newsletterInputGroup} onSubmit={handleNewsletterSubmit}>

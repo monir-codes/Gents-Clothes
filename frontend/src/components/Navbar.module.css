@@ -243,9 +243,13 @@
 }
 
 @media (max-width: 768px) {
+  .navContainer {
+    height: 68px;
+  }
+
   .logoImg {
-    height: 44px;
-    max-width: 170px;
+    height: 42px;
+    max-width: 160px;
   }
 
   .logo {
@@ -256,5 +260,24 @@
   
   .navIcons {
     gap: var(--space-2);
+  }
+}
+
+@media (max-width: 480px) {
+  .navContainer {
+    height: 60px;
+  }
+
+  .logoImg {
+    height: 36px;
+    max-width: 135px;
+  }
+
+  .navIcons {
+    gap: 8px;
+  }
+
+  .iconBtn {
+    font-size: 1.15rem;
   }
 }

@@ -307,19 +307,35 @@
 }
 
 @media (max-width: 768px) {
+  .productContainer {
+    padding-top: var(--space-2);
+    padding-bottom: var(--space-6);
+  }
   .mainSection {
     flex-direction: column;
+    gap: var(--space-4);
+    margin-bottom: var(--space-6);
   }
   .gallery {
     width: 100%;
     position: relative;
     top: auto;
+    gap: var(--space-2);
+  }
+  .mainImageContainer {
+    max-height: 52vh;
+  }
+  .thumbnail {
+    width: 64px;
+    height: 82px;
   }
   .info {
     width: 100%;
+    padding-top: 0;
   }
   .title {
-    font-size: 1.5rem;
+    font-size: 1.45rem;
+    line-height: 1.25;
   }
   .actionContainer {
     flex-wrap: wrap;
@@ -329,19 +345,34 @@
     flex: 1 1 100%;
     order: 3;
     width: 100%;
+    height: 48px;
+    font-size: 0.95rem;
   }
   .qtyBox {
     flex: 1;
     min-width: 120px;
+    height: 48px;
     justify-content: space-between;
   }
   .wishlistBtn {
-    flex: 1;
+    flex: 0 0 48px;
+    height: 48px;
   }
   .trustBadges {
-    flex-wrap: wrap;
+    gap: var(--space-2);
+    padding: var(--space-3);
+  }
+  .trustItem {
+    font-size: 0.75rem;
   }
   .tabHeaders {
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: var(--space-3);
+    padding-bottom: 4px;
+  }
+  .tabHeader {
+    font-size: 0.95rem;
+    white-space: nowrap;
   }
 }

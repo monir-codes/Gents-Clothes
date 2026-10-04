@@ -228,6 +228,17 @@
 }
 
 @media (max-width: 768px) {
+  .footer {
+    padding-top: var(--space-5);
+  }
+  .footerContent {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+  .footerLogoImg {
+    height: 44px;
+    max-width: 160px;
+  }
   .bottomBarInner {
     flex-direction: column;
     text-align: center;
