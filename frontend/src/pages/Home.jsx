@@ -383,32 +383,6 @@ const Home = () => {
         </section>
       )}
 
-      {/* Trust & Quality Features */}
-      {settings.features && settings.features.length > 0 && (
-        <section className="container" style={{ padding: 'var(--space-8) var(--space-4)' }}>
-          <div className={styles.featuresGrid}>
-            {settings.features.map((feature, i) => (
-              <motion.div 
-                key={i} 
-                className={styles.featureItem}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1, duration: 0.4 }}
-                whileHover={{ y: -4 }}
-              >
-                {feature.icon === 'Truck' && <Truck size={36} className={styles.featureIcon} />}
-                {feature.icon === 'Shield' && <Shield size={36} className={styles.featureIcon} />}
-                {feature.icon === 'RefreshCw' && <RefreshCw size={36} className={styles.featureIcon} />}
-                {!['Truck', 'Shield', 'RefreshCw'].includes(feature.icon) && <Shield size={36} className={styles.featureIcon} />}
-                <h3 style={{ marginBottom: '6px', fontSize: '1.1rem' }}>{feature.title}</h3>
-                <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>{feature.subtitle}</p>
-              </motion.div>
-            ))}
-          </div>
-        </section>
-      )}
-
       {/* Newsletter Section */}
       <motion.section 
         className={styles.newsletterSection}
