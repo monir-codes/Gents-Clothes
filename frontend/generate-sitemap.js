@@ -2,56 +2,88 @@ import fs from 'fs';
 import path from 'path';
 
 // Using the production API URL to fetch products during build
-const API_URL = 'https://ronggoboti-server.vercel.app/api';
+const API_URLS = [
+  'https://gents-clothes-server.vercel.app/api/products',
+  'https://ronggoboti-server.vercel.app/api/products'
+];
 const BASE_URL = 'https://ronggoboti.vercel.app';
 
 async function generateSitemap() {
-  console.log('Generating sitemap...');
+  console.log('Generating high-performance SEO sitemap...');
   try {
-    // Basic static routes
-    const staticRoutes = [
-      '',
-      '/shop',
-      '/collections',
-      '/about',
-      '/contact',
-      '/faq',
-      '/shipping',
-      '/returns'
+    const today = new Date().toISOString().split('T')[0];
+
+    // Core static & category routes
+    const staticPages = [
+      { route: '', priority: '1.0', changefreq: 'daily' },
+      { route: '/shop', priority: '0.9', changefreq: 'daily' },
+      { route: '/collections', priority: '0.9', changefreq: 'daily' },
+      { route: '/shop?category=Sarees', priority: '0.85', changefreq: 'weekly' },
+      { route: '/shop?category=Salwar+Kameez', priority: '0.85', changefreq: 'weekly' },
+      { route: '/shop?category=Kurtis', priority: '0.85', changefreq: 'weekly' },
+      { route: '/shop?category=Lehengas', priority: '0.85', changefreq: 'weekly' },
+      { route: '/shop?category=Modest+Wear', priority: '0.8', changefreq: 'weekly' },
+      { route: '/shop?category=Co-ord+Sets', priority: '0.8', changefreq: 'weekly' },
+      { route: '/about', priority: '0.7', changefreq: 'monthly' },
+      { route: '/contact', priority: '0.7', changefreq: 'monthly' },
+      { route: '/faq', priority: '0.7', changefreq: 'monthly' },
+      { route: '/shipping', priority: '0.5', changefreq: 'monthly' },
+      { route: '/returns', priority: '0.5', changefreq: 'monthly' },
+      { route: '/size-guide', priority: '0.5', changefreq: 'monthly' },
+      { route: '/privacy', priority: '0.3', changefreq: 'yearly' },
+      { route: '/terms', priority: '0.3', changefreq: 'yearly' }
     ];
 
     let sitemap = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
 `;
 
-    // Add static routes
-    staticRoutes.forEach(route => {
+    // Add static & category routes
+    staticPages.forEach(({ route, priority, changefreq }) => {
       sitemap += `  <url>
     <loc>${BASE_URL}${route}</loc>
-    <changefreq>daily</changefreq>
-    <priority>${route === '' ? '1.0' : '0.8'}</priority>
+    <lastmod>${today}</lastmod>
+    <changefreq>${changefreq}</changefreq>
+    <priority>${priority}</priority>
   </url>\n`;
     });
 
-    // Try to fetch dynamic products
-    try {
-      const response = await fetch(`${API_URL}/products`);
-      if (response.ok) {
-        const data = await response.json();
-        const products = Array.isArray(data) ? data : (data.products || []);
-        
-        products.forEach(product => {
-          sitemap += `  <url>
-    <loc>${BASE_URL}/product/${product._id}</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>\n`;
-        });
-      } else {
-        console.warn('Could not fetch products for sitemap. Using only static routes.');
+    // Try fetching products from live APIs
+    let products = [];
+    for (const url of API_URLS) {
+      try {
+        const response = await fetch(url);
+        if (response.ok) {
+          const data = await response.json();
+          products = Array.isArray(data) ? data : (data.products || []);
+          if (products.length > 0) break;
+        }
+      } catch (err) {
+        // Try next URL
       }
-    } catch (apiError) {
-      console.warn('API connection failed during sitemap generation. Using only static routes.');
+    }
+
+    if (Array.isArray(products) && products.length > 0) {
+      products.forEach(product => {
+        const lastMod = product.updatedAt ? new Date(product.updatedAt).toISOString().split('T')[0] : today;
+        const imgTag = product.image ? `
+    <image:image>
+      <image:loc>${product.image}</image:loc>
+      <image:title><![CDATA[${product.name || 'রঙবতী'}]]></image:title>
+      <image:caption><![CDATA[${product.description?.substring(0, 150) || 'রঙবতী - Women Fashion'}]]></image:caption>
+    </image:image>` : '';
+
+        sitemap += `  <url>
+    <loc>${BASE_URL}/product/${product._id}</loc>
+    <lastmod>${lastMod}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>${imgTag}
+  </url>\n`;
+      });
+      console.log(`Fetched and included ${products.length} products with Google Image metadata.`);
+    } else {
+      console.warn('Live API unreachable during build, generated comprehensive static sitemap.');
     }
 
     sitemap += `</urlset>`;

@@ -1,7 +1,9 @@
 User-agent: *
 Allow: /
 
-# Disallow access to admin panel
+# Disallow access to admin and boss panels
+Disallow: /boss/
+Disallow: /boss/*
 Disallow: /admin/
 Disallow: /admin/*
 Disallow: /api/

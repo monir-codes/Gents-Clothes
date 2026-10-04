@@ -226,8 +226,67 @@
   transition: all 0.3s ease;
 }
 
-.radioLabel:hover {
+.deliveryZoneGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.zoneCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md, 8px);
+  cursor: pointer;
+  background: var(--color-surface, #faf6f1);
+  transition: all 0.25s ease;
+}
+
+.zoneCard:hover {
   border-color: var(--color-accent);
+  background: #ffffff;
+}
+
+.zoneCardActive {
+  border-color: var(--color-brand-maroon, #5e0f2b);
+  background: #ffffff;
+  box-shadow: 0 4px 14px rgba(94, 15, 43, 0.08);
+}
+
+.zoneInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.zoneRadio {
+  accent-color: var(--color-brand-maroon, #5e0f2b);
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.zoneTitle {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--color-text-primary);
+  margin-bottom: 2px;
+}
+
+.zoneSub {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+}
+
+.zonePrice {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--color-brand-maroon, #5e0f2b);
+  white-space: nowrap;
 }
 
 .placeOrderBtn {

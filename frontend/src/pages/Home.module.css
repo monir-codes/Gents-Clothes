@@ -186,7 +186,7 @@
 .marqueeContainer {
   background-color: var(--color-text-primary);
   color: var(--color-background);
-  padding: var(--space-2) 0;
+  padding: 10px 0;
   overflow: hidden;
   white-space: nowrap;
   display: flex;
@@ -195,20 +195,48 @@
 
 .marqueeText {
   display: inline-block;
-  font-size: 1rem;
+  font-size: 0.92rem;
   font-weight: 600;
-  letter-spacing: 2px;
+  letter-spacing: 1.8px;
   text-transform: uppercase;
-  animation: marquee 20s linear infinite;
+  animation: marquee 25s linear infinite;
 }
 
 .marqueeText span {
-  margin: 0 40px;
+  margin: 0 35px;
 }
 
 @keyframes marquee {
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
+}
+
+@media (max-width: 768px) {
+  .marqueeContainer {
+    padding: 7px 0;
+  }
+  .marqueeText {
+    font-size: 0.78rem;
+    letter-spacing: 1.2px;
+    font-weight: 500;
+  }
+  .marqueeText span {
+    margin: 0 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .marqueeContainer {
+    padding: 6px 0;
+  }
+  .marqueeText {
+    font-size: 0.70rem;
+    letter-spacing: 0.8px;
+    font-weight: 500;
+  }
+  .marqueeText span {
+    margin: 0 14px;
+  }
 }
 
 /* Quiz Banner */

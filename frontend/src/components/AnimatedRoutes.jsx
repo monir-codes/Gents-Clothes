@@ -16,6 +16,7 @@ import Register from '../pages/Register';
 import ForgotPassword from '../pages/ForgotPassword';
 import ResetPassword from '../pages/ResetPassword';
 import Dashboard from '../pages/Dashboard';
+import NotFound from '../pages/NotFound';
 
 import { About, FAQ, Contact, LegalPage } from '../pages/StaticPages';
 import AdminLayout from '../pages/Admin/AdminLayout';
@@ -84,8 +85,8 @@ const AnimatedRoutes = () => {
         <Route path="/privacy" element={<PageWrapper><LegalPage title="Privacy Policy" /></PageWrapper>} />
         <Route path="/terms" element={<PageWrapper><LegalPage title="Terms of Service" /></PageWrapper>} />
 
-        {/* Admin Panel */}
-        <Route path="/admin" element={<PageWrapper><AdminSecurityWrapper><AdminLayout /></AdminSecurityWrapper></PageWrapper>}>
+        {/* Boss / Admin Panel */}
+        <Route path="/boss" element={<PageWrapper><AdminSecurityWrapper><AdminLayout /></AdminSecurityWrapper></PageWrapper>}>
           <Route index element={<AdminDashboard />} />
           <Route path="products" element={<AdminProducts />} />
           <Route path="reviews" element={<AdminReviews />} />
@@ -94,6 +95,9 @@ const AnimatedRoutes = () => {
           <Route path="marketing" element={<AdminMarketing />} />
           <Route path="settings" element={<AdminSettings />} />
         </Route>
+
+        {/* 404 Fallback Route */}
+        <Route path="*" element={<PageWrapper><NotFound /></PageWrapper>} />
       </Routes>
     </AnimatePresence>
   );

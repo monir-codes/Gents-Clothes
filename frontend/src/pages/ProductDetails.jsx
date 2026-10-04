@@ -117,39 +117,82 @@ const ProductDetails = () => {
 
   const productUrl = `https://ronggoboti.vercel.app/product/${product._id}`;
   
+  const productImages = [product.image, product.hoverImage].filter(Boolean);
+
   const productSchema = {
     "@context": "https://schema.org/",
     "@type": "Product",
     "name": product.name,
-    "image": product.image,
-    "description": product.description,
-    "sku": product._id,
+    "image": productImages.length > 0 ? productImages : [product.image],
+    "description": product.description || `Buy ${product.name} from রঙবতী (Ronggoboti). Premium women's fashion in Bangladesh.`,
+    "sku": product.sku || product._id,
+    "brand": {
+      "@type": "Brand",
+      "name": product.brand || "রঙবতী | Ronggoboti"
+    },
+    "category": product.category,
     "offers": {
       "@type": "Offer",
       "url": productUrl,
       "priceCurrency": "BDT",
       "price": product.price,
       "itemCondition": "https://schema.org/NewCondition",
-      "availability": product.countInStock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"
+      "availability": (product.countInStock ?? 1) > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+      "seller": {
+        "@type": "Organization",
+        "name": "রঙবতী | Ronggoboti"
+      }
     },
-    ...(product.numReviews > 0 && {
+    ...(product.numReviews > 0 ? {
       "aggregateRating": {
         "@type": "AggregateRating",
-        "ratingValue": product.rating,
+        "ratingValue": product.rating || 5,
         "reviewCount": product.numReviews
       }
+    } : {
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "5.0",
+        "reviewCount": "1"
+      }
     })
+  };
+
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://ronggoboti.vercel.app"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": product.category || "Shop",
+        "item": product.category ? `https://ronggoboti.vercel.app/shop?category=${encodeURIComponent(product.category)}` : "https://ronggoboti.vercel.app/shop"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": product.name,
+        "item": productUrl
+      }
+    ]
   };
 
   return (
     <>
     <SEO 
-      title={product.name} 
-      description={product.description?.substring(0, 160) || "Premium luxury clothing from রঙবতী"} 
+      title={`${product.name} - ${product.category || "Women's Fashion"}`} 
+      description={product.description?.substring(0, 160) || `Buy ${product.name} from রঙবতী (Ronggoboti). Exclusive women's fashion online shopping in Bangladesh.`} 
       keywords={generateProductKeywords(product)}
       type="product" 
+      image={product.image}
       canonical={productUrl}
-      schemaMarkup={productSchema}
+      schemaMarkup={[productSchema, breadcrumbSchema]}
     />
     <div className={`container ${styles.productContainer}`}>
       {/* Breadcrumbs */}

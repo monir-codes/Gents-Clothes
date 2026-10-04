@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 import Loader from '../../components/Loader';
 import styles from './Admin.module.css';
@@ -81,7 +82,7 @@ const AdminDashboard = () => {
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
         <h2 style={{ margin: 0 }}>Recent Orders</h2>
-        <a href="/admin/orders" style={{ padding: '6px 12px', background: 'var(--color-accent)', color: 'white', borderRadius: '4px', textDecoration: 'none', fontSize: '0.9rem' }}>Manage Orders</a>
+        <Link to="/boss/orders" style={{ padding: '6px 12px', background: 'var(--color-accent)', color: 'white', borderRadius: '4px', textDecoration: 'none', fontSize: '0.9rem' }}>Manage Orders</Link>
       </div>
       <div className={styles.tableContainer}>
         <table className={styles.table}>

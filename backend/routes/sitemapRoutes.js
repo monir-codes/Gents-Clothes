@@ -6,28 +6,40 @@ router.get('/', async (req, res) => {
   try {
     const products = await Product.find({});
     
-    // Core pages
+    // Core static & category pages
     const staticPages = [
-      '',
-      '/shop',
-      '/about',
-      '/contact',
-      '/faq',
-      '/privacy',
-      '/terms',
+      { path: '', priority: '1.0', changefreq: 'daily' },
+      { path: '/shop', priority: '0.9', changefreq: 'daily' },
+      { path: '/collections', priority: '0.9', changefreq: 'daily' },
+      { path: '/shop?category=Sarees', priority: '0.85', changefreq: 'weekly' },
+      { path: '/shop?category=Salwar+Kameez', priority: '0.85', changefreq: 'weekly' },
+      { path: '/shop?category=Kurtis', priority: '0.85', changefreq: 'weekly' },
+      { path: '/shop?category=Lehengas', priority: '0.85', changefreq: 'weekly' },
+      { path: '/shop?category=Modest+Wear', priority: '0.8', changefreq: 'weekly' },
+      { path: '/shop?category=Co-ord+Sets', priority: '0.8', changefreq: 'weekly' },
+      { path: '/about', priority: '0.7', changefreq: 'monthly' },
+      { path: '/contact', priority: '0.7', changefreq: 'monthly' },
+      { path: '/faq', priority: '0.7', changefreq: 'monthly' },
+      { path: '/shipping', priority: '0.5', changefreq: 'monthly' },
+      { path: '/returns', priority: '0.5', changefreq: 'monthly' },
+      { path: '/size-guide', priority: '0.5', changefreq: 'monthly' },
+      { path: '/privacy', priority: '0.3', changefreq: 'yearly' },
+      { path: '/terms', priority: '0.3', changefreq: 'yearly' },
     ];
 
-    const baseUrl = 'https://gents-clothes.vercel.app';
+    const baseUrl = 'https://ronggoboti.vercel.app';
+    const today = new Date().toISOString().split('T')[0];
 
     let sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n`;
-    sitemap += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
+    sitemap += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n`;
 
     // Add static pages
-    staticPages.forEach((page) => {
+    staticPages.forEach(({ path, priority, changefreq }) => {
       sitemap += `  <url>\n`;
-      sitemap += `    <loc>${baseUrl}${page}</loc>\n`;
-      sitemap += `    <changefreq>daily</changefreq>\n`;
-      sitemap += `    <priority>${page === '' ? '1.0' : '0.8'}</priority>\n`;
+      sitemap += `    <loc>${baseUrl}${path}</loc>\n`;
+      sitemap += `    <lastmod>${today}</lastmod>\n`;
+      sitemap += `    <changefreq>${changefreq}</changefreq>\n`;
+      sitemap += `    <priority>${priority}</priority>\n`;
       sitemap += `  </url>\n`;
     });
 
@@ -35,11 +47,16 @@ router.get('/', async (req, res) => {
     products.forEach((product) => {
       sitemap += `  <url>\n`;
       sitemap += `    <loc>${baseUrl}/product/${product._id}</loc>\n`;
-      // Use updatedAt if available, otherwise just leave out lastmod or use current date
-      const lastMod = product.updatedAt ? product.updatedAt.toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
+      const lastMod = product.updatedAt ? product.updatedAt.toISOString().split('T')[0] : today;
       sitemap += `    <lastmod>${lastMod}</lastmod>\n`;
       sitemap += `    <changefreq>weekly</changefreq>\n`;
       sitemap += `    <priority>0.9</priority>\n`;
+      if (product.image) {
+        sitemap += `    <image:image>\n`;
+        sitemap += `      <image:loc>${product.image}</image:loc>\n`;
+        sitemap += `      <image:title><![CDATA[${product.name || 'রঙবতী'}]]></image:title>\n`;
+        sitemap += `    </image:image>\n`;
+      }
       sitemap += `  </url>\n`;
     });
 

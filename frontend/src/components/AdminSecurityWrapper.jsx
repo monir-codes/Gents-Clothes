@@ -16,14 +16,14 @@ const AdminSecurityWrapper = ({ children }) => {
       
       if (!user || !user.isAdmin || !token) {
         await Swal.fire({
-          title: 'Not Logged In',
-          text: 'You must log in with an Admin account (mdrummanmondal2@gmail.com or info.gentsclothes@gmail.com) first to access this API data.',
-          icon: 'error',
+          title: 'Access Restricted',
+          text: 'You must log in with an authorized Administrator account to access this area.',
+          icon: 'warning',
           background: '#1a1a1a',
           color: '#ffffff',
-          confirmButtonColor: '#d33',
+          confirmButtonColor: '#c9a265',
         });
-        navigate('/login');
+        navigate('/login?redirect=/boss');
         setIsChecking(false);
         return;
       }

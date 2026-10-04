@@ -59,14 +59,26 @@ const Login = () => {
   };
 
   const handleGoogleLogin = async () => {
+    setMessage(null);
     try {
       const gUser = await signInWithGoogle();
       if (gUser && gUser.email) {
-        await googleLogin(gUser.displayName || 'Google User', gUser.email);
+        const success = await googleLogin(gUser.displayName || 'Google User', gUser.email);
+        if (success) {
+          navigate(redirect);
+        }
       }
     } catch (error) {
       console.error("Google Sign In Failed", error);
-      setMessage("Google Sign In Failed. Please try again.");
+      let errorMsg = "Google Sign In Failed. Please try again.";
+      if (error?.code === 'auth/popup-closed-by-user') {
+        errorMsg = "Login window was closed before completion.";
+      } else if (error?.code === 'auth/unauthorized-domain') {
+        errorMsg = "This domain is not authorized in Firebase Console.";
+      } else if (error?.code === 'auth/popup-blocked') {
+        errorMsg = "Login popup was blocked by the browser. Please allow popups.";
+      }
+      setMessage(errorMsg);
     }
   };
 

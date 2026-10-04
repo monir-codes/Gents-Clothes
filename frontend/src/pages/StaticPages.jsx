@@ -5,7 +5,7 @@ import { Sparkles, Heart, Feather, ShieldCheck, ArrowRight } from 'lucide-react'
 import axios from 'axios';
 import SEO from '../components/SEO';
 
-const StaticPageTemplate = ({ title, subtitle, children, contentKey }) => {
+const StaticPageTemplate = ({ title, subtitle, children, contentKey, schemaMarkup }) => {
   const [settings, setSettings] = useState(null);
 
   useEffect(() => {
@@ -22,6 +22,11 @@ const StaticPageTemplate = ({ title, subtitle, children, contentKey }) => {
 
   return (
     <div style={{ background: 'var(--color-background)', minHeight: '80vh', paddingBottom: '80px' }}>
+      <SEO 
+        title={title} 
+        description={subtitle || `${title} - রঙবতী (Ronggoboti) Women's Fashion & Lifestyle in Bangladesh.`} 
+        schemaMarkup={schemaMarkup}
+      />
       {/* Header Banner */}
       <div style={{
         background: 'linear-gradient(180deg, var(--color-surface, #faf6f1) 0%, var(--color-background, #ffffff) 100%)',
@@ -392,15 +397,57 @@ export const About = () => {
   );
 };
 
-export const FAQ = () => (
-  <StaticPageTemplate 
-    title="Frequently Asked Questions" 
-    subtitle="Got questions? We're here to help with orders, styling, deliveries, and more."
-    contentKey="faq"
-  >
-    <p>Loading FAQ...</p>
-  </StaticPageTemplate>
-);
+export const FAQ = () => {
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How can I order products from রঙবতী (Ronggoboti)?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "You can easily order online by selecting your desired saree, salwar kameez, or kurti, adding it to your shopping cart, and checking out with Cash on Delivery, bKash, or Card payment."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the delivery time across Bangladesh?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Delivery takes 2-3 business days inside Dhaka and 3-5 business days outside Dhaka."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Are the fabrics 100% authentic and premium quality?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, every fabric at রঙবতী is handpicked and crafted using genuine silks, authentic Dhakai Jamdani weaves, pure cotton, and premium georgettes."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is your return & exchange policy?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "We offer a hassle-free 7-day return and exchange policy for any unworn items with tags attached."
+        }
+      }
+    ]
+  };
+
+  return (
+    <StaticPageTemplate 
+      title="Frequently Asked Questions (FAQ) | রঙবতী" 
+      subtitle="Find answers to common questions about orders, shipping, sizes, and styling."
+      contentKey="faq"
+      schemaMarkup={faqSchema}
+    >
+      <p>Loading FAQ...</p>
+    </StaticPageTemplate>
+  );
+};
 
 export const Contact = () => (
   <StaticPageTemplate 

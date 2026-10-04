@@ -32,8 +32,32 @@ const Checkout = () => {
     city: user?.addresses?.[0]?.city || ''
   });
 
+  const deliveryZones = [
+    { 
+      id: 'inside-dhaka', 
+      name: 'ঢাকা সিটির মধ্যে', 
+      nameEn: 'Inside Dhaka City', 
+      charge: 70, 
+      deliveryTime: '২-৩ কার্যদিবস' 
+    },
+    { 
+      id: 'sub-dhaka', 
+      name: 'সাব ঢাকা (সাভার, গাজীপুর, নারায়ণগঞ্জ, কেরানীগঞ্জ)', 
+      nameEn: 'Sub Dhaka (Gazipur, Savar, Narayanganj, Keraniganj)', 
+      charge: 100, 
+      deliveryTime: '২-৪ কার্যদিবস' 
+    },
+    { 
+      id: 'outside-dhaka', 
+      name: 'ঢাকার বাহিরে (সারা বাংলাদেশ)', 
+      nameEn: 'Outside Dhaka (All over Bangladesh)', 
+      charge: 120, 
+      deliveryTime: '৩-৫ কার্যদিবস' 
+    }
+  ];
+
+  const [selectedZone, setSelectedZone] = useState('inside-dhaka');
   const [paymentMethod, setPaymentMethod] = useState('COD');
-  const [deliveryCharge, setDeliveryCharge] = useState(120);
 
   // Coupon State
   const [couponInput, setCouponInput] = useState('');
@@ -41,33 +65,43 @@ const Checkout = () => {
   const [couponLoading, setCouponLoading] = useState(false);
   const [couponError, setCouponError] = useState('');
 
+  const activeZone = deliveryZones.find(z => z.id === selectedZone) || deliveryZones[0];
   const itemsPrice = cartItems.reduce((acc, item) => acc + item.price * item.qty, 0);
   const discountAmount = appliedCoupon 
     ? Math.round((itemsPrice * appliedCoupon.discountPercentage) / 100) 
     : 0;
   const discountedItemsPrice = Math.max(0, itemsPrice - discountAmount);
-  const shippingPrice = itemsPrice > 5000 ? 0 : deliveryCharge;
+  const shippingPrice = itemsPrice > 5000 ? 0 : activeZone.charge;
   const totalPrice = discountedItemsPrice + shippingPrice;
 
   useEffect(() => {
     if (!user) {
       navigate('/login?redirect=/checkout');
     }
-    const fetchSettings = async () => {
-      try {
-        const { data } = await axios.get('/api/settings');
-        if (data && data.paymentSettings && data.paymentSettings.deliveryCharge !== undefined) {
-          setDeliveryCharge(data.paymentSettings.deliveryCharge);
-        }
-      } catch (error) {
-        console.error('Error fetching settings:', error);
-      }
-    };
-    fetchSettings();
   }, [user, navigate]);
 
   const handleRegionChange = (e) => {
-    setAddress({ ...address, region: e.target.value, district: '' });
+    const newRegion = e.target.value;
+    setAddress({ ...address, region: newRegion, district: '' });
+    if (newRegion && newRegion !== 'Dhaka') {
+      setSelectedZone('outside-dhaka');
+    }
+  };
+
+  const handleDistrictChange = (e) => {
+    const newDistrict = e.target.value;
+    setAddress({ ...address, district: newDistrict });
+    if (address.region === 'Dhaka') {
+      if (newDistrict === 'Dhaka') {
+        setSelectedZone('inside-dhaka');
+      } else if (['Gazipur', 'Narayanganj', 'Faridpur', 'Manikganj', 'Munshiganj', 'Narsingdi'].includes(newDistrict)) {
+        setSelectedZone('sub-dhaka');
+      } else {
+        setSelectedZone('outside-dhaka');
+      }
+    } else {
+      setSelectedZone('outside-dhaka');
+    }
   };
 
   const handleApplyCoupon = async (e) => {
@@ -225,7 +259,7 @@ const Checkout = () => {
             </div>
             <div className={styles.formGroup}>
               <label className={styles.label}>District</label>
-              <select required className={styles.input} value={address.district} onChange={e => setAddress({...address, district: e.target.value})} disabled={!address.region}>
+              <select required className={styles.input} value={address.district} onChange={handleDistrictChange} disabled={!address.region}>
                 <option value="">Select District</option>
                 {currentDistricts.map(district => (
                   <option key={district} value={district}>{district}</option>
@@ -236,10 +270,46 @@ const Checkout = () => {
 
           <div className={styles.formGroup}>
             <label className={styles.label}>City/Thana</label>
-            <input required type="text" className={styles.input} value={address.city} onChange={e => setAddress({...address, city: e.target.value})} />
+            <input required type="text" className={styles.input} value={address.city} onChange={e => setAddress({...address, city: e.target.value})} placeholder="e.g. Dhanmondi, Mirpur, Uttara, etc." />
           </div>
 
-          <h2 className={styles.sectionTitle} style={{ marginTop: '40px' }}>Payment Method</h2>
+          <h2 className={styles.sectionTitle} style={{ marginTop: '30px' }}>Delivery Charge & Zone</h2>
+          <div className={styles.deliveryZoneGroup}>
+            {deliveryZones.map(zone => {
+              const isSelected = selectedZone === zone.id;
+              return (
+                <div 
+                  key={zone.id}
+                  className={`${styles.zoneCard} ${isSelected ? styles.zoneCardActive : ''}`}
+                  onClick={() => setSelectedZone(zone.id)}
+                >
+                  <div className={styles.zoneInfo}>
+                    <input 
+                      type="radio" 
+                      name="deliveryZone" 
+                      value={zone.id} 
+                      checked={isSelected}
+                      onChange={() => setSelectedZone(zone.id)}
+                      className={styles.zoneRadio}
+                    />
+                    <div>
+                      <div className={styles.zoneTitle}>{zone.name}</div>
+                      <div className={styles.zoneSub}>{zone.nameEn} • ডেলিভারি সময়: {zone.deliveryTime}</div>
+                    </div>
+                  </div>
+                  <div className={styles.zonePrice}>
+                    {itemsPrice > 5000 ? (
+                      <span style={{ color: '#16a34a', fontSize: '0.95rem' }}>FREE</span>
+                    ) : (
+                      `৳${zone.charge}`
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <h2 className={styles.sectionTitle} style={{ marginTop: '30px' }}>Payment Method</h2>
           <div className={styles.paymentMethod}>
             <label className={styles.radioLabel}>
               <input 
@@ -348,7 +418,7 @@ const Checkout = () => {
         )}
 
         <div className={styles.summaryItem}>
-          <span>Shipping</span>
+          <span>Shipping ({activeZone.name})</span>
           <span>{shippingPrice === 0 ? <span style={{ color: '#16a34a', fontWeight: 600 }}>Free</span> : `৳${shippingPrice}`}</span>
         </div>
 

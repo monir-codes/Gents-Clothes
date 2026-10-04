@@ -5,9 +5,22 @@ import CategoryCard from '../components/CategoryCard';
 import styles from './Shop.module.css';
 
 const Collections = () => {
+  const collectionsSchema = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "Exclusive Women's Fashion Collections - রঙবতী | Ronggoboti",
+    "description": "Explore exclusive festive, bridal, Jamdani, silk, and contemporary women's fashion collections from রঙবতী (Ronggoboti) in Bangladesh.",
+    "url": "https://ronggoboti.vercel.app/collections"
+  };
+
   return (
     <div className="container" style={{ paddingTop: '60px', paddingBottom: '60px', minHeight: '80vh' }}>
-      <SEO title="Collections" description="Explore রঙবতী exclusive collections" />
+      <SEO 
+        title="Exclusive Women's Fashion Collections - শাড়ি, থ্রি পিস, কুর্তি" 
+        description="Explore exclusive festive, bridal, Dhakai Jamdani, pure silk, and modern designer collections from রঙবতী (Ronggoboti) in Bangladesh." 
+        canonical="https://ronggoboti.vercel.app/collections"
+        schemaMarkup={collectionsSchema}
+      />
       
       <motion.div 
         initial={{ opacity: 0, y: 20 }}

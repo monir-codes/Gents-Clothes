@@ -110,11 +110,45 @@ const Home = () => {
 
   if (loading) return <Loader fullScreen />;
 
+  const homeSchema = [
+    {
+      "@context": "https://schema.org",
+      "@type": "ClothingStore",
+      "name": "রঙবতী | Ronggoboti",
+      "alternateName": ["Ronggoboti", "রঙবতী", "Rongoboti", "Ronggoboti Fashion", "Ronggoboti BD"],
+      "url": "https://ronggoboti.vercel.app",
+      "logo": "https://ronggoboti.vercel.app/images/ronggoboti-logo.png",
+      "image": "https://ronggoboti.vercel.app/images/hero-banner.jpg",
+      "description": "রঙবতী (Ronggoboti) - বাংলাদেশের শীর্ষস্থানীয় প্রিমিয়াম ওমেন ফ্যাশন ও লাইফস্টাইল ব্র্যান্ড। শাড়ি, সালোয়ার কামিজ, কুর্তি ও লেহেঙ্গার সেরা অনলাইন শপ।",
+      "priceRange": "৳৳",
+      "currenciesAccepted": "BDT",
+      "paymentAccepted": "Cash on Delivery, bKash, Nagad, Card",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Dhaka",
+        "addressCountry": "BD"
+      }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "url": "https://ronggoboti.vercel.app",
+      "name": "রঙবতী | Ronggoboti",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://ronggoboti.vercel.app/shop?search={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+  ];
+
   return (
     <div style={{ overflowX: 'hidden' }}>
       <SEO 
-        title="রঙবতী - Luxury Women's Fashion & Lifestyle" 
-        description="রঙবতী - Explore handcrafted sarees, premium salwar suits, luxury kurtis, and contemporary women's fashion in Bangladesh." 
+        title="রঙবতী | Ronggoboti - Exclusive Women's Fashion & Designer Clothing BD" 
+        description="রঙবতী (Ronggoboti) - বাংলাদেশের শীর্ষস্থানীয় প্রিমিয়াম ওমেন ফ্যাশন ব্র্যান্ড। এক্সক্লুসিভ শাড়ি (Sarees), সালোয়ার কামিজ (Salwar Kameez), ডিজাইনার কুর্তি (Kurtis), লেহেঙ্গা ও মডেস্ট ওয়েয়ার অনলাইন কিনুন সেরা দামে। Fast delivery across Bangladesh." 
+        canonical="https://ronggoboti.vercel.app"
+        schemaMarkup={homeSchema}
       />
 
       {/* Fixed Hero Section (No parallax scroll displacement) */}

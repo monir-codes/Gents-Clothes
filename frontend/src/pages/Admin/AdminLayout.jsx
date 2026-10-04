@@ -22,25 +22,25 @@ const AdminLayout = () => {
       <aside className={`${styles.sidebar} ${isSidebarOpen ? styles.sidebarOpen : ''}`}>
         <div className={styles.sidebarBrand}>Admin Panel</div>
         <nav className={styles.nav}>
-          <Link to="/admin" onClick={() => setSidebarOpen(false)} className={`${styles.navItem} ${location.pathname === '/admin' ? styles.active : ''}`}>
+          <Link to="/boss" onClick={() => setSidebarOpen(false)} className={`${styles.navItem} ${location.pathname === '/boss' ? styles.active : ''}`}>
             <LayoutDashboard size={20} /> Dashboard
           </Link>
-          <Link to="/admin/products" onClick={() => setSidebarOpen(false)} className={`${styles.navItem} ${location.pathname.includes('/products') ? styles.active : ''}`}>
+          <Link to="/boss/products" onClick={() => setSidebarOpen(false)} className={`${styles.navItem} ${location.pathname.includes('/products') ? styles.active : ''}`}>
             <Package size={20} /> Products
           </Link>
-          <Link to="/admin/reviews" onClick={() => setSidebarOpen(false)} className={`${styles.navItem} ${location.pathname.includes('/reviews') ? styles.active : ''}`}>
+          <Link to="/boss/reviews" onClick={() => setSidebarOpen(false)} className={`${styles.navItem} ${location.pathname.includes('/reviews') ? styles.active : ''}`}>
             <Sparkles size={20} /> Reviews
           </Link>
-          <Link to="/admin/orders" onClick={() => setSidebarOpen(false)} className={`${styles.navItem} ${location.pathname.includes('/orders') ? styles.active : ''}`}>
+          <Link to="/boss/orders" onClick={() => setSidebarOpen(false)} className={`${styles.navItem} ${location.pathname.includes('/orders') ? styles.active : ''}`}>
             <ShoppingCart size={20} /> Orders
           </Link>
-          <Link to="/admin/customers" onClick={() => setSidebarOpen(false)} className={`${styles.navItem} ${location.pathname.includes('/customers') ? styles.active : ''}`}>
+          <Link to="/boss/customers" onClick={() => setSidebarOpen(false)} className={`${styles.navItem} ${location.pathname.includes('/customers') ? styles.active : ''}`}>
             <Users size={20} /> User Management
           </Link>
-          <Link to="/admin/marketing" onClick={() => setSidebarOpen(false)} className={`${styles.navItem} ${location.pathname.includes('/marketing') ? styles.active : ''}`}>
+          <Link to="/boss/marketing" onClick={() => setSidebarOpen(false)} className={`${styles.navItem} ${location.pathname.includes('/marketing') ? styles.active : ''}`}>
             <Sparkles size={20} /> Marketing & AI
           </Link>
-          <Link to="/admin/settings" onClick={() => setSidebarOpen(false)} className={`${styles.navItem} ${location.pathname.includes('/settings') ? styles.active : ''}`}>
+          <Link to="/boss/settings" onClick={() => setSidebarOpen(false)} className={`${styles.navItem} ${location.pathname.includes('/settings') ? styles.active : ''}`}>
             <Settings size={20} /> Settings
           </Link>
         </nav>

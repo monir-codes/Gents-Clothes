@@ -1,0 +1,178 @@
+.container {
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  background: radial-gradient(circle at 50% 30%, rgba(201, 162, 101, 0.08) 0%, var(--color-background) 70%);
+}
+
+.contentWrapper {
+  max-width: 720px;
+  width: 100%;
+  text-align: center;
+  background: #ffffff;
+  border: 1px solid var(--color-border, #ebdcd0);
+  border-radius: var(--radius-xl, 24px);
+  padding: clamp(36px, 6vw, 64px) clamp(20px, 5vw, 48px);
+  box-shadow: 0 20px 60px rgba(94, 15, 43, 0.06), 0 4px 16px rgba(0, 0, 0, 0.02);
+  position: relative;
+  overflow: hidden;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 18px;
+  background: rgba(94, 15, 43, 0.06);
+  border: 1px solid rgba(94, 15, 43, 0.12);
+  border-radius: 30px;
+  color: var(--color-brand-maroon, #5e0f2b);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 24px;
+}
+
+.glitchNumber {
+  font-size: clamp(5rem, 15vw, 8.5rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -2px;
+  background: linear-gradient(135deg, var(--color-brand-maroon, #5e0f2b) 0%, var(--color-accent, #c9a265) 60%, #300613 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 12px;
+  font-family: var(--font-family-primary, serif);
+  user-select: none;
+}
+
+.title {
+  font-size: clamp(1.5rem, 4vw, 2.2rem);
+  font-weight: 700;
+  color: var(--color-brand-maroon, #5e0f2b);
+  margin-bottom: 14px;
+  line-height: 1.3;
+}
+
+.description {
+  font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+  color: var(--color-text-secondary, #6c5a60);
+  line-height: 1.7;
+  max-width: 520px;
+  margin: 0 auto 36px;
+}
+
+.actionButtons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 40px;
+}
+
+.btnPrimary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 28px;
+  background: var(--color-brand-maroon, #5e0f2b);
+  color: #ffffff;
+  border-radius: var(--radius-sm, 6px);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(94, 15, 43, 0.25);
+  border: none;
+  cursor: pointer;
+}
+
+.btnPrimary:hover {
+  background: #3e091c;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(94, 15, 43, 0.35);
+  color: #ffffff;
+}
+
+.btnSecondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 26px;
+  background: transparent;
+  color: var(--color-brand-maroon, #5e0f2b);
+  border: 1.5px solid var(--color-brand-maroon, #5e0f2b);
+  border-radius: var(--radius-sm, 6px);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.btnSecondary:hover {
+  background: rgba(94, 15, 43, 0.05);
+  border-color: var(--color-accent, #c9a265);
+  color: var(--color-accent, #c9a265);
+  transform: translateY(-2px);
+}
+
+.popularSection {
+  border-top: 1px dashed var(--color-border, #ebdcd0);
+  padding-top: 28px;
+}
+
+.popularLabel {
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-weight: 700;
+  color: var(--color-accent, #c9a265);
+  margin-bottom: 16px;
+}
+
+.categoryPills {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.pill {
+  padding: 8px 16px;
+  background: var(--color-surface, #faf6f1);
+  border: 1px solid var(--color-border, #ebdcd0);
+  border-radius: 20px;
+  color: var(--color-text-primary, #2d1820);
+  text-decoration: none;
+  font-size: 0.88rem;
+  font-weight: 500;
+  transition: all 0.25s ease;
+}
+
+.pill:hover {
+  background: var(--color-brand-maroon, #5e0f2b);
+  color: #ffffff;
+  border-color: var(--color-brand-maroon, #5e0f2b);
+  transform: translateY(-2px);
+}
+
+@media (max-width: 600px) {
+  .contentWrapper {
+    padding: 36px 16px;
+  }
+  .actionButtons {
+    flex-direction: column;
+    width: 100%;
+  }
+  .btnPrimary, .btnSecondary {
+    width: 100%;
+    justify-content: center;
+  }
+}

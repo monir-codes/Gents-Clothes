@@ -146,9 +146,33 @@ const Footer = () => {
         </div>
       </div>
 
+      {/* SEO Popular Searches & Brand Authority */}
+      <div className={`container ${styles.seoKeywordsSection}`}>
+        <div className={styles.seoKeywordsTitle}>
+          <span>Popular Searches at রঙবতী (Ronggoboti)</span>
+        </div>
+        <div className={styles.seoKeywordsList}>
+          <Link to="/shop?category=Sarees">শাড়ি কালেকশন (Sarees BD)</Link>
+          <Link to="/shop?category=Salwar+Kameez">সালোয়ার কামিজ (Salwar Kameez)</Link>
+          <Link to="/shop?category=Kurtis+%26+Tunics">ডিজাইনার কুর্তি (Kurtis)</Link>
+          <Link to="/shop?category=Lehengas+%26+Gowns">লেহেঙ্গা ও গাউন (Lehenga BD)</Link>
+          <Link to="/shop?category=Modest+Wear">মডেস্ট ওয়্যার ও আবায়া (Abaya BD)</Link>
+          <Link to="/shop?category=Co-ord+Sets">কর্ড সেট (Co-ord Sets)</Link>
+          <Link to="/shop?search=Jamdani">জামদানি শাড়ি (Jamdani Saree)</Link>
+          <Link to="/shop?search=Katan">কাতান শাড়ি (Katan Saree)</Link>
+          <Link to="/shop?search=Silk">সিল্ক শাড়ি (Pure Silk Saree)</Link>
+          <Link to="/shop?category=Salwar+Kameez">থ্রি পিস ডিজাইন (Three Piece)</Link>
+          <Link to="/shop?collection=festive">ঈদ কালেকশন ২০২৬ (Eid Collection)</Link>
+          <Link to="/shop">Women's Clothing Online Shopping BD</Link>
+        </div>
+        <p className={styles.seoBrandSummary}>
+          রঙবতী (Ronggoboti) - বাংলাদেশের শীর্ষস্থানীয় প্রিমিয়াম ওমেন ফ্যাশন ও লাইফস্টাইল ব্র্যান্ড। আমাদের এক্সক্লুসিভ ডিজাইনার শাড়ি, সালোয়ার কামিজ, কুর্তি, লেহেঙ্গা ও মডেস্ট ওয়্যার অনলাইন অর্ডার করুন সবচেয়ে বিশ্বস্ত কোয়ালিটি এবং হোম ডেলিভারি সুবিধায়।
+        </p>
+      </div>
+
       <div className={styles.bottomBar}>
         <div className={`container ${styles.bottomBarInner}`}>
-          <p>&copy; {new Date().getFullYear()} Ronggoboti. All Rights Reserved.</p>
+          <p>&copy; {new Date().getFullYear()} রঙবতী (Ronggoboti). All Rights Reserved.</p>
           <div className={styles.legalLinks}>
             <Link to="/privacy">Privacy Policy</Link>
             <Link to="/terms">Terms of Service</Link>
