@@ -101,12 +101,15 @@ const Shop = ({ hideHeader }) => {
     : (Array.isArray(products) ? products.filter(p => p.name && p.name.toLowerCase().includes(searchTerm.toLowerCase())) : []);
   const filteredProducts = displayedProducts;
 
-  const seoTitle = category 
-    ? `${category} Collection - Buy Online in Bangladesh` 
+  const categoryFromQuery = queryParams.get('category');
+  const currentCategoryName = selectedCategories.length === 1 ? selectedCategories[0] : categoryFromQuery;
+
+  const seoTitle = currentCategoryName 
+    ? `${currentCategoryName} Collection - Buy Online in Bangladesh` 
     : "Shop Women's Fashion Collection - শাড়ি, থ্রি পিস, কুর্তি";
 
-  const seoDescription = category
-    ? `Explore exclusive ${category} collection at রঙবতী (Ronggoboti). Premium quality, exquisite design, and fast home delivery all over Bangladesh.`
+  const seoDescription = currentCategoryName
+    ? `Explore exclusive ${currentCategoryName} collection at রঙবতী (Ronggoboti). Premium quality, exquisite design, and fast home delivery all over Bangladesh.`
     : "রঙবতী (Ronggoboti) এর এক্সক্লুসিভ শাড়ি, সালোয়ার কামিজ, কুর্তি, থ্রি পিস এবং লেহেঙ্গার সম্পূর্ণ কালেকশন অনলাইন দেখুন ও সেরা মূল্যে অর্ডার করুন।";
 
   const shopSchema = {
