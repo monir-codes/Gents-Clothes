@@ -50,10 +50,22 @@ https.get(API_URL, (res) => {
   <!-- Dynamic Products -->
 `;
 
+      const slugify = (text) => {
+        if (!text) return '';
+        return text
+          .toString()
+          .toLowerCase()
+          .trim()
+          .replace(/[^\w\s\u0980-\u09FF-]/g, '')
+          .replace(/[\s_-]+/g, '-')
+          .replace(/^-+|-+$/g, '');
+      };
+
       if (Array.isArray(products)) {
         products.forEach((product) => {
           const lastMod = product.updatedAt ? new Date(product.updatedAt).toISOString().split('T')[0] : today;
-          xml += `  <url>\n    <loc>${BASE_URL}/product/${product._id}</loc>\n    <lastmod>${lastMod}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.9</priority>\n`;
+          const slug = product.slug || slugify(product.name) || product._id;
+          xml += `  <url>\n    <loc>${BASE_URL}/product/${slug}</loc>\n    <lastmod>${lastMod}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.9</priority>\n`;
           if (product.image) {
             xml += `    <image:image>\n      <image:loc>${product.image}</image:loc>\n      <image:title><![CDATA[${product.name || 'রঙবতী'}]]></image:title>\n    </image:image>\n`;
           }

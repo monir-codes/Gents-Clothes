@@ -43,10 +43,22 @@ router.get('/', async (req, res) => {
       sitemap += `  </url>\n`;
     });
 
+    const slugify = (text) => {
+      if (!text) return '';
+      return text
+        .toString()
+        .toLowerCase()
+        .trim()
+        .replace(/[^\w\s\u0980-\u09FF-]/g, '')
+        .replace(/[\s_-]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+    };
+
     // Add dynamic product pages
     products.forEach((product) => {
+      const slug = product.slug || slugify(product.name) || product._id;
       sitemap += `  <url>\n`;
-      sitemap += `    <loc>${baseUrl}/product/${product._id}</loc>\n`;
+      sitemap += `    <loc>${baseUrl}/product/${slug}</loc>\n`;
       const lastMod = product.updatedAt ? product.updatedAt.toISOString().split('T')[0] : today;
       sitemap += `    <lastmod>${lastMod}</lastmod>\n`;
       sitemap += `    <changefreq>weekly</changefreq>\n`;

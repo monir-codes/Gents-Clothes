@@ -40,6 +40,7 @@ const productSchema = new mongoose.Schema({
   },
   
   // Unique identifiers
+  slug: { type: String, unique: true, sparse: true, index: true },
   sku: { type: String, unique: true, sparse: true },
   barcode: { type: String },
   
@@ -47,6 +48,35 @@ const productSchema = new mongoose.Schema({
   aiDescription: { type: String },
 }, {
   timestamps: true,
+});
+
+// Helper for generating SEO friendly slugs
+const slugify = (text) => {
+  if (!text) return '';
+  return text
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s\u0980-\u09FF-]/g, '')
+    .replace(/[\s_-]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+};
+
+// Pre-save hook to ensure slug is always populated
+productSchema.pre('save', async function (next) {
+  if (!this.slug || this.isModified('name')) {
+    let baseSlug = slugify(this.name) || `product-${Math.floor(1000 + Math.random() * 9000)}`;
+    let currentSlug = baseSlug;
+    let count = 1;
+
+    // Check for collision
+    while (await mongoose.models.Product.findOne({ slug: currentSlug, _id: { $ne: this._id } })) {
+      currentSlug = `${baseSlug}-${count}`;
+      count++;
+    }
+    this.slug = currentSlug;
+  }
+  next();
 });
 
 const Product = mongoose.model('Product', productSchema);

@@ -45,20 +45,35 @@ const getProducts = async (req, res) => {
   }
 };
 
-// @desc    Fetch single product
+const mongoose = require('mongoose');
+
+// @desc    Fetch single product (by ID or Slug)
 // @route   GET /api/products/:id
 // @access  Public
 const getProductById = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
+    const identifier = req.params.id;
+    let product = null;
+
+    if (mongoose.Types.ObjectId.isValid(identifier)) {
+      product = await Product.findById(identifier);
+    }
+    
+    if (!product) {
+      product = await Product.findOne({ slug: identifier });
+    }
 
     if (product) {
+      // If product has no slug yet, generate and save it
+      if (!product.slug) {
+        await product.save();
+      }
       res.json(product);
     } else {
       res.status(404).json({ message: 'Product not found' });
     }
   } catch (error) {
-    res.status(500).json({ message: 'Server Error' });
+    res.status(500).json({ message: 'Server Error', error: error.message });
   }
 };
 

@@ -64,9 +64,21 @@ async function generateSitemap() {
       }
     }
 
+    const slugify = (text) => {
+      if (!text) return '';
+      return text
+        .toString()
+        .toLowerCase()
+        .trim()
+        .replace(/[^\w\s\u0980-\u09FF-]/g, '')
+        .replace(/[\s_-]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+    };
+
     if (Array.isArray(products) && products.length > 0) {
       products.forEach(product => {
         const lastMod = product.updatedAt ? new Date(product.updatedAt).toISOString().split('T')[0] : today;
+        const slug = product.slug || slugify(product.name) || product._id;
         const imgTag = product.image ? `
     <image:image>
       <image:loc>${product.image}</image:loc>
@@ -75,7 +87,7 @@ async function generateSitemap() {
     </image:image>` : '';
 
         sitemap += `  <url>
-    <loc>${BASE_URL}/product/${product._id}</loc>
+    <loc>${BASE_URL}/product/${slug}</loc>
     <lastmod>${lastMod}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>${imgTag}

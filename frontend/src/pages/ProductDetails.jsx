@@ -11,6 +11,7 @@ import SEO from '../components/SEO';
 import ProductCard from '../components/ProductCard';
 import RecentlyViewed from '../components/RecentlyViewed';
 import { generateProductKeywords } from '../utils/seoHelpers';
+import { getProductUrl } from '../utils/slugify';
 import styles from './ProductDetails.module.css';
 
 const ProductDetails = () => {
@@ -115,7 +116,7 @@ const ProductDetails = () => {
   if (loading) return <Loader fullScreen />;
   if (!product) return <div className="container" style={{padding: '50px 0'}}>Product not found</div>;
 
-  const productUrl = `https://ronggoboti.vercel.app/product/${product._id}`;
+  const productUrl = `https://ronggoboti.vercel.app${getProductUrl(product)}`;
   
   const productImages = [product.image, product.hoverImage].filter(Boolean);
 
@@ -405,7 +406,7 @@ const ProductDetails = () => {
               <div style={{ padding: '20px', background: 'var(--color-surface)', borderRadius: '8px' }}>
                 <h3 style={{ fontSize: '1.2rem', marginBottom: '15px' }}>Write a Review</h3>
                 {!user ? (
-                  <p>Please <Link to={`/login?redirect=/product/${product._id}?tab=reviews`} style={{ color: 'var(--color-accent)', textDecoration: 'underline' }}>log in</Link> to write a review.</p>
+                  <p>Please <Link to={`/login?redirect=${getProductUrl(product)}?tab=reviews`} style={{ color: 'var(--color-accent)', textDecoration: 'underline' }}>log in</Link> to write a review.</p>
                 ) : (
                   <form onSubmit={submitReview} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                     <div>

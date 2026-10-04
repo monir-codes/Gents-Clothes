@@ -4,6 +4,7 @@ import { Heart, ShoppingBag } from 'lucide-react';
 import { motion } from 'framer-motion';
 import useCartStore from '../store/useCartStore';
 import useWishlistStore from '../store/useWishlistStore';
+import { getProductUrl } from '../utils/slugify';
 import styles from './ProductCard.module.css';
 
 const ProductCard = ({ product }) => {
@@ -37,7 +38,7 @@ const ProductCard = ({ product }) => {
       whileHover={{ y: -5, boxShadow: "0 10px 25px rgba(0,0,0,0.1)" }}
     >
       <div className={styles.imageWrapper}>
-        <Link to={`/product/${product._id}`} className={styles.imageContainer}>
+        <Link to={getProductUrl(product)} className={styles.imageContainer}>
           <img src={product.image} alt={product.name} className={styles.image} />
           {product.hoverImage && (
             <img src={product.hoverImage} alt={product.name} className={styles.hoverImage} />
@@ -67,7 +68,7 @@ const ProductCard = ({ product }) => {
       </div>
 
       <div className={styles.details}>
-        <Link to={`/product/${product._id}`}>
+        <Link to={getProductUrl(product)}>
           <h3 className={styles.name}>{product.name}</h3>
         </Link>
         <div className={styles.priceContainer}>
