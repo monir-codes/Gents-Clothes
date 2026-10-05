@@ -1,34 +1,91 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import axios from 'axios';
 import styles from './Admin.module.css';
-import { Plus, Edit, Trash2, X, Upload } from 'lucide-react';
+import { 
+  Plus, Edit, Trash2, X, Upload, Sparkles, Wand2, Search, 
+  Check, RefreshCw, Link as LinkIcon, Image as ImageIcon, AlertCircle 
+} from 'lucide-react';
 import Swal from 'sweetalert2';
 import useAuthStore from '../../store/useAuthStore';
 
-// User's official ImgBB API key
-const IMGBB_API_KEY = "affe71bc1ff1277c7d83bc8e9dfe4c3c"; 
+// ImgBB API Key
+const IMGBB_API_KEY = "affe71bc1ff1277c7d83bc8e9dfe4c3c";
+
+// Pre-defined Categories
+const CATEGORIES = [
+  "Sarees",
+  "Salwar Kameez",
+  "Kurtis & Tunics",
+  "Lehengas & Gowns",
+  "Western Wear",
+  "Modest Wear",
+  "Co-ord Sets",
+  "Jewelry & Accessories",
+  "Men's Collection"
+];
+
+// Quick Category-Specific Size Presets
+const SIZE_PRESETS = {
+  "Sarees": ["12 Haat with Blouse Piece", "12 Haat (Free Size)", "14 Haat with Blouse Piece", "Without Blouse Piece"],
+  "Salwar Kameez": ["Unstitched (Free Size)", "Semi-Stitched", "36, 38, 40, 42, 44", "38, 40, 42, 44, 46", "S, M, L, XL, XXL"],
+  "Kurtis & Tunics": ["36, 38, 40, 42, 44", "S, M, L, XL", "S, M, L, XL, XXL", "Free Size"],
+  "Lehengas & Gowns": ["Semi-Stitched (Free Size)", "Custom Fit (36-44)", "Ready-to-Wear"],
+  "Modest Wear": ["52, 54, 56", "52, 54, 56, 58", "54, 56, 58", "Free Size with Hijab"],
+  "Western Wear": ["S, M, L, XL", "XS, S, M, L, XL, XXL", "Free Size"],
+  "Co-ord Sets": ["S, M, L, XL", "Free Size", "36, 38, 40, 42"],
+  "Jewelry & Accessories": ["Free Size", "Adjustable", "Standard Size"],
+  "Men's Collection": ["38, 40, 42, 44", "S, M, L, XL, XXL", "Free Size"]
+};
+
+// Quick Example Prompts for Magic AI
+const MAGIC_EXAMPLES = [
+  {
+    label: "🥻 Saree (Bangla)",
+    text: "লাল জামদানি শাড়ি ৮৪ কাউন্ট পিওর কটন। সাথে ম্যাচিং আনস্টিচড ব্লাউজ পিস আছে। শাড়ির সাইজ ১২ হাত। দাম ৩৫০০ টাকা, আগের দাম ছিল ৪২০০ টাকা। গোল্ডেন জরির কাজ করা। ড্রাই ওয়াশ করতে হবে।"
+  },
+  {
+    label: "👗 3-Piece Salwar Kameez",
+    text: "Pakistani Luxury Embroidered Lawn 3-Piece Salwar Kameez with pure chiffon dupatta. Kamiz 3 yards, salwar 2.5 yards, dupatta 2.5 yards. Color: Emerald Green, Pastel Pink. Price 2850 BDT, regular 3400. Delicate cold wash."
+  },
+  {
+    label: "👚 Kurti & Tunic",
+    text: "Designer Hand Embroidery Cotton Kurti in Mustard Yellow and Maroon. Available chest sizes 38, 40, 42, 44. Price 1450 Tk. Hand wash."
+  },
+  {
+    label: "🧕 Abaya / Modest Wear",
+    text: "Premium Dubai Cherry Silk Abaya with matching Hijab. Available sizes: 52, 54, 56. Colors: Jet Black, Olive, Plum. Price 3200 Tk. Dry clean recommended."
+  }
+];
 
 const AdminProducts = () => {
   const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [imageTarget, setImageTarget] = useState(null); // 'image' or 'hoverImage'
+  const [imageInputMode, setImageInputMode] = useState('upload'); // 'upload' or 'url'
   const { token } = useAuthStore();
+
+  // Search & Filter
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategoryFilter, setSelectedCategoryFilter] = useState('ALL');
+
+  // AI Magic State
   const [magicText, setMagicText] = useState('');
   const [isMagicLoading, setIsMagicLoading] = useState(false);
 
-  const [formData, setFormData] = useState({
+  const initialFormState = {
     name: '',
-    price: 0,
-    category: '',
+    price: '',
+    oldPrice: '',
+    category: 'Sarees',
     brand: 'রঙবতী',
-    countInStock: 0,
+    countInStock: 10,
     description: '',
     image: '',
     hoverImage: '',
-    oldPrice: '',
     sku: '',
     sizes: '',
     colors: '',
@@ -37,14 +94,19 @@ const AdminProducts = () => {
       gsm: '',
       washInstruction: ''
     }
-  });
+  };
+
+  const [formData, setFormData] = useState(initialFormState);
 
   const fetchProducts = async () => {
     try {
-      const { data } = await axios.get('/api/products?limit=100');
+      setLoading(true);
+      const { data } = await axios.get('/api/products?limit=150');
       setProducts(Array.isArray(data?.products) ? data.products : (Array.isArray(data) ? data : []));
     } catch (error) {
-      console.error(error);
+      console.error('Failed to fetch products:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -53,13 +115,23 @@ const AdminProducts = () => {
   }, []);
 
   const handleInputChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleFabricDetailChange = (e) => {
-    setFormData({
-      ...formData,
-      fabricDetails: { ...formData.fabricDetails, [e.target.name]: e.target.value }
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      fabricDetails: { ...prev.fabricDetails, [name]: value }
+    }));
+  };
+
+  const handleSizePresetClick = (sizePreset) => {
+    setFormData(prev => {
+      if (!prev.sizes) return { ...prev, sizes: sizePreset };
+      if (prev.sizes.includes(sizePreset)) return prev;
+      return { ...prev, sizes: `${prev.sizes}, ${sizePreset}` };
     });
   };
 
@@ -79,49 +151,61 @@ const AdminProducts = () => {
       });
       const data = await response.json();
       
-      if (data.success) {
+      if (data.success && data.data?.url) {
         setFormData(prev => ({ ...prev, [target]: data.data.url }));
-        Swal.fire({ title: 'Success', text: 'Image uploaded successfully!', icon: 'success', toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
+        Swal.fire({ 
+          title: 'Uploaded!', 
+          text: 'Image uploaded successfully.', 
+          icon: 'success', 
+          toast: true, 
+          position: 'top-end', 
+          showConfirmButton: false, 
+          timer: 2000 
+        });
       } else {
-        Swal.fire('Error', 'Image upload failed. Check API Key.', 'error');
+        Swal.fire('Upload Error', data.error?.message || 'Image upload failed. Please try again or paste direct URL.', 'error');
       }
     } catch (error) {
-      Swal.fire('Error', 'Image upload failed', 'error');
+      Swal.fire('Error', 'Image upload service unreachable. You can paste the direct image URL instead.', 'error');
+    } finally {
+      setIsUploading(false);
+      e.target.value = null;
     }
-    
-    setIsUploading(false);
-    e.target.value = null; // Reset input
   };
 
   const generateDetails = async () => {
-    const context = formData.name || formData.description;
+    const context = formData.name || formData.description || formData.category;
     if (!context) {
-      Swal.fire('Error', 'Please enter a product name first', 'warning');
+      Swal.fire('Missing Product Info', 'Please enter a product title or basic notes first.', 'warning');
       return;
     }
     
     setIsGenerating(true);
     try {
-      const { data } = await axios.post('/api/ai/generate', { type: 'product_details', context });
-      try {
-        const resultString = data.result.replace(/```json/g, '').replace(/```/g, '').trim();
-        const parsedData = JSON.parse(resultString);
+      const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+      const { data } = await axios.post('/api/ai/generate', { type: 'product_details', context }, config);
+      
+      const parsed = data.data || (typeof data.result === 'string' ? JSON.parse(data.result.replace(/```json/gi, '').replace(/```/g, '').trim()) : null);
+
+      if (parsed) {
         setFormData(prev => ({
           ...prev,
-          description: parsedData.description || prev.description,
+          description: parsed.description || prev.description,
+          category: parsed.category || prev.category,
+          sizes: parsed.sizes || prev.sizes,
           fabricDetails: {
-            material: parsedData.material || prev.fabricDetails?.material || '',
-            gsm: parsedData.gsm || prev.fabricDetails?.gsm || '',
-            washInstruction: parsedData.washInstruction || prev.fabricDetails?.washInstruction || ''
+            material: parsed.material || prev.fabricDetails?.material || '',
+            gsm: parsed.gsm || prev.fabricDetails?.gsm || '',
+            washInstruction: parsed.washInstruction || prev.fabricDetails?.washInstruction || ''
           }
         }));
-        Swal.fire({ title: 'Success', text: 'All details generated!', icon: 'success', toast: true, position: 'top-end', showConfirmButton: false, timer: 3000 });
-      } catch (parseError) {
-        console.error("Failed to parse JSON:", data.result);
-        Swal.fire('Error', 'Failed to parse AI response. Please try again.', 'error');
+        Swal.fire({ title: 'AI Details Generated!', text: 'Description and fabric specifications updated.', icon: 'success', toast: true, position: 'top-end', showConfirmButton: false, timer: 2500 });
+      } else {
+        Swal.fire('Notice', 'AI responded in plain text. Please review.', 'info');
       }
     } catch (error) {
-      Swal.fire('Error', error.response?.data?.message || 'Failed to generate details', 'error');
+      console.error(error);
+      Swal.fire('Error', error.response?.data?.message || 'Failed to generate details. Please check connection.', 'error');
     } finally {
       setIsGenerating(false);
     }
@@ -129,39 +213,62 @@ const AdminProducts = () => {
 
   const handleMagicFill = async () => {
     if (!magicText.trim()) {
-      Swal.fire('Error', 'Please paste some text first!', 'warning');
+      Swal.fire('Empty Input', 'Please paste raw product details or click one of the examples below.', 'warning');
       return;
     }
     
     setIsMagicLoading(true);
     try {
-      const { data } = await axios.post('/api/ai/generate', { type: 'smart_extract', context: magicText });
-      try {
-        const resultString = data.result.replace(/```json/g, '').replace(/```/g, '').trim();
-        const parsedData = JSON.parse(resultString);
-        
+      const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+      const { data } = await axios.post('/api/ai/generate', { type: 'smart_extract', context: magicText }, config);
+      
+      const parsedData = data.data || (typeof data.result === 'string' ? JSON.parse(data.result.replace(/```json/gi, '').replace(/```/g, '').trim()) : null);
+      
+      if (parsedData) {
+        const safeSizes = Array.isArray(parsedData.sizes) 
+          ? parsedData.sizes.join(', ') 
+          : (parsedData.sizes ? String(parsedData.sizes) : prev.sizes);
+
+        const safeColors = Array.isArray(parsedData.colors) 
+          ? parsedData.colors.join(', ') 
+          : (parsedData.colors ? String(parsedData.colors) : prev.colors);
+
+        const safeMaterial = Array.isArray(parsedData.material) 
+          ? parsedData.material.join(' / ') 
+          : (parsedData.material ? String(parsedData.material) : (prev.fabricDetails?.material || ''));
+
         setFormData(prev => ({
           ...prev,
           name: parsedData.name || prev.name,
-          price: parsedData.price || prev.price,
+          price: parsedData.price !== undefined ? parsedData.price : prev.price,
+          oldPrice: parsedData.oldPrice !== null && parsedData.oldPrice !== undefined ? parsedData.oldPrice : prev.oldPrice,
           category: parsedData.category || prev.category,
-          sizes: parsedData.sizes || prev.sizes,
-          colors: parsedData.colors || prev.colors,
+          sizes: safeSizes,
+          colors: safeColors,
+          sku: parsedData.sku || prev.sku,
           description: parsedData.description || prev.description,
           fabricDetails: {
-            material: parsedData.material || prev.fabricDetails?.material || '',
+            material: safeMaterial,
             gsm: parsedData.gsm || prev.fabricDetails?.gsm || '',
             washInstruction: parsedData.washInstruction || prev.fabricDetails?.washInstruction || ''
           }
         }));
-        setMagicText('');
-        Swal.fire({ title: 'Magic Fill Success!', text: 'Form populated with extracted details.', icon: 'success', toast: true, position: 'top-end', showConfirmButton: false, timer: 3000 });
-      } catch (parseError) {
-        console.error("Failed to parse JSON:", data.result);
-        Swal.fire('Error', 'Failed to parse AI response. Please check your text and try again.', 'error');
+
+        Swal.fire({ 
+          title: '✨ Magic Auto-Fill Success!', 
+          text: `Form successfully populated for "${parsedData.name || 'Product'}".`, 
+          icon: 'success', 
+          toast: true, 
+          position: 'top-end', 
+          showConfirmButton: false, 
+          timer: 3500 
+        });
+      } else {
+        Swal.fire('Extraction Error', 'Could not parse response into fields. Please verify your text.', 'error');
       }
     } catch (error) {
-      Swal.fire('Error', error.response?.data?.message || 'Failed to extract details', 'error');
+      console.error(error);
+      Swal.fire('Error', error.response?.data?.message || 'Failed to extract product details.', 'error');
     } finally {
       setIsMagicLoading(false);
     }
@@ -169,11 +276,24 @@ const AdminProducts = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!formData.name.trim()) {
+      Swal.fire('Required Field', 'Product title is required.', 'warning');
+      return;
+    }
+
     try {
       const submissionData = {
         ...formData,
-        sizes: typeof formData.sizes === 'string' ? formData.sizes.split(',').map(s => s.trim()).filter(Boolean) : formData.sizes,
-        colors: typeof formData.colors === 'string' ? formData.colors.split(',').map(c => c.trim()).filter(Boolean) : formData.colors
+        price: Number(formData.price) || 0,
+        oldPrice: formData.oldPrice ? Number(formData.oldPrice) : null,
+        countInStock: Number(formData.countInStock) >= 0 ? Number(formData.countInStock) : 0,
+        sizes: typeof formData.sizes === 'string' 
+          ? formData.sizes.split(',').map(s => s.trim()).filter(Boolean) 
+          : formData.sizes,
+        colors: typeof formData.colors === 'string' 
+          ? formData.colors.split(',').map(c => c.trim()).filter(Boolean) 
+          : formData.colors
       };
 
       const config = {
@@ -184,22 +304,23 @@ const AdminProducts = () => {
 
       if (editingId) {
         await axios.put(`/api/products/${editingId}`, submissionData, config);
-        Swal.fire('Updated!', 'Product updated successfully.', 'success');
+        Swal.fire('Updated!', 'Product updated successfully in live catalog.', 'success');
       } else {
         await axios.post('/api/products', submissionData, config);
-        Swal.fire('Added!', 'Product added successfully.', 'success');
+        Swal.fire('Published!', 'New product added to live catalog.', 'success');
       }
       setIsModalOpen(false);
       fetchProducts();
     } catch (error) {
-      Swal.fire('Error', 'Failed to save product', 'error');
+      console.error('Save product error:', error);
+      Swal.fire('Error Saving Product', error.response?.data?.message || error.message || 'Failed to save product to database.', 'error');
     }
   };
 
   const openAddModal = () => {
     setEditingId(null);
     setMagicText('');
-    setFormData({ name: '', price: 0, oldPrice: '', category: '', brand: 'রঙবতী', countInStock: 0, description: '', image: '', hoverImage: '', sku: '', sizes: '', colors: '', fabricDetails: { material: '', gsm: '', washInstruction: '' } });
+    setFormData(initialFormState);
     setIsModalOpen(true);
   };
 
@@ -207,18 +328,18 @@ const AdminProducts = () => {
     setEditingId(product._id);
     setMagicText('');
     setFormData({
-      name: product.name,
-      price: product.price,
-      category: product.category,
-      brand: product.brand,
-      countInStock: product.countInStock,
-      description: product.description,
-      image: product.image,
+      name: product.name || '',
+      price: product.price || 0,
+      category: product.category || 'Sarees',
+      brand: product.brand || 'রঙবতী',
+      countInStock: product.countInStock !== undefined ? product.countInStock : 0,
+      description: product.description || '',
+      image: product.image || '',
       hoverImage: product.hoverImage || '',
       oldPrice: product.oldPrice || '',
       sku: product.sku || '',
-      sizes: product.sizes ? product.sizes.join(', ') : '',
-      colors: product.colors ? product.colors.join(', ') : '',
+      sizes: Array.isArray(product.sizes) ? product.sizes.join(', ') : (product.sizes || ''),
+      colors: Array.isArray(product.colors) ? product.colors.join(', ') : (product.colors || ''),
       fabricDetails: {
         material: product.fabricDetails?.material || '',
         gsm: product.fabricDetails?.gsm || '',
@@ -228,10 +349,10 @@ const AdminProducts = () => {
     setIsModalOpen(true);
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (id, name) => {
     const result = await Swal.fire({
-      title: 'Are you sure?',
-      text: "You won't be able to revert this!",
+      title: 'Delete Product?',
+      text: `Are you sure you want to delete "${name}"? This action cannot be undone.`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#d33',
@@ -247,73 +368,276 @@ const AdminProducts = () => {
           }
         };
         await axios.delete(`/api/products/${id}`, config);
-        Swal.fire('Deleted!', 'Product has been deleted.', 'success');
+        Swal.fire('Deleted!', 'Product removed from database.', 'success');
         fetchProducts();
       } catch (error) {
-        Swal.fire('Error', 'Failed to delete product', 'error');
+        Swal.fire('Error', error.response?.data?.message || 'Failed to delete product', 'error');
       }
     }
   };
 
+  // Filtered Products
+  const filteredProducts = useMemo(() => {
+    return products.filter(p => {
+      const matchSearch = searchQuery === '' || 
+        p.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        p.sku?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.category?.toLowerCase().includes(searchQuery.toLowerCase());
+
+      const matchCategory = selectedCategoryFilter === 'ALL' || p.category === selectedCategoryFilter;
+
+      return matchSearch && matchCategory;
+    });
+  }, [products, searchQuery, selectedCategoryFilter]);
+
+  const activeCategoryPresets = SIZE_PRESETS[formData.category] || SIZE_PRESETS["Sarees"];
+
   return (
     <div style={{ position: 'relative' }}>
+      {/* Header */}
       <div className={styles.dashboardHeader}>
-        <h1 className={styles.dashboardTitle}>Products Database</h1>
-        <button onClick={openAddModal} style={{ padding: '10px 20px', background: 'var(--color-text-primary)', color: 'white', borderRadius: '4px', display: 'flex', gap: '8px', alignItems: 'center' }}>
-          <Plus size={18} /> Add Product
+        <div>
+          <h1 className={styles.dashboardTitle}>Products Catalog</h1>
+          <p style={{ margin: 0, color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>
+            Manage and publish women's fashion, sarees, dresses & ethnic collections
+          </p>
+        </div>
+        <button 
+          onClick={openAddModal} 
+          style={{ 
+            padding: '11px 22px', 
+            background: 'var(--color-accent)', 
+            color: 'white', 
+            borderRadius: '6px', 
+            border: 'none',
+            display: 'flex', 
+            gap: '8px', 
+            alignItems: 'center',
+            cursor: 'pointer',
+            fontWeight: 600,
+            fontSize: '0.95rem',
+            boxShadow: '0 2px 8px rgba(94, 15, 43, 0.25)'
+          }}
+        >
+          <Plus size={19} /> Add New Product
         </button>
       </div>
 
+      {/* Filters Bar */}
+      <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center', marginBottom: '20px', background: 'var(--color-background)', padding: '14px', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: '1 1 250px', background: 'var(--color-surface)', padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--color-border)' }}>
+          <Search size={18} color="var(--color-text-secondary)" />
+          <input 
+            type="text" 
+            placeholder="Search by product title, SKU, or category..." 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{ border: 'none', background: 'transparent', width: '100%', outline: 'none', fontFamily: 'inherit', fontSize: '0.9rem' }}
+          />
+          {searchQuery && (
+            <button onClick={() => setSearchQuery('')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+              <X size={16} color="var(--color-text-secondary)" />
+            </button>
+          )}
+        </div>
+
+        <select 
+          value={selectedCategoryFilter} 
+          onChange={(e) => setSelectedCategoryFilter(e.target.value)}
+          style={{ padding: '9px 14px', border: '1px solid var(--color-border)', borderRadius: '6px', background: 'var(--color-surface)', fontSize: '0.9rem', cursor: 'pointer' }}
+        >
+          <option value="ALL">All Categories ({products.length})</option>
+          {CATEGORIES.map(cat => (
+            <option key={cat} value={cat}>{cat}</option>
+          ))}
+        </select>
+
+        <button 
+          onClick={fetchProducts} 
+          title="Refresh List"
+          style={{ padding: '9px 14px', background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}
+        >
+          <RefreshCw size={15} className={loading ? styles.spin : ''} /> Refresh
+        </button>
+      </div>
+
+      {/* Products Table */}
       <div className={styles.tableContainer}>
         <table className={styles.table}>
           <thead>
             <tr>
-              <th>Image</th>
-              <th>Name</th>
+              <th style={{ width: '60px' }}>Image</th>
+              <th>Product Details</th>
               <th>Category</th>
               <th>Price</th>
-              <th>Stock</th>
-              <th>Action</th>
+              <th>Sizes</th>
+              <th>Stock Status</th>
+              <th style={{ textAlign: 'right' }}>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {products.map(product => (
-              <tr key={product._id}>
-                <td><img src={product.image} alt={product.name} style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px' }} /></td>
-                <td>{product.name}</td>
-                <td>{product.category}</td>
-                <td>৳{product.price}</td>
-                <td>
-                  <span style={{ color: product.countInStock > 0 ? 'var(--color-success)' : 'var(--color-error)', fontWeight: 600 }}>
-                    {product.countInStock > 0 ? product.countInStock : 'Out of Stock'}
-                  </span>
-                </td>
-                <td>
-                  <button onClick={() => openEditModal(product)} style={{ marginRight: '16px', color: 'var(--color-accent)' }}>
-                    <Edit size={18} />
-                  </button>
-                  <button onClick={() => handleDelete(product._id)} style={{ color: 'var(--color-error)' }}>
-                    <Trash2 size={18} />
-                  </button>
+            {loading ? (
+              <tr>
+                <td colSpan="7" style={{ textAlign: 'center', padding: '40px', color: 'var(--color-text-secondary)' }}>
+                  Loading product catalog...
                 </td>
               </tr>
-            ))}
+            ) : filteredProducts.length === 0 ? (
+              <tr>
+                <td colSpan="7" style={{ textAlign: 'center', padding: '40px', color: 'var(--color-text-secondary)' }}>
+                  No products found matching your search.
+                </td>
+              </tr>
+            ) : (
+              filteredProducts.map(product => (
+                <tr key={product._id}>
+                  <td>
+                    <img 
+                      src={product.image || 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&q=80&w=200'} 
+                      alt={product.name} 
+                      style={{ width: '46px', height: '46px', objectFit: 'cover', borderRadius: '6px', border: '1px solid var(--color-border)' }} 
+                    />
+                  </td>
+                  <td>
+                    <div style={{ fontWeight: 600, color: 'var(--color-text-primary)' }}>{product.name}</div>
+                    <div style={{ fontSize: '0.78rem', color: 'var(--color-text-secondary)', marginTop: '2px', fontFamily: 'monospace' }}>
+                      SKU: {product.sku || 'N/A'}
+                    </div>
+                  </td>
+                  <td>
+                    <span style={{ fontSize: '0.82rem', padding: '3px 8px', background: 'var(--color-surface)', borderRadius: '4px', border: '1px solid var(--color-border)' }}>
+                      {product.category || 'Uncategorized'}
+                    </span>
+                  </td>
+                  <td>
+                    <div style={{ fontWeight: 700, color: 'var(--color-text-primary)' }}>৳{product.price}</div>
+                    {product.oldPrice && (
+                      <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', textDecoration: 'line-through' }}>
+                        ৳{product.oldPrice}
+                      </div>
+                    )}
+                  </td>
+                  <td>
+                    <div style={{ fontSize: '0.82rem', maxWidth: '180px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={Array.isArray(product.sizes) ? product.sizes.join(', ') : product.sizes}>
+                      {Array.isArray(product.sizes) && product.sizes.length > 0 
+                        ? product.sizes.join(', ') 
+                        : (typeof product.sizes === 'string' && product.sizes ? product.sizes : 'Free Size')}
+                    </div>
+                  </td>
+                  <td>
+                    <span style={{ 
+                      padding: '3px 8px', 
+                      borderRadius: '4px', 
+                      fontSize: '0.8rem', 
+                      fontWeight: 600,
+                      background: product.countInStock > 0 ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                      color: product.countInStock > 0 ? '#16a34a' : '#ef4444' 
+                    }}>
+                      {product.countInStock > 0 ? `${product.countInStock} In Stock` : 'Out of Stock'}
+                    </span>
+                  </td>
+                  <td style={{ textAlign: 'right' }}>
+                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                      <button 
+                        onClick={() => openEditModal(product)} 
+                        title="Edit Product"
+                        style={{ background: 'none', border: '1px solid var(--color-border)', borderRadius: '4px', padding: '6px 10px', cursor: 'pointer', color: 'var(--color-accent)' }}
+                      >
+                        <Edit size={16} />
+                      </button>
+                      <button 
+                        onClick={() => handleDelete(product._id, product.name)} 
+                        title="Delete Product"
+                        style={{ background: 'none', border: '1px solid var(--color-border)', borderRadius: '4px', padding: '6px 10px', cursor: 'pointer', color: 'var(--color-error)' }}
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
 
+      {/* Add / Edit Product Modal */}
       {isModalOpen && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000, padding: '20px' }}>
-          <div style={{ background: 'var(--color-surface)', width: '100%', maxWidth: '700px', maxHeight: '90vh', overflowY: 'auto', padding: '30px', borderRadius: '8px', position: 'relative' }}>
-            <button onClick={() => setIsModalOpen(false)} style={{ position: 'absolute', top: '20px', right: '20px' }}>
-              <X size={24} />
+        <div style={{ 
+          position: 'fixed', 
+          top: 0, 
+          left: 0, 
+          right: 0, 
+          bottom: 0, 
+          width: '100vw', 
+          height: '100vh', 
+          height: '100dvh',
+          background: 'rgba(15, 23, 42, 0.75)', 
+          backdropFilter: 'blur(5px)',
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center', 
+          zIndex: 10000, 
+          padding: '16px' 
+        }}>
+          <div style={{ 
+            background: 'var(--color-background)', 
+            width: '100%', 
+            maxWidth: '780px', 
+            maxHeight: '92vh', 
+            overflowY: 'auto', 
+            padding: '28px', 
+            borderRadius: '12px', 
+            position: 'relative',
+            boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
+            border: '1px solid var(--color-border)',
+            overscrollBehaviorY: 'contain'
+          }}>
+            <button 
+              onClick={() => setIsModalOpen(false)} 
+              aria-label="Close modal"
+              style={{ 
+                position: 'absolute', 
+                top: '18px', 
+                right: '18px', 
+                background: 'var(--color-surface)', 
+                border: '1px solid var(--color-border)', 
+                borderRadius: '50%', 
+                width: '34px', 
+                height: '34px', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                cursor: 'pointer' 
+              }}
+            >
+              <X size={18} />
             </button>
-            <h2 style={{ marginBottom: '20px' }}>{editingId ? 'Edit Product' : 'Add New Product'}</h2>
+
+            <div style={{ marginBottom: '20px' }}>
+              <h2 style={{ fontSize: '1.4rem', fontWeight: 700, margin: '0 0 4px 0' }}>
+                {editingId ? 'Edit Product' : 'Add New Product'}
+              </h2>
+              <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>
+                {editingId ? 'Update product specifications and live storefront data.' : 'Fill in the details manually or use AI Magic Paste to auto-populate the entire form.'}
+              </p>
+            </div>
             
-            {/* Magic Paste Section */}
-            <div style={{ background: 'var(--color-surface-dim, #f9fafb)', padding: '15px', borderRadius: '8px', marginBottom: '20px', border: '1px solid var(--color-border)', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.05)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                <label style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--color-accent)' }}>✨ AI Magic Paste</label>
+            {/* AI Magic Paste Section */}
+            <div style={{ 
+              background: 'linear-gradient(135deg, rgba(94, 15, 43, 0.04) 0%, rgba(94, 15, 43, 0.09) 100%)', 
+              padding: '16px', 
+              borderRadius: '10px', 
+              marginBottom: '24px', 
+              border: '1px solid rgba(94, 15, 43, 0.2)' 
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', flexWrap: 'wrap', gap: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Sparkles size={18} color="var(--color-accent)" />
+                  <span style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--color-accent)' }}>
+                    AI Magic Paste (Gemini AI)
+                  </span>
+                </div>
                 <button 
                   type="button" 
                   onClick={handleMagicFill}
@@ -322,116 +646,328 @@ const AdminProducts = () => {
                     background: 'var(--color-accent)', 
                     color: 'white', 
                     border: 'none', 
-                    padding: '6px 14px', 
-                    borderRadius: '4px', 
-                    fontSize: '0.85rem', 
-                    cursor: 'pointer',
+                    padding: '7px 16px', 
+                    borderRadius: '6px', 
+                    fontSize: '0.88rem', 
+                    cursor: isMagicLoading ? 'wait' : 'pointer',
                     fontWeight: 600,
-                    opacity: isMagicLoading ? 0.7 : 1
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    opacity: isMagicLoading ? 0.7 : 1,
+                    boxShadow: '0 2px 6px rgba(94, 15, 43, 0.2)'
                   }}
                 >
-                  {isMagicLoading ? 'Extracting...' : '✨ Auto Fill Form'}
+                  <Wand2 size={16} />
+                  {isMagicLoading ? '✨ Analyzing with AI...' : '✨ Auto-Fill Entire Form'}
                 </button>
               </div>
+
               <textarea 
-                placeholder="Paste raw product details here (e.g. from WhatsApp, Excel, etc.)..."
+                placeholder="Paste raw unstructured notes, supplier details, WhatsApp/FB copy (Bangla, English, Banglish) e.g. 'Pure cotton red jamdani saree 12 haat with blouse piece, price 3500, dry clean only'..."
                 value={magicText}
                 onChange={(e) => setMagicText(e.target.value)}
-                style={{ width: '100%', padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px', minHeight: '80px', fontFamily: 'inherit', resize: 'vertical' }}
-              ></textarea>
-              <p style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', marginTop: '8px', marginBottom: 0 }}>
-                Gemini AI will analyze your text and automatically fill the Name, Price, Category, Sizes, Colors, Description, and Fabric Details!
-              </p>
+                style={{ 
+                  width: '100%', 
+                  padding: '12px', 
+                  border: '1px solid var(--color-border)', 
+                  borderRadius: '6px', 
+                  minHeight: '75px', 
+                  fontFamily: 'inherit', 
+                  fontSize: '0.88rem',
+                  resize: 'vertical',
+                  background: 'var(--color-background)'
+                }}
+              />
+
+              {/* Example Prompts */}
+              <div style={{ marginTop: '10px', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                <span style={{ fontSize: '0.78rem', color: 'var(--color-text-secondary)', fontWeight: 600 }}>Quick Examples:</span>
+                {MAGIC_EXAMPLES.map((ex, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setMagicText(ex.text)}
+                    style={{
+                      background: 'var(--color-surface)',
+                      border: '1px solid var(--color-border)',
+                      borderRadius: '4px',
+                      padding: '3px 8px',
+                      fontSize: '0.75rem',
+                      cursor: 'pointer',
+                      color: 'var(--color-text-primary)'
+                    }}
+                  >
+                    {ex.label}
+                  </button>
+                ))}
+              </div>
             </div>
 
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
               
-              {/* Images Upload */}
-              <div style={{ display: 'flex', gap: '15px' }}>
-                <div style={{ flex: 1, border: '2px dashed var(--color-border)', padding: '20px', textAlign: 'center', borderRadius: '8px' }}>
-                  <p style={{ fontWeight: 600, marginBottom: '10px' }}>Main Image</p>
-                  {formData.image ? (
-                    <img src={formData.image} alt="Preview" style={{ height: '100px', marginBottom: '10px', objectFit: 'contain' }} />
-                  ) : (
-                    <Upload size={32} style={{ marginBottom: '10px', color: 'var(--color-text-secondary)' }} />
-                  )}
-                  <div>
-                    <label style={{ cursor: 'pointer', color: 'var(--color-accent)', fontWeight: 600 }}>
-                      {isUploading && imageTarget === 'image' ? 'Uploading...' : 'Upload Main Image'}
-                      <input type="file" style={{ display: 'none' }} accept="image/*" onChange={(e) => handleImageUpload(e, 'image')} />
-                    </label>
+              {/* Product Images (Upload or URL) */}
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                  <label style={{ fontWeight: 600, fontSize: '0.9rem' }}>Product Imagery</label>
+                  <div style={{ display: 'flex', gap: '6px' }}>
+                    <button
+                      type="button"
+                      onClick={() => setImageInputMode('upload')}
+                      style={{
+                        padding: '3px 10px',
+                        fontSize: '0.78rem',
+                        borderRadius: '4px',
+                        border: '1px solid var(--color-border)',
+                        background: imageInputMode === 'upload' ? 'var(--color-text-primary)' : 'var(--color-surface)',
+                        color: imageInputMode === 'upload' ? '#fff' : 'var(--color-text-primary)',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      File Upload
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setImageInputMode('url')}
+                      style={{
+                        padding: '3px 10px',
+                        fontSize: '0.78rem',
+                        borderRadius: '4px',
+                        border: '1px solid var(--color-border)',
+                        background: imageInputMode === 'url' ? 'var(--color-text-primary)' : 'var(--color-surface)',
+                        color: imageInputMode === 'url' ? '#fff' : 'var(--color-text-primary)',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Paste URL
+                    </button>
                   </div>
                 </div>
 
-                <div style={{ flex: 1, border: '2px dashed var(--color-border)', padding: '20px', textAlign: 'center', borderRadius: '8px' }}>
-                  <p style={{ fontWeight: 600, marginBottom: '10px' }}>Hover Image</p>
-                  {formData.hoverImage ? (
-                    <img src={formData.hoverImage} alt="Preview" style={{ height: '100px', marginBottom: '10px', objectFit: 'contain' }} />
-                  ) : (
-                    <Upload size={32} style={{ marginBottom: '10px', color: 'var(--color-text-secondary)' }} />
-                  )}
-                  <div>
-                    <label style={{ cursor: 'pointer', color: 'var(--color-accent)', fontWeight: 600 }}>
-                      {isUploading && imageTarget === 'hoverImage' ? 'Uploading...' : 'Upload Hover Image'}
-                      <input type="file" style={{ display: 'none' }} accept="image/*" onChange={(e) => handleImageUpload(e, 'hoverImage')} />
-                    </label>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '14px' }}>
+                  {/* Main Image */}
+                  <div style={{ border: '1px dashed var(--color-border)', padding: '14px', textAlign: 'center', borderRadius: '8px', background: 'var(--color-surface)' }}>
+                    <p style={{ fontWeight: 600, fontSize: '0.85rem', marginBottom: '8px' }}>Main Front Image</p>
+                    {formData.image ? (
+                      <div style={{ position: 'relative', display: 'inline-block' }}>
+                        <img src={formData.image} alt="Preview" style={{ height: '90px', width: '90px', objectFit: 'cover', borderRadius: '6px', marginBottom: '8px', border: '1px solid var(--color-border)' }} />
+                        <button 
+                          type="button" 
+                          onClick={() => setFormData(p => ({ ...p, image: '' }))}
+                          style={{ position: 'absolute', top: '-6px', right: '-6px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '50%', width: '20px', height: '20px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                        >
+                          <X size={12} />
+                        </button>
+                      </div>
+                    ) : (
+                      <Upload size={28} style={{ marginBottom: '6px', color: 'var(--color-text-secondary)' }} />
+                    )}
+
+                    {imageInputMode === 'upload' ? (
+                      <div>
+                        <label style={{ cursor: 'pointer', color: 'var(--color-accent)', fontWeight: 600, fontSize: '0.82rem', display: 'block' }}>
+                          {isUploading && imageTarget === 'image' ? 'Uploading to ImgBB...' : 'Choose Main File'}
+                          <input type="file" style={{ display: 'none' }} accept="image/*" onChange={(e) => handleImageUpload(e, 'image')} />
+                        </label>
+                      </div>
+                    ) : (
+                      <input 
+                        type="url" 
+                        name="image" 
+                        placeholder="https://example.com/image.jpg" 
+                        value={formData.image} 
+                        onChange={handleInputChange} 
+                        style={{ width: '100%', padding: '6px 8px', fontSize: '0.8rem', border: '1px solid var(--color-border)', borderRadius: '4px', marginTop: '6px' }}
+                      />
+                    )}
+                  </div>
+
+                  {/* Hover Image */}
+                  <div style={{ border: '1px dashed var(--color-border)', padding: '14px', textAlign: 'center', borderRadius: '8px', background: 'var(--color-surface)' }}>
+                    <p style={{ fontWeight: 600, fontSize: '0.85rem', marginBottom: '8px' }}>Hover / Angle Image (Optional)</p>
+                    {formData.hoverImage ? (
+                      <div style={{ position: 'relative', display: 'inline-block' }}>
+                        <img src={formData.hoverImage} alt="Hover Preview" style={{ height: '90px', width: '90px', objectFit: 'cover', borderRadius: '6px', marginBottom: '8px', border: '1px solid var(--color-border)' }} />
+                        <button 
+                          type="button" 
+                          onClick={() => setFormData(p => ({ ...p, hoverImage: '' }))}
+                          style={{ position: 'absolute', top: '-6px', right: '-6px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '50%', width: '20px', height: '20px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                        >
+                          <X size={12} />
+                        </button>
+                      </div>
+                    ) : (
+                      <Upload size={28} style={{ marginBottom: '6px', color: 'var(--color-text-secondary)' }} />
+                    )}
+
+                    {imageInputMode === 'upload' ? (
+                      <div>
+                        <label style={{ cursor: 'pointer', color: 'var(--color-accent)', fontWeight: 600, fontSize: '0.82rem', display: 'block' }}>
+                          {isUploading && imageTarget === 'hoverImage' ? 'Uploading to ImgBB...' : 'Choose Hover File'}
+                          <input type="file" style={{ display: 'none' }} accept="image/*" onChange={(e) => handleImageUpload(e, 'hoverImage')} />
+                        </label>
+                      </div>
+                    ) : (
+                      <input 
+                        type="url" 
+                        name="hoverImage" 
+                        placeholder="https://example.com/hover.jpg" 
+                        value={formData.hoverImage} 
+                        onChange={handleInputChange} 
+                        style={{ width: '100%', padding: '6px 8px', fontSize: '0.8rem', border: '1px solid var(--color-border)', borderRadius: '4px', marginTop: '6px' }}
+                      />
+                    )}
                   </div>
                 </div>
               </div>
 
-              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                <input type="text" name="name" placeholder="Product Name" value={formData.name} onChange={handleInputChange} required style={{ flex: '1 1 250px', padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px' }} />
-                <input type="text" name="sku" placeholder="Product Code (e.g. GF-001)" value={formData.sku} onChange={handleInputChange} style={{ flex: '1 1 150px', padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px' }} />
+              {/* Title & SKU */}
+              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                <div style={{ flex: '1 1 350px' }}>
+                  <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '5px', fontWeight: 600 }}>Product Title / Name *</label>
+                  <input 
+                    type="text" 
+                    name="name" 
+                    placeholder="e.g. Royal Blue Zari Embroidered Pure Katan Silk Saree" 
+                    value={formData.name} 
+                    onChange={handleInputChange} 
+                    required 
+                    style={{ width: '100%', padding: '10px 12px', border: '1px solid var(--color-border)', borderRadius: '6px', fontSize: '0.92rem' }} 
+                  />
+                </div>
+                <div style={{ flex: '1 1 180px' }}>
+                  <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '5px', fontWeight: 600 }}>SKU / Product Code</label>
+                  <input 
+                    type="text" 
+                    name="sku" 
+                    placeholder="e.g. RGB-SAR-101 (Auto generated if blank)" 
+                    value={formData.sku} 
+                    onChange={handleInputChange} 
+                    style={{ width: '100%', padding: '10px 12px', border: '1px solid var(--color-border)', borderRadius: '6px', fontSize: '0.92rem' }} 
+                  />
+                </div>
               </div>
               
-              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                <div style={{ flex: '1 1 30%' }}>
-                  <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '5px', fontWeight: 600 }}>Price (৳)</label>
-                  <input type="number" name="price" placeholder="Price (৳)" value={formData.price} onChange={handleInputChange} required style={{ width: '100%', padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px' }} />
+              {/* Pricing & Stock */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '5px', fontWeight: 600 }}>Selling Price (৳) *</label>
+                  <input 
+                    type="number" 
+                    name="price" 
+                    placeholder="e.g. 3500" 
+                    value={formData.price} 
+                    onChange={handleInputChange} 
+                    required 
+                    style={{ width: '100%', padding: '10px 12px', border: '1px solid var(--color-border)', borderRadius: '6px', fontSize: '0.92rem' }} 
+                  />
                 </div>
-                <div style={{ flex: '1 1 30%' }}>
-                  <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '5px', fontWeight: 600 }}>Previous Price (Optional)</label>
-                  <input type="number" name="oldPrice" placeholder="e.g. 2500" value={formData.oldPrice} onChange={handleInputChange} style={{ width: '100%', padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px' }} />
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '5px', fontWeight: 600 }}>Previous / Regular Price (৳)</label>
+                  <input 
+                    type="number" 
+                    name="oldPrice" 
+                    placeholder="e.g. 4200 (for discount badge)" 
+                    value={formData.oldPrice} 
+                    onChange={handleInputChange} 
+                    style={{ width: '100%', padding: '10px 12px', border: '1px solid var(--color-border)', borderRadius: '6px', fontSize: '0.92rem' }} 
+                  />
                 </div>
-                <div style={{ flex: '1 1 30%' }}>
+                <div>
                   <label style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '5px', fontWeight: 600 }}>
-                    Stock Quantity 
-                    <span style={{ color: formData.countInStock > 0 ? 'var(--color-success)' : 'var(--color-error)' }}>
-                      {formData.countInStock > 0 ? ' (In Stock)' : ' (Out of Stock)'}
+                    <span>Stock Quantity</span>
+                    <span style={{ color: Number(formData.countInStock) > 0 ? '#16a34a' : '#ef4444' }}>
+                      {Number(formData.countInStock) > 0 ? ' (In Stock)' : ' (Out of Stock)'}
                     </span>
                   </label>
-                  <input type="number" name="countInStock" placeholder="Stock Qty (0 = Out of Stock)" value={formData.countInStock} onChange={handleInputChange} required style={{ width: '100%', padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px' }} />
+                  <input 
+                    type="number" 
+                    name="countInStock" 
+                    placeholder="10" 
+                    value={formData.countInStock} 
+                    onChange={handleInputChange} 
+                    required 
+                    style={{ width: '100%', padding: '10px 12px', border: '1px solid var(--color-border)', borderRadius: '6px', fontSize: '0.92rem' }} 
+                  />
                 </div>
               </div>
 
-              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                <div style={{ flex: '1 1 200px' }}>
-                  <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '5px', fontWeight: 600 }}>Category</label>
-                  <select name="category" value={formData.category} onChange={handleInputChange} required style={{ width: '100%', padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px' }}>
-                    <option value="" disabled>Select Category</option>
-                    <option value="Sarees">Sarees</option>
-                    <option value="Salwar Kameez">Salwar Kameez</option>
-                    <option value="Kurtis & Tunics">Kurtis & Tunics</option>
-                    <option value="Lehengas & Gowns">Lehengas & Gowns</option>
-                    <option value="Western Wear">Western Wear</option>
-                    <option value="Modest Wear">Modest Wear & Abayas</option>
-                    <option value="Co-ord Sets">Co-ord Sets</option>
-                    <option value="Jewelry & Accessories">Jewelry & Accessories</option>
+              {/* Category, Sizes, Colors */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '12px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '5px', fontWeight: 600 }}>Category *</label>
+                  <select 
+                    name="category" 
+                    value={formData.category} 
+                    onChange={handleInputChange} 
+                    required 
+                    style={{ width: '100%', padding: '10px 12px', border: '1px solid var(--color-border)', borderRadius: '6px', fontSize: '0.92rem', background: 'var(--color-surface)', cursor: 'pointer' }}
+                  >
+                    {CATEGORIES.map(cat => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
                   </select>
                 </div>
-                <div style={{ flex: '1 1 200px' }}>
-                  <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '5px', fontWeight: 600 }}>Sizes (comma separated)</label>
-                  <input type="text" name="sizes" placeholder="e.g. S, M, L, XL" value={formData.sizes} onChange={handleInputChange} style={{ width: '100%', padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px' }} />
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '5px', fontWeight: 600 }}>
+                    Sizes / Measurements (comma separated)
+                  </label>
+                  <input 
+                    type="text" 
+                    name="sizes" 
+                    placeholder="e.g. 12 Haat with Blouse Piece, Free Size, 38, 40, 42" 
+                    value={formData.sizes} 
+                    onChange={handleInputChange} 
+                    style={{ width: '100%', padding: '10px 12px', border: '1px solid var(--color-border)', borderRadius: '6px', fontSize: '0.92rem' }} 
+                  />
                 </div>
-                <div style={{ flex: '1 1 200px' }}>
+
+                <div>
                   <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '5px', fontWeight: 600 }}>Colors (comma separated)</label>
-                  <input type="text" name="colors" placeholder="e.g. Black, White, Navy" value={formData.colors} onChange={handleInputChange} style={{ width: '100%', padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px' }} />
+                  <input 
+                    type="text" 
+                    name="colors" 
+                    placeholder="e.g. Maroon, Antique Gold, Royal Blue" 
+                    value={formData.colors} 
+                    onChange={handleInputChange} 
+                    style={{ width: '100%', padding: '10px 12px', border: '1px solid var(--color-border)', borderRadius: '6px', fontSize: '0.92rem' }} 
+                  />
+                </div>
+              </div>
+
+              {/* Quick Size Presets for Current Category */}
+              <div style={{ background: 'var(--color-surface)', padding: '10px 14px', borderRadius: '6px', border: '1px solid var(--color-border)' }}>
+                <div style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--color-text-secondary)', marginBottom: '6px' }}>
+                  ⚡ Quick Size Presets for {formData.category} (click to add):
+                </div>
+                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                  {activeCategoryPresets.map(preset => (
+                    <button
+                      key={preset}
+                      type="button"
+                      onClick={() => handleSizePresetClick(preset)}
+                      style={{
+                        background: 'var(--color-background)',
+                        border: '1px solid var(--color-border)',
+                        borderRadius: '4px',
+                        padding: '4px 10px',
+                        fontSize: '0.78rem',
+                        cursor: 'pointer',
+                        color: 'var(--color-accent)',
+                        fontWeight: 500
+                      }}
+                    >
+                      + {preset}
+                    </button>
+                  ))}
                 </div>
               </div>
               
-              <div style={{ position: 'relative' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                  <label style={{ fontWeight: 600, fontSize: '0.9rem' }}>Product & Fabric Details</label>
+              {/* Fabric & Craft Details */}
+              <div style={{ border: '1px solid var(--color-border)', padding: '16px', borderRadius: '8px', background: 'var(--color-surface-dim, #fafafa)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
+                  <label style={{ fontWeight: 700, fontSize: '0.92rem' }}>Fabric, Material & Care Details</label>
                   <button 
                     type="button" 
                     onClick={generateDetails}
@@ -444,34 +980,111 @@ const AdminProducts = () => {
                       borderRadius: '4px', 
                       fontSize: '0.8rem', 
                       cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
                       opacity: isGenerating ? 0.7 : 1
                     }}
                   >
-                    {isGenerating ? 'Generating...' : '✨ Generate All Details with AI'}
+                    <Sparkles size={14} />
+                    {isGenerating ? 'Generating...' : '✨ Generate AI Specs & Copy'}
                   </button>
                 </div>
                 
-                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '10px' }}>
-                  <div style={{ flex: '1 1 30%' }}>
-                    <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '5px', fontWeight: 600 }}>Material</label>
-                    <input type="text" name="material" placeholder="e.g. 100% Cotton" value={formData.fabricDetails.material} onChange={handleFabricDetailChange} style={{ width: '100%', padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px' }} />
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px', marginBottom: '14px' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.82rem', marginBottom: '4px', fontWeight: 600 }}>Material / Fabric</label>
+                    <input 
+                      type="text" 
+                      name="material" 
+                      placeholder="e.g. Pure Katan Silk / 84 Count Cotton" 
+                      value={formData.fabricDetails.material} 
+                      onChange={handleFabricDetailChange} 
+                      style={{ width: '100%', padding: '8px 10px', border: '1px solid var(--color-border)', borderRadius: '4px', fontSize: '0.88rem', background: 'var(--color-background)' }} 
+                    />
                   </div>
-                  <div style={{ flex: '1 1 30%' }}>
-                    <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '5px', fontWeight: 600 }}>GSM</label>
-                    <input type="text" name="gsm" placeholder="e.g. 160 GSM" value={formData.fabricDetails.gsm} onChange={handleFabricDetailChange} style={{ width: '100%', padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px' }} />
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.82rem', marginBottom: '4px', fontWeight: 600 }}>GSM / Weave Count</label>
+                    <input 
+                      type="text" 
+                      name="gsm" 
+                      placeholder="e.g. 84 Count / Heavy Weight / N/A" 
+                      value={formData.fabricDetails.gsm} 
+                      onChange={handleFabricDetailChange} 
+                      style={{ width: '100%', padding: '8px 10px', border: '1px solid var(--color-border)', borderRadius: '4px', fontSize: '0.88rem', background: 'var(--color-background)' }} 
+                    />
                   </div>
-                  <div style={{ flex: '1 1 30%' }}>
-                    <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '5px', fontWeight: 600 }}>Wash Instruction</label>
-                    <input type="text" name="washInstruction" placeholder="e.g. Machine wash cold" value={formData.fabricDetails.washInstruction} onChange={handleFabricDetailChange} style={{ width: '100%', padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px' }} />
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.82rem', marginBottom: '4px', fontWeight: 600 }}>Wash & Care Instruction</label>
+                    <input 
+                      type="text" 
+                      name="washInstruction" 
+                      placeholder="e.g. Dry clean recommended" 
+                      value={formData.fabricDetails.washInstruction} 
+                      onChange={handleFabricDetailChange} 
+                      style={{ width: '100%', padding: '8px 10px', border: '1px solid var(--color-border)', borderRadius: '4px', fontSize: '0.88rem', background: 'var(--color-background)' }} 
+                    />
                   </div>
                 </div>
 
-                <textarea name="description" placeholder="Enter basic details and click 'Generate All Details with AI', or write full description here..." value={formData.description} onChange={handleInputChange} required style={{ padding: '10px', border: '1px solid var(--color-border)', borderRadius: '4px', minHeight: '120px', width: '100%', fontFamily: 'inherit', resize: 'vertical' }}></textarea>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.82rem', marginBottom: '4px', fontWeight: 600 }}>Luxury Product Description *</label>
+                  <textarea 
+                    name="description" 
+                    placeholder="Rich description highlighting elegance, styling advice, craftsmanship..." 
+                    value={formData.description} 
+                    onChange={handleInputChange} 
+                    required 
+                    style={{ 
+                      padding: '10px 12px', 
+                      border: '1px solid var(--color-border)', 
+                      borderRadius: '4px', 
+                      minHeight: '100px', 
+                      width: '100%', 
+                      fontFamily: 'inherit', 
+                      fontSize: '0.88rem',
+                      resize: 'vertical',
+                      background: 'var(--color-background)'
+                    }}
+                  />
+                </div>
               </div>
 
-              <button type="submit" style={{ padding: '12px', background: 'var(--color-text-primary)', color: 'white', borderRadius: '4px', fontWeight: 600, marginTop: '10px' }}>
-                {editingId ? 'Update Product' : 'Publish Product'}
-              </button>
+              {/* Submit Buttons */}
+              <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '10px' }}>
+                <button 
+                  type="button" 
+                  onClick={() => setIsModalOpen(false)}
+                  style={{ 
+                    padding: '12px 20px', 
+                    background: 'var(--color-surface)', 
+                    color: 'var(--color-text-primary)', 
+                    border: '1px solid var(--color-border)', 
+                    borderRadius: '6px', 
+                    fontWeight: 600,
+                    cursor: 'pointer' 
+                  }}
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  style={{ 
+                    padding: '12px 28px', 
+                    background: 'var(--color-text-primary)', 
+                    color: 'white', 
+                    border: 'none', 
+                    borderRadius: '6px', 
+                    fontWeight: 600,
+                    fontSize: '0.95rem',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+                  }}
+                >
+                  {editingId ? 'Save & Update Product' : 'Publish Product to Store'}
+                </button>
+              </div>
+
             </form>
           </div>
         </div>

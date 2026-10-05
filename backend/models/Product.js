@@ -63,20 +63,19 @@ const slugify = (text) => {
 };
 
 // Pre-save hook to ensure slug is always populated
-productSchema.pre('save', async function (next) {
+productSchema.pre('save', async function () {
   if (!this.slug || this.isModified('name')) {
     let baseSlug = slugify(this.name) || `product-${Math.floor(1000 + Math.random() * 9000)}`;
     let currentSlug = baseSlug;
     let count = 1;
 
     // Check for collision
-    while (await mongoose.models.Product.findOne({ slug: currentSlug, _id: { $ne: this._id } })) {
+    while (await this.constructor.findOne({ slug: currentSlug, _id: { $ne: this._id } })) {
       currentSlug = `${baseSlug}-${count}`;
       count++;
     }
     this.slug = currentSlug;
   }
-  next();
 });
 
 const Product = mongoose.model('Product', productSchema);

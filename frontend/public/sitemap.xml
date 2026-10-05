@@ -3,137 +3,104 @@
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://ronggoboti.vercel.app</loc>
-    <lastmod>2026-10-04</lastmod>
+    <lastmod>2026-10-05</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://ronggoboti.vercel.app/shop</loc>
-    <lastmod>2026-10-04</lastmod>
+    <lastmod>2026-10-05</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://ronggoboti.vercel.app/collections</loc>
-    <lastmod>2026-10-04</lastmod>
+    <lastmod>2026-10-05</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://ronggoboti.vercel.app/shop?category=Sarees</loc>
-    <lastmod>2026-10-04</lastmod>
+    <lastmod>2026-10-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://ronggoboti.vercel.app/shop?category=Salwar+Kameez</loc>
-    <lastmod>2026-10-04</lastmod>
+    <lastmod>2026-10-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://ronggoboti.vercel.app/shop?category=Kurtis</loc>
-    <lastmod>2026-10-04</lastmod>
+    <lastmod>2026-10-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://ronggoboti.vercel.app/shop?category=Lehengas</loc>
-    <lastmod>2026-10-04</lastmod>
+    <lastmod>2026-10-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://ronggoboti.vercel.app/shop?category=Modest+Wear</loc>
-    <lastmod>2026-10-04</lastmod>
+    <lastmod>2026-10-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://ronggoboti.vercel.app/shop?category=Co-ord+Sets</loc>
-    <lastmod>2026-10-04</lastmod>
+    <lastmod>2026-10-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://ronggoboti.vercel.app/about</loc>
-    <lastmod>2026-10-04</lastmod>
+    <lastmod>2026-10-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://ronggoboti.vercel.app/contact</loc>
-    <lastmod>2026-10-04</lastmod>
+    <lastmod>2026-10-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://ronggoboti.vercel.app/faq</loc>
-    <lastmod>2026-10-04</lastmod>
+    <lastmod>2026-10-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://ronggoboti.vercel.app/shipping</loc>
-    <lastmod>2026-10-04</lastmod>
+    <lastmod>2026-10-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://ronggoboti.vercel.app/returns</loc>
-    <lastmod>2026-10-04</lastmod>
+    <lastmod>2026-10-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://ronggoboti.vercel.app/size-guide</loc>
-    <lastmod>2026-10-04</lastmod>
+    <lastmod>2026-10-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://ronggoboti.vercel.app/privacy</loc>
-    <lastmod>2026-10-04</lastmod>
+    <lastmod>2026-10-05</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
     <loc>https://ronggoboti.vercel.app/terms</loc>
-    <lastmod>2026-10-04</lastmod>
+    <lastmod>2026-10-05</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
-  </url>
-  <url>
-    <loc>https://ronggoboti.vercel.app/product/stylish-ribbed-cotton-set</loc>
-    <lastmod>2026-08-13</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-    <image:image>
-      <image:loc>https://i.ibb.co/99mhLfGC/e52670c4-1d13-4a72-acc2-ef6a2d1f1802.webp</image:loc>
-      <image:title><![CDATA[Stylish Ribbed Cotton Set]]></image:title>
-      <image:caption><![CDATA[This stylish ribbed cotton set, crafted from export quality rib cotton, provides superior comfort and style. It features a coordinated shirt and pant,]]></image:caption>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://ronggoboti.vercel.app/product/premium-casual-platted-shirt-pant-set</loc>
-    <lastmod>2026-08-13</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-    <image:image>
-      <image:loc>https://i.ibb.co/b5QZPJc8/Products-e1a34b9c-2be8-4a6b-b1a1-91326d295995.webp</image:loc>
-      <image:title><![CDATA[Premium Casual Platted Shirt & Pant Set]]></image:title>
-      <image:caption><![CDATA[This premium quality casual platted shirt and pant set is crafted from 100% export-oriented, 230+ GSM ribbed cotton, ensuring a soft and comfortable f]]></image:caption>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://ronggoboti.vercel.app/product/stylish-rebed-cotton-set</loc>
-    <lastmod>2026-08-12</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-    <image:image>
-      <image:loc>https://i.ibb.co/CpspkrZY/c5a07397-ec1f-4fce-82d8-26d68baf3216-1.webp</image:loc>
-      <image:title><![CDATA[Stylish Rebed cotton set]]></image:title>
-      <image:caption><![CDATA[This stylish Rebed cotton set features a Zipper Polo shirt and matching pants, crafted from export quality Rib Cotton with a GSM of 220+. It's designe]]></image:caption>
-    </image:image>
   </url>
 </urlset>

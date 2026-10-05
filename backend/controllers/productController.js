@@ -87,27 +87,57 @@ const createProduct = async (req, res) => {
       countInStock, numReviews, description, colors, sizes, fabricDetails, sku
     } = req.body;
 
+    if (!name || !name.trim()) {
+      return res.status(400).json({ message: 'Product title (Name) is required' });
+    }
+
+    // Default luxury image if none uploaded yet
+    const fallbackImage = 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&q=80&w=800';
+
+    const safeColors = Array.isArray(colors) 
+      ? colors.filter(Boolean) 
+      : (typeof colors === 'string' ? colors.split(',').map(c => c.trim()).filter(Boolean) : []);
+
+    const safeSizes = Array.isArray(sizes) 
+      ? sizes.filter(Boolean) 
+      : (typeof sizes === 'string' ? sizes.split(',').map(s => s.trim()).filter(Boolean) : []);
+
+    const safeFabricDetails = typeof fabricDetails === 'object' && fabricDetails !== null ? {
+      material: fabricDetails.material || '',
+      gsm: fabricDetails.gsm || '',
+      washInstruction: fabricDetails.washInstruction || ''
+    } : {
+      material: typeof fabricDetails === 'string' ? fabricDetails : '',
+      gsm: '',
+      washInstruction: ''
+    };
+
+    const catName = category || 'Sarees';
+    const catCode = catName.substring(0, 3).toUpperCase().replace(/[^A-Z]/g, 'PRD');
+    const autoSku = `RGB-${catCode}-${Math.floor(1000 + Math.random() * 9000)}`;
+
     const product = new Product({
-      name: name || 'Sample name',
-      price: price || 0,
-      oldPrice: oldPrice || null,
-      image: image || '/images/sample.jpg',
-      hoverImage: hoverImage || '',
+      name: name.trim(),
+      price: Number(price) >= 0 ? Number(price) : 0,
+      oldPrice: oldPrice && Number(oldPrice) > 0 ? Number(oldPrice) : null,
+      image: image && image.trim() ? image.trim() : fallbackImage,
+      hoverImage: hoverImage && hoverImage.trim() ? hoverImage.trim() : '',
       brand: brand || 'রঙবতী',
-      category: category || 'Sample category',
-      countInStock: countInStock || 0,
+      category: catName,
+      countInStock: Number(countInStock) >= 0 ? Number(countInStock) : 0,
       numReviews: numReviews || 0,
-      description: description || 'Sample description',
-      colors: colors || [],
-      sizes: sizes || [],
-      fabricDetails: fabricDetails || '',
-      sku: sku || `GF-${Math.floor(100000 + Math.random() * 900000)}`
+      description: description ? description.trim() : 'Exquisite luxury fashion piece from রঙবতী.',
+      colors: safeColors,
+      sizes: safeSizes,
+      fabricDetails: safeFabricDetails,
+      sku: sku && sku.trim() ? sku.trim() : autoSku
     });
 
     const createdProduct = await product.save();
     res.status(201).json(createdProduct);
   } catch (error) {
-    res.status(500).json({ message: 'Server Error', error: error.message });
+    console.error('Create Product Error:', error);
+    res.status(500).json({ message: error.message || 'Server Error creating product' });
   }
 };
 
@@ -135,19 +165,37 @@ const updateProduct = async (req, res) => {
     const product = await Product.findById(req.params.id);
 
     if (product) {
-      product.name = name || product.name;
-      product.price = price || product.price;
-      if (oldPrice !== undefined) product.oldPrice = oldPrice;
-      product.description = description || product.description;
-      product.image = image || product.image;
-      product.hoverImage = hoverImage || product.hoverImage;
-      product.brand = brand || product.brand;
-      product.category = category || product.category;
-      product.countInStock = countInStock !== undefined ? countInStock : product.countInStock;
-      product.colors = colors || product.colors;
-      product.sizes = sizes || product.sizes;
-      product.fabricDetails = fabricDetails || product.fabricDetails;
-      if (sku) product.sku = sku;
+      if (name) product.name = name.trim();
+      if (price !== undefined) product.price = Number(price) >= 0 ? Number(price) : 0;
+      if (oldPrice !== undefined) product.oldPrice = oldPrice && Number(oldPrice) > 0 ? Number(oldPrice) : null;
+      if (description !== undefined) product.description = description.trim();
+      if (image) product.image = image.trim();
+      if (hoverImage !== undefined) product.hoverImage = hoverImage.trim();
+      if (brand) product.brand = brand;
+      if (category) product.category = category;
+      if (countInStock !== undefined) product.countInStock = Number(countInStock) >= 0 ? Number(countInStock) : 0;
+      
+      if (colors !== undefined) {
+        product.colors = Array.isArray(colors) 
+          ? colors.filter(Boolean) 
+          : (typeof colors === 'string' ? colors.split(',').map(c => c.trim()).filter(Boolean) : []);
+      }
+
+      if (sizes !== undefined) {
+        product.sizes = Array.isArray(sizes) 
+          ? sizes.filter(Boolean) 
+          : (typeof sizes === 'string' ? sizes.split(',').map(s => s.trim()).filter(Boolean) : []);
+      }
+
+      if (fabricDetails !== undefined) {
+        product.fabricDetails = typeof fabricDetails === 'object' && fabricDetails !== null ? {
+          material: fabricDetails.material || product.fabricDetails?.material || '',
+          gsm: fabricDetails.gsm || product.fabricDetails?.gsm || '',
+          washInstruction: fabricDetails.washInstruction || product.fabricDetails?.washInstruction || ''
+        } : product.fabricDetails;
+      }
+
+      if (sku && sku.trim()) product.sku = sku.trim();
 
       const updatedProduct = await product.save();
       res.json(updatedProduct);
@@ -155,7 +203,8 @@ const updateProduct = async (req, res) => {
       res.status(404).json({ message: 'Product not found' });
     }
   } catch (error) {
-    res.status(500).json({ message: 'Server Error', error: error.message });
+    console.error('Update Product Error:', error);
+    res.status(500).json({ message: error.message || 'Server Error updating product' });
   }
 };
 
