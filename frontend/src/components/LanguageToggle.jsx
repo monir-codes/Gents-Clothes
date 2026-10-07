@@ -14,9 +14,8 @@ const LanguageToggle = ({ variant = 'icon', isFullWidth = false, className = '' 
         type="button"
         className={`${styles.globeIconButton} ${className}`}
         onClick={toggleLanguage}
-        aria-label={isBn ? "ভাষা পরিবর্তন (বাংলা / English)" : "Switch Language (Bengali / English)"}
-        data-tooltip={isBn ? "ভাষা: বাংলা (Click for English)" : "Language: English (বাংলায় দেখতে ক্লিক করুন)"}
-        title={isBn ? "ভাষা: বাংলা (Click for English)" : "Language: English (বাংলায় দেখতে ক্লিক করুন)"}
+        aria-label={isBn ? "ভাষা পরিবর্তন" : "Switch Language"}
+        data-tooltip={isBn ? "ভাষা" : "Language"}
       >
         <Globe size={20} strokeWidth={1.8} className={styles.globeSvg} />
         <span className={styles.langMicroBadge}>

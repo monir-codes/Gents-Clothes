@@ -109,8 +109,8 @@ const Navbar = () => {
             {/* Search Trigger */}
             <button 
               className={styles.iconBtn} 
-              aria-label={isBn ? "পণ্য খুঁজুন (Search)" : "Search products"}
-              data-tooltip={isBn ? "অনুসন্ধান (Search)" : "Search products"}
+              aria-label={isBn ? "অনুসন্ধান" : "Search"}
+              data-tooltip={isBn ? "সার্চ" : "Search"}
               onClick={() => setIsSearchOpen(true)}
             >
               <Search size={21} strokeWidth={1.75} />
@@ -126,7 +126,7 @@ const Navbar = () => {
               to="/wishlist" 
               className={styles.iconBtn} 
               aria-label={t('nav.wishlist', 'Wishlist')}
-              data-tooltip={isBn ? "উইশলিস্ট (Wishlist)" : "Wishlist"}
+              data-tooltip={isBn ? "উইশলিস্ট" : "Wishlist"}
             >
               <Heart size={21} strokeWidth={1.75} />
               {wishlistItems.length > 0 && (
@@ -139,7 +139,7 @@ const Navbar = () => {
               className={styles.iconBtn} 
               aria-label={t('nav.cart', 'Cart')} 
               onClick={toggleCart} 
-              data-tooltip={isBn ? "শপিং ব্যাগ (Cart)" : "Shopping Bag"}
+              data-tooltip={isBn ? "কার্ট" : "Cart"}
             >
               <ShoppingBag size={21} strokeWidth={1.75} />
               {cartItems.length > 0 && (
@@ -155,7 +155,7 @@ const Navbar = () => {
                     className={styles.iconBtn} 
                     aria-label={t('nav.profile', 'User')} 
                     onClick={handleAuth} 
-                    data-tooltip={isBn ? `প্রোফাইল (${user.name || 'ইউজার'})` : `Profile (${user.name || 'User'})`}
+                    data-tooltip={!isUserMenuOpen ? (isBn ? "প্রোফাইল" : "Profile") : undefined}
                   >
                     <User size={21} strokeWidth={1.75} />
                   </button>
@@ -180,7 +180,7 @@ const Navbar = () => {
                   className={styles.iconBtn} 
                   aria-label={t('nav.login', 'Login')} 
                   onClick={handleAuth} 
-                  data-tooltip={isBn ? "প্রবেশ / একাউন্ট (Login)" : "Login / Register"}
+                  data-tooltip={isBn ? "লগইন" : "Login"}
                 >
                   <User size={21} strokeWidth={1.75} />
                 </button>
@@ -192,7 +192,6 @@ const Navbar = () => {
               className={styles.mobileMenuBtn} 
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
-              data-tooltip={isMobileMenuOpen ? (isBn ? "মেনু বন্ধ করুন" : "Close menu") : (isBn ? "মেনু খুলুন" : "Open menu")}
             >
               {isMobileMenuOpen ? <X size={22} strokeWidth={2} /> : <Menu size={22} strokeWidth={2} />}
             </button>

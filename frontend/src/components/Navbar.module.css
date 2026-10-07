@@ -128,7 +128,7 @@
   color: var(--color-brand-maroon, #5e0f2b);
 }
 
-/* Luxury Floating Tooltips on Hover */
+/* Luxury Floating Tooltips on Hover (with intentional 0.35s delay) */
 .iconBtn[data-tooltip],
 .mobileMenuBtn[data-tooltip] {
   position: relative;
@@ -145,8 +145,11 @@
   border-style: solid;
   border-color: transparent transparent rgba(26, 20, 22, 0.96) transparent;
   opacity: 0;
+  visibility: hidden;
   pointer-events: none;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1) 0s,
+              transform 0.2s cubic-bezier(0.4, 0, 0.2, 1) 0s,
+              visibility 0.2s linear 0s;
   z-index: 1002;
 }
 
@@ -162,14 +165,17 @@
   color: #ffffff;
   font-size: 0.75rem;
   font-weight: 500;
-  padding: 5px 10px;
+  padding: 5px 11px;
   border-radius: 6px;
   white-space: nowrap;
   opacity: 0;
+  visibility: hidden;
   pointer-events: none;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
   border: 1px solid rgba(255, 255, 255, 0.12);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1) 0s,
+              transform 0.2s cubic-bezier(0.4, 0, 0.2, 1) 0s,
+              visibility 0.2s linear 0s;
   z-index: 1001;
   letter-spacing: 0.3px;
 }
@@ -179,7 +185,30 @@
 .mobileMenuBtn[data-tooltip]:hover::before,
 .mobileMenuBtn[data-tooltip]:hover::after {
   opacity: 1;
+  visibility: visible;
   transform: translateX(-50%) translateY(0);
+  transition-delay: 0.35s;
+}
+
+/* Ensure rightmost desktop user icon tooltip stays within screen and doesn't overflow */
+.desktopUserIcon .iconBtn[data-tooltip]::before {
+  left: auto;
+  right: 14px;
+  transform: translateY(-4px);
+}
+
+.desktopUserIcon .iconBtn[data-tooltip]::after {
+  left: auto;
+  right: 0;
+  transform: translateY(-4px);
+}
+
+.desktopUserIcon .iconBtn[data-tooltip]:hover::before {
+  transform: translateY(0);
+}
+
+.desktopUserIcon .iconBtn[data-tooltip]:hover::after {
+  transform: translateY(0);
 }
 
 .badge {
@@ -237,6 +266,7 @@
 
 .desktopUserIcon {
   display: block;
+  position: relative;
 }
 
 /* Auth links for desktop when user not logged in */
@@ -258,17 +288,17 @@
   color: var(--color-accent);
 }
 
-
 .userMenu {
   position: absolute;
-  top: 100%;
+  top: calc(100% + 8px);
   right: 0;
   background-color: var(--color-background);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  z-index: 1000;
-  min-width: 130px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  z-index: 2000;
+  min-width: 140px;
+  overflow: hidden;
 }
 
 .userMenuItem {

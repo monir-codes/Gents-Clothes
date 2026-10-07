@@ -49,7 +49,7 @@
   pointer-events: none;
 }
 
-/* Tooltip on hover */
+/* Tooltip on hover with 0.4s delay */
 .globeIconButton[data-tooltip] {
   position: relative;
 }
@@ -64,8 +64,11 @@
   border-style: solid;
   border-color: transparent transparent rgba(26, 20, 22, 0.96) transparent;
   opacity: 0;
+  visibility: hidden;
   pointer-events: none;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1) 0s,
+              transform 0.2s cubic-bezier(0.4, 0, 0.2, 1) 0s,
+              visibility 0.2s linear 0s;
   z-index: 1002;
 }
 
@@ -80,14 +83,17 @@
   color: #ffffff;
   font-size: 0.75rem;
   font-weight: 500;
-  padding: 5px 10px;
+  padding: 5px 11px;
   border-radius: 6px;
   white-space: nowrap;
   opacity: 0;
+  visibility: hidden;
   pointer-events: none;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
   border: 1px solid rgba(255, 255, 255, 0.12);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1) 0s,
+              transform 0.2s cubic-bezier(0.4, 0, 0.2, 1) 0s,
+              visibility 0.2s linear 0s;
   z-index: 1001;
   letter-spacing: 0.3px;
 }
@@ -95,7 +101,9 @@
 .globeIconButton[data-tooltip]:hover::before,
 .globeIconButton[data-tooltip]:hover::after {
   opacity: 1;
+  visibility: visible;
   transform: translateX(-50%) translateY(0);
+  transition-delay: 0.4s;
 }
 
 /* Mobile drawer full width pill format */
