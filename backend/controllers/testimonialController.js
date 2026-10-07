@@ -1,11 +1,11 @@
 const Testimonial = require('../models/Testimonial');
 
-// Default initial high-quality reviews in case DB is newly initialized
+// Default initial high-quality reviews without real photos (using pure styled avatars)
 const DEFAULT_TESTIMONIALS = [
   {
     name: "নুসরাত জাহান",
     location: "ধানমন্ডি, ঢাকা",
-    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+    avatar: "",
     rating: 5,
     comment: "রঙবতী থেকে লাল ঢাকাই জামদানি শাড়িটা অর্ডার করেছিলাম। কাপড়ের কোয়ালিটি ও সূক্ষ্ম সুতার কাজ অসম্ভব সুন্দর! ডেলিভারিও পেয়েছি মাত্র ২ দিনে। অত্যন্ত সন্তুষ্ট!",
     productName: "রয়েল লাল ঢাকাই জামদানি",
@@ -16,7 +16,7 @@ const DEFAULT_TESTIMONIALS = [
   {
     name: "Tahmina Rahman",
     location: "Gulshan, Dhaka",
-    avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80",
+    avatar: "",
     rating: 5,
     comment: "The Pakistani Luxury Lawn 3-Piece exceeded all my expectations. Pure chiffon dupatta and exquisite embroidery. Perfectly tailored to perfection!",
     productName: "Luxury Embroidered Lawn Suite",
@@ -27,7 +27,7 @@ const DEFAULT_TESTIMONIALS = [
   {
     name: "ফারহানা হক",
     location: "জিইসি মোড়, চট্টগ্রাম",
-    avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80",
+    avatar: "",
     rating: 5,
     comment: "দুবাই চেরি সিল্ক আবায়াটির ফ্যাব্রিক প্রিমিয়াম এবং ফল অত্যন্ত এলিগ্যান্ট। হিজাবের কোয়ালিটিও চমৎকার। অনলাইন কেনাকাটায় এমন সততা বিরল। ধন্যবাদ রঙবতী!",
     productName: "দুবাই চেরি সিল্ক আবায়া",
@@ -38,7 +38,7 @@ const DEFAULT_TESTIMONIALS = [
   {
     name: "Dr. Sabina Yasmin",
     location: "Sylhet Sadar",
-    avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80",
+    avatar: "",
     rating: 5,
     comment: "Pure Handloom Cotton Saree-র কালার কম্বিনেশন একদম ছবির মতোই নিখুঁত। নরম ও আরামদায়ক ফ্যাব্রিক। অফিস ও ক্যাজুয়াল ব্যবহারের জন্য সেরা!",
     productName: "হ্যান্ডলুম কটন শাড়ি",
@@ -49,7 +49,7 @@ const DEFAULT_TESTIMONIALS = [
   {
     name: "আফরিন সুলতানা",
     location: "উত্তরা, ঢাকা",
-    avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=150&auto=format&fit=crop&q=80",
+    avatar: "",
     rating: 5,
     comment: "ওয়েডিং কালেকশনের কাতান সিল্ক শাড়িটি পরে সবার প্রশংসা পেয়েছি। প্যাকেজিং ও কাস্টমার সার্ভিস এককথায় অসাধারণ। রঙবতী সবসময় আমার প্রথম পছন্দ!",
     productName: "কাতান সিল্ক ওয়েডিং কালেকশন",
@@ -75,7 +75,6 @@ const getTestimonials = async (req, res) => {
     res.json(testimonials);
   } catch (error) {
     console.error('Error fetching testimonials:', error);
-    // Return defaults gracefully if DB lookup fails
     res.json(DEFAULT_TESTIMONIALS);
   }
 };

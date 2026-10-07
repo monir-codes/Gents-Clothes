@@ -157,14 +157,21 @@
 .productTag {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  background: rgba(0, 0, 0, 0.03);
-  padding: 4px 10px;
-  border-radius: 6px;
-  font-size: 0.8rem;
-  color: var(--color-text-secondary, #666);
+  gap: 7px;
+  background: rgba(94, 15, 43, 0.05);
+  border: 1px solid rgba(94, 15, 43, 0.12);
+  padding: 5px 12px;
+  border-radius: 50px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--color-accent, #5E0F2B);
   margin-bottom: 20px;
   width: fit-content;
+}
+
+.productTagIcon {
+  color: var(--color-accent, #5E0F2B);
+  flex-shrink: 0;
 }
 
 .authorWrapper {
@@ -176,27 +183,21 @@
   margin-top: auto;
 }
 
-.avatarImg {
-  width: 46px;
-  height: 46px;
+.avatarInitial {
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.avatarFallback {
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #b37d4e, #d4a373);
-  color: #fff;
+  color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-family: 'Playfair Display', Georgia, serif;
   font-weight: 700;
-  font-size: 1.1rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  font-size: 1.15rem;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  flex-shrink: 0;
+  letter-spacing: 0.5px;
 }
 
 .authorDetails {

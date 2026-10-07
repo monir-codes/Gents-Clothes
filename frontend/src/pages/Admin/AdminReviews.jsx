@@ -2,20 +2,37 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { 
   Check, X, MessageSquare, Trash2, Plus, Edit2, Star, Sparkles, 
-  Upload, Eye, EyeOff, UserCheck, MapPin, Tag, RefreshCw 
+  Eye, EyeOff, UserCheck, MapPin, Tag, ShoppingBag, Heart 
 } from 'lucide-react';
 import Swal from 'sweetalert2';
 import useAuthStore from '../../store/useAuthStore';
 import Loader from '../../components/Loader';
 
-// ImgBB API Key
-const IMGBB_API_KEY = "affe71bc1ff1277c7d83bc8e9dfe4c3c";
+// Luxurious gradient palette for customer initial avatars
+const AVATAR_GRADIENTS = [
+  'linear-gradient(135deg, #5E0F2B 0%, #831843 100%)', // Deep Burgundy
+  'linear-gradient(135deg, #B45309 0%, #D97706 100%)', // Warm Amber
+  'linear-gradient(135deg, #0F766E 0%, #14B8A6 100%)', // Emerald Teal
+  'linear-gradient(135deg, #4338CA 0%, #6366F1 100%)', // Royal Indigo
+  'linear-gradient(135deg, #9D174D 0%, #BE185D 100%)', // Rose Crimson
+  'linear-gradient(135deg, #B37D4E 0%, #D4A373 100%)', // Classic Gold
+  'linear-gradient(135deg, #701A75 0%, #A21CAF 100%)', // Plum Violet
+];
 
-const SAMPLE_AI_REVIEWS = [
+const getAvatarGradient = (name = '') => {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const index = Math.abs(hash) % AVATAR_GRADIENTS.length;
+  return AVATAR_GRADIENTS[index];
+};
+
+const SAMPLE_PRESET_REVIEWS = [
   {
     name: "মেহরুন নেসা",
     location: "বনানী, ঢাকা",
-    avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80",
+    avatar: "",
     rating: 5,
     comment: "অর্ডার করার ২ দিনের মধ্যেই জামদানি শাড়িটা হাতে পেয়েছি। কাপড়ের জমিন ও সুতার বুনন একদম মনের মতো। রঙবতীকে অনেক ধন্যবাদ!",
     productName: "পিওর ঢাকাই জামদানি শাড়ি",
@@ -25,7 +42,7 @@ const SAMPLE_AI_REVIEWS = [
   {
     name: "Sadia Islam",
     location: "Nasirabad, Chattogram",
-    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+    avatar: "",
     rating: 5,
     comment: "The Pakistani Lawn 3-piece is pure luxury! Soft breathable cotton with breathtaking chiffon dupatta. Definitely ordering more for Eid!",
     productName: "Luxury Designer 3-Piece Suite",
@@ -35,7 +52,7 @@ const SAMPLE_AI_REVIEWS = [
   {
     name: "নাজমা বেগম",
     location: "উপশহর, সিলেট",
-    avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80",
+    avatar: "",
     rating: 5,
     comment: "দুবাই চেরি আবায়ার ফল ও ফ্যাব্রিক অত্যন্ত এলিগ্যান্ট। হিজাবের কোয়ালিটিও প্রিমিয়াম। শালীন ও স্টাইলিশ পোশাকের জন্য সেরা শপ!",
     productName: "দুবাই চেরি সিল্ক আবায়া",
@@ -45,7 +62,7 @@ const SAMPLE_AI_REVIEWS = [
   {
     name: "ফারিয়া তাসনিম",
     location: "উত্তরা সেক্টর ৭, ঢাকা",
-    avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=150&auto=format&fit=crop&q=80",
+    avatar: "",
     rating: 5,
     comment: "ওয়েডিং পার্টির জন্য কাতান শাড়ি নিয়েছিলাম। কালার এবং জরির গর্জিয়াস কাজ সবাইকে মুগ্ধ করেছে। প্যাকেজিংও ছিল রাজকীয়!",
     productName: "রয়েল কাতান সিল্ক শাড়ি",
@@ -55,7 +72,7 @@ const SAMPLE_AI_REVIEWS = [
   {
     name: "Tasneem Farhana",
     location: "Khulna City",
-    avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80",
+    avatar: "",
     rating: 5,
     comment: "Handloom Cotton Kurti is so comfortable for daily and university wear. Zero color bleed after washing. Highly recommended!",
     productName: "হ্যান্ডলুম কটন কুর্তি",
@@ -73,13 +90,11 @@ const AdminReviews = () => {
   const [loadingTestimonials, setLoadingTestimonials] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTestimonialId, setEditingTestimonialId] = useState(null);
-  const [isUploading, setIsUploading] = useState(false);
 
   // Form State
   const initialFormState = {
     name: '',
     location: 'ঢাকা, বাংলাদেশ',
-    avatar: '',
     rating: 5,
     comment: '',
     productName: '',
@@ -143,7 +158,6 @@ const AdminReviews = () => {
     setFormData({
       name: t.name || '',
       location: t.location || 'ঢাকা, বাংলাদেশ',
-      avatar: t.avatar || '',
       rating: t.rating || 5,
       comment: t.comment || '',
       productName: t.productName || '',
@@ -167,25 +181,25 @@ const AdminReviews = () => {
         await axios.put(`/api/testimonials/${editingTestimonialId}`, formData, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        Swal.fire('Success', 'Testimonial updated successfully', 'success');
+        Swal.fire('Success', 'Review updated successfully!', 'success');
       } else {
         await axios.post('/api/testimonials', formData, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        Swal.fire('Success', 'New testimonial added to homepage slider!', 'success');
+        Swal.fire('Success', 'New review added to homepage slider!', 'success');
       }
       setIsModalOpen(false);
       fetchTestimonials();
     } catch (error) {
       console.error(error);
-      Swal.fire('Error', error.response?.data?.message || 'Failed to save testimonial', 'error');
+      Swal.fire('Error', error.response?.data?.message || 'Failed to save review', 'error');
     }
   };
 
   // Handle Delete Testimonial
   const handleDeleteTestimonial = async (id, name) => {
     const result = await Swal.fire({
-      title: 'Delete Testimonial?',
+      title: 'Delete Review?',
       text: `Are you sure you want to remove the review by "${name}"?`,
       icon: 'warning',
       showCancelButton: true,
@@ -198,11 +212,11 @@ const AdminReviews = () => {
         await axios.delete(`/api/testimonials/${id}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        Swal.fire('Deleted', 'Testimonial has been removed.', 'success');
+        Swal.fire('Deleted', 'Review has been removed.', 'success');
         fetchTestimonials();
       } catch (error) {
         console.error(error);
-        Swal.fire('Error', 'Failed to delete testimonial', 'error');
+        Swal.fire('Error', 'Failed to delete review', 'error');
       }
     }
   };
@@ -219,39 +233,10 @@ const AdminReviews = () => {
     }
   };
 
-  // Upload Avatar Image to ImgBB
-  const handleAvatarUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    setIsUploading(true);
-    const body = new FormData();
-    body.append("image", file);
-
-    try {
-      const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
-        method: "POST",
-        body: body
-      });
-      const data = await res.json();
-      if (data.success) {
-        setFormData(prev => ({ ...prev, avatar: data.data.url }));
-        Swal.fire('Uploaded', 'Customer photo uploaded successfully', 'success');
-      } else {
-        Swal.fire('Error', 'Image upload failed', 'error');
-      }
-    } catch (err) {
-      console.error(err);
-      Swal.fire('Error', 'Image upload failed', 'error');
-    } finally {
-      setIsUploading(false);
-    }
-  };
-
   // Generate Sample Reviews
   const handleGenerateSampleReviews = async () => {
     const result = await Swal.fire({
-      title: 'Auto-Add 5 High Quality Reviews?',
+      title: 'Add 5 Customer Reviews?',
       text: 'This will add 5 realistic customer reviews in Bangla & English for your Homepage slider.',
       icon: 'question',
       showCancelButton: true,
@@ -261,12 +246,12 @@ const AdminReviews = () => {
 
     if (result.isConfirmed) {
       try {
-        for (const sample of SAMPLE_AI_REVIEWS) {
+        for (const sample of SAMPLE_PRESET_REVIEWS) {
           await axios.post('/api/testimonials', sample, {
             headers: { Authorization: `Bearer ${token}` }
           });
         }
-        Swal.fire('Success', 'Added 5 sample reviews to homepage slider!', 'success');
+        Swal.fire('Success', 'Added 5 reviews to homepage slider!', 'success');
         fetchTestimonials();
       } catch (err) {
         console.error(err);
@@ -308,7 +293,7 @@ const AdminReviews = () => {
             Customer Feedback & Reviews
           </h1>
           <p style={{ color: 'var(--color-text-secondary, #666)', fontSize: '0.92rem', margin: '5px 0 0 0' }}>
-            Manage homepage auto-sliding testimonials and per-product customer reviews.
+            Manage homepage auto-sliding customer reviews and per-product ratings.
           </p>
         </div>
 
@@ -321,17 +306,17 @@ const AdminReviews = () => {
                 alignItems: 'center',
                 gap: '8px',
                 padding: '10px 18px',
-                background: 'rgba(212, 163, 115, 0.15)',
-                color: '#b37d4e',
-                border: '1px solid rgba(212, 163, 115, 0.4)',
+                background: 'rgba(94, 15, 43, 0.08)',
+                color: 'var(--color-accent, #5E0F2B)',
+                border: '1px solid rgba(94, 15, 43, 0.25)',
                 borderRadius: '8px',
                 fontWeight: 600,
                 fontSize: '0.88rem',
                 cursor: 'pointer'
               }}
             >
-              <Sparkles size={16} />
-              <span>+ Add 5 AI Preset Reviews</span>
+              <Heart size={15} fill="currentColor" />
+              <span>+ Add 5 Preset Reviews</span>
             </button>
 
             <button 
@@ -412,180 +397,181 @@ const AdminReviews = () => {
             <Loader />
           ) : testimonials.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '60px 20px', background: 'var(--color-surface, #fafafa)', borderRadius: '12px', border: '1px dashed var(--color-border, #ccc)' }}>
-              <Sparkles size={40} color="#b37d4e" style={{ marginBottom: '15px' }} />
+              <Heart size={40} color="var(--color-accent)" style={{ marginBottom: '15px' }} />
               <h3 style={{ margin: '0 0 10px 0' }}>No Homepage Reviews Added Yet</h3>
               <p style={{ color: 'var(--color-text-secondary, #666)', marginBottom: '20px' }}>
-                Add customer feedback or generate 5 realistic reviews to display in the auto-scrolling slider on your homepage!
+                Add customer feedback to display in the auto-scrolling slider on your homepage!
               </p>
               <button 
                 onClick={handleGenerateSampleReviews}
-                style={{ padding: '10px 20px', background: '#b37d4e', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 600 }}
+                style={{ padding: '10px 20px', background: 'var(--color-accent)', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 600 }}
               >
-                Auto-Add 5 Preset Reviews
+                Add 5 Preset Reviews
               </button>
             </div>
           ) : (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '20px' }}>
-              {testimonials.map((t) => (
-                <div 
-                  key={t._id} 
-                  style={{
-                    background: 'var(--color-surface, #ffffff)',
-                    border: '1px solid var(--color-border, #eee)',
-                    borderRadius: '12px',
-                    padding: '20px',
-                    boxShadow: '0 2px 10px rgba(0,0,0,0.03)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    position: 'relative',
-                    opacity: t.isActive ? 1 : 0.65
-                  }}
-                >
-                  <div>
-                    {/* Header with Rating and Status */}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                      <div style={{ display: 'flex', gap: '2px', color: '#f59e0b' }}>
-                        {[...Array(t.rating || 5)].map((_, i) => (
-                          <Star key={i} size={16} fill="currentColor" />
-                        ))}
+              {testimonials.map((t, idx) => {
+                const avatarInitial = t.name ? t.name.trim().charAt(0).toUpperCase() : 'R';
+                const avatarBg = getAvatarGradient(t.name || `rev-${idx}`);
+
+                return (
+                  <div 
+                    key={t._id} 
+                    style={{
+                      background: 'var(--color-surface, #ffffff)',
+                      border: '1px solid var(--color-border, #eee)',
+                      borderRadius: '12px',
+                      padding: '20px',
+                      boxShadow: '0 2px 10px rgba(0,0,0,0.03)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
+                      position: 'relative',
+                      opacity: t.isActive ? 1 : 0.65
+                    }}
+                  >
+                    <div>
+                      {/* Header with Rating and Status */}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                        <div style={{ display: 'flex', gap: '2px', color: '#f59e0b' }}>
+                          {[...Array(t.rating || 5)].map((_, i) => (
+                            <Star key={i} size={16} fill="currentColor" />
+                          ))}
+                        </div>
+
+                        <div style={{ display: 'flex', gap: '6px' }}>
+                          <span 
+                            style={{
+                              fontSize: '0.75rem',
+                              padding: '3px 8px',
+                              borderRadius: '50px',
+                              fontWeight: 600,
+                              background: t.isActive ? 'rgba(16, 185, 129, 0.1)' : 'rgba(100, 116, 139, 0.1)',
+                              color: t.isActive ? '#10b981' : '#64748b'
+                            }}
+                          >
+                            {t.isActive ? 'Active on Home' : 'Hidden'}
+                          </span>
+                        </div>
                       </div>
 
-                      <div style={{ display: 'flex', gap: '6px' }}>
-                        <span 
-                          style={{
-                            fontSize: '0.75rem',
-                            padding: '3px 8px',
-                            borderRadius: '50px',
-                            fontWeight: 600,
-                            background: t.isActive ? 'rgba(16, 185, 129, 0.1)' : 'rgba(100, 116, 139, 0.1)',
-                            color: t.isActive ? '#10b981' : '#64748b'
+                      {/* Review text */}
+                      <p style={{ fontSize: '0.95rem', lineHeight: '1.6', color: 'var(--color-text-primary, #2d2d2d)', margin: '0 0 15px 0' }}>
+                        "{t.comment}"
+                      </p>
+
+                      {/* Product Mention */}
+                      {t.productName && (
+                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(94, 15, 43, 0.05)', border: '1px solid rgba(94, 15, 43, 0.12)', padding: '4px 10px', borderRadius: '50px', fontSize: '0.78rem', color: 'var(--color-accent, #5E0F2B)', marginBottom: '15px' }}>
+                          <ShoppingBag size={12} />
+                          <span>{t.productName}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Customer Info & Actions */}
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', borderTop: '1px solid var(--color-border, #eee)', paddingTop: '15px', marginBottom: '15px' }}>
+                        {/* Avatar Initial Monogram */}
+                        <div 
+                          style={{ 
+                            width: '42px', 
+                            height: '42px', 
+                            borderRadius: '50%', 
+                            background: avatarBg, 
+                            color: '#fff', 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            justifyContent: 'center', 
+                            fontWeight: 700,
+                            fontFamily: 'Georgia, serif',
+                            fontSize: '1.1rem',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.12)'
                           }}
                         >
-                          {t.isActive ? 'Active on Home' : 'Hidden'}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Review text */}
-                    <p style={{ fontSize: '0.95rem', lineHeight: '1.6', color: 'var(--color-text-primary, #2d2d2d)', margin: '0 0 15px 0' }}>
-                      "{t.comment}"
-                    </p>
-
-                    {/* Product Mention */}
-                    {t.productName && (
-                      <div style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', background: 'rgba(0,0,0,0.03)', padding: '4px 10px', borderRadius: '6px', fontSize: '0.8rem', color: 'var(--color-text-secondary, #666)', marginBottom: '15px' }}>
-                        <Tag size={12} />
-                        <span>{t.productName}</span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Customer Info & Actions */}
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', borderTop: '1px solid var(--color-border, #eee)', paddingTop: '15px', marginBottom: '15px' }}>
-                      {t.avatar ? (
-                        <img 
-                          src={t.avatar} 
-                          alt={t.name} 
-                          style={{ width: '42px', height: '42px', borderRadius: '50%', objectFit: 'cover' }}
-                          onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
-                        />
-                      ) : null}
-                      <div 
-                        style={{ 
-                          width: '42px', 
-                          height: '42px', 
-                          borderRadius: '50%', 
-                          background: 'linear-gradient(135deg, #b37d4e, #d4a373)', 
-                          color: '#fff', 
-                          display: t.avatar ? 'none' : 'flex', 
-                          alignItems: 'center', 
-                          justifyContent: 'center', 
-                          fontWeight: 700 
-                        }}
-                      >
-                        {t.name ? t.name.charAt(0).toUpperCase() : 'R'}
-                      </div>
-
-                      <div style={{ flex: 1 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                          <strong style={{ fontSize: '0.95rem' }}>{t.name}</strong>
-                          {t.verified !== false && (
-                            <span title="Verified Buyer" style={{ color: '#10b981', display: 'inline-flex' }}>
-                              <UserCheck size={14} />
-                            </span>
-                          )}
+                          {avatarInitial}
                         </div>
-                        <div style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary, #888)', display: 'flex', alignItems: 'center', gap: '3px' }}>
-                          <MapPin size={11} />
-                          <span>{t.location || 'ঢাকা, বাংলাদেশ'}</span>
+
+                        <div style={{ flex: 1 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                            <strong style={{ fontSize: '0.95rem' }}>{t.name}</strong>
+                            {t.verified !== false && (
+                              <span title="Verified Buyer" style={{ color: '#10b981', display: 'inline-flex' }}>
+                                <UserCheck size={14} />
+                              </span>
+                            )}
+                          </div>
+                          <div style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary, #888)', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                            <MapPin size={11} />
+                            <span>{t.location || 'ঢাকা, বাংলাদেশ'}</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    {/* Action buttons */}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <button
-                        onClick={() => handleToggleActive(t)}
-                        style={{
-                          background: 'none',
-                          border: 'none',
-                          fontSize: '0.8rem',
-                          color: t.isActive ? '#64748b' : '#10b981',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '4px',
-                          padding: '4px 0'
-                        }}
-                      >
-                        {t.isActive ? <EyeOff size={14} /> : <Eye size={14} />}
-                        <span>{t.isActive ? 'Hide' : 'Show on Home'}</span>
-                      </button>
-
-                      <div style={{ display: 'flex', gap: '8px' }}>
+                      {/* Action buttons */}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <button
-                          onClick={() => handleOpenEditModal(t)}
+                          onClick={() => handleToggleActive(t)}
                           style={{
-                            padding: '6px 12px',
-                            background: 'var(--color-surface, #fafafa)',
-                            border: '1px solid var(--color-border, #ddd)',
-                            borderRadius: '6px',
+                            background: 'none',
+                            border: 'none',
+                            fontSize: '0.8rem',
+                            color: t.isActive ? '#64748b' : '#10b981',
                             cursor: 'pointer',
                             display: 'flex',
                             alignItems: 'center',
                             gap: '4px',
-                            fontSize: '0.82rem'
+                            padding: '4px 0'
                           }}
                         >
-                          <Edit2 size={13} />
-                          <span>Edit</span>
+                          {t.isActive ? <EyeOff size={14} /> : <Eye size={14} />}
+                          <span>{t.isActive ? 'Hide' : 'Show on Home'}</span>
                         </button>
 
-                        <button
-                          onClick={() => handleDeleteTestimonial(t._id, t.name)}
-                          style={{
-                            padding: '6px 12px',
-                            background: 'rgba(239, 68, 68, 0.08)',
-                            color: '#ef4444',
-                            border: '1px solid rgba(239, 68, 68, 0.2)',
-                            borderRadius: '6px',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '4px',
-                            fontSize: '0.82rem'
-                          }}
-                        >
-                          <Trash2 size={13} />
-                          <span>Delete</span>
-                        </button>
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          <button
+                            onClick={() => handleOpenEditModal(t)}
+                            style={{
+                              padding: '6px 12px',
+                              background: 'var(--color-surface, #fafafa)',
+                              border: '1px solid var(--color-border, #ddd)',
+                              borderRadius: '6px',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '4px',
+                              fontSize: '0.82rem'
+                            }}
+                          >
+                            <Edit2 size={13} />
+                            <span>Edit</span>
+                          </button>
+
+                          <button
+                            onClick={() => handleDeleteTestimonial(t._id, t.name)}
+                            style={{
+                              padding: '6px 12px',
+                              background: 'rgba(239, 68, 68, 0.08)',
+                              color: '#ef4444',
+                              border: '1px solid rgba(239, 68, 68, 0.2)',
+                              borderRadius: '6px',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '4px',
+                              fontSize: '0.82rem'
+                            }}
+                          >
+                            <Trash2 size={13} />
+                            <span>Delete</span>
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
@@ -671,7 +657,7 @@ const AdminReviews = () => {
           <div style={{ background: 'var(--color-surface, #fff)', width: '100%', maxWidth: '580px', maxHeight: '90vh', overflowY: 'auto', borderRadius: '16px', padding: '25px', boxShadow: '0 10px 40px rgba(0,0,0,0.2)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', borderBottom: '1px solid var(--color-border, #eee)', paddingBottom: '12px' }}>
               <h2 style={{ margin: 0, fontSize: '1.3rem', fontWeight: 700 }}>
-                {editingTestimonialId ? 'Edit Homepage Review' : 'Add New Homepage Review'}
+                {editingTestimonialId ? 'Edit Customer Review' : 'Add New Customer Review'}
               </h2>
               <button onClick={() => setIsModalOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}>
                 <X size={20} />
@@ -679,6 +665,36 @@ const AdminReviews = () => {
             </div>
 
             <form onSubmit={handleSubmitTestimonial}>
+              {/* Customer Avatar Live Preview */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '14px', background: 'var(--color-background, #f9f9f9)', padding: '12px 16px', borderRadius: '10px', marginBottom: '16px', border: '1px solid var(--color-border, #eee)' }}>
+                <div 
+                  style={{ 
+                    width: '46px', 
+                    height: '46px', 
+                    borderRadius: '50%', 
+                    background: getAvatarGradient(formData.name || 'Customer'), 
+                    color: '#fff', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center', 
+                    fontWeight: 700, 
+                    fontFamily: 'Georgia, serif',
+                    fontSize: '1.2rem',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
+                  }}
+                >
+                  {formData.name ? formData.name.trim().charAt(0).toUpperCase() : 'R'}
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.90rem', fontWeight: 600 }}>
+                    {formData.name || 'Customer Name'}
+                  </div>
+                  <div style={{ fontSize: '0.78rem', color: 'var(--color-text-secondary, #888)' }}>
+                    Avatar is auto-generated with custom monogram initial
+                  </div>
+                </div>
+              </div>
+
               {/* Customer Name */}
               <div style={{ marginBottom: '14px' }}>
                 <label style={{ display: 'block', fontSize: '0.88rem', fontWeight: 600, marginBottom: '6px' }}>Customer Name *</label>
@@ -733,35 +749,15 @@ const AdminReviews = () => {
               </div>
 
               {/* Product Purchased Tag */}
-              <div style={{ marginBottom: '14px' }}>
+              <div style={{ marginBottom: '18px' }}>
                 <label style={{ display: 'block', fontSize: '0.88rem', fontWeight: 600, marginBottom: '6px' }}>Product Purchased (Optional Tag)</label>
                 <input 
                   type="text" 
                   value={formData.productName} 
                   onChange={(e) => setFormData({ ...formData, productName: e.target.value })}
-                  placeholder="e.g. রয়েল ঢাকাই জামদানি বা পাকিস্তানি লন থ্রি-পিস"
+                  placeholder="e.g. রয়েল লাল ঢাকাই জামদানি বা পাকিস্তানি লন থ্রি-পিস"
                   style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--color-border, #ccc)', fontSize: '0.92rem' }}
                 />
-              </div>
-
-              {/* Customer Avatar Photo */}
-              <div style={{ marginBottom: '18px' }}>
-                <label style={{ display: 'block', fontSize: '0.88rem', fontWeight: 600, marginBottom: '6px' }}>Customer Photo / Avatar URL</label>
-                <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                  <input 
-                    type="url" 
-                    value={formData.avatar} 
-                    onChange={(e) => setFormData({ ...formData, avatar: e.target.value })}
-                    placeholder="https://... image link or upload below"
-                    style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid var(--color-border, #ccc)', fontSize: '0.92rem' }}
-                  />
-                  <label style={{ padding: '10px 14px', background: '#eee', borderRadius: '8px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
-                    <Upload size={14} />
-                    <span>{isUploading ? 'Uploading...' : 'Upload'}</span>
-                    <input type="file" accept="image/*" onChange={handleAvatarUpload} style={{ display: 'none' }} disabled={isUploading} />
-                  </label>
-                </div>
-                <span style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary, #888)' }}>Leave empty to automatically use the customer's initials circle.</span>
               </div>
 
               {/* Checkbox Options */}
@@ -772,7 +768,7 @@ const AdminReviews = () => {
                     checked={formData.verified} 
                     onChange={(e) => setFormData({ ...formData, verified: e.target.checked })}
                   />
-                  <span>Show "Verified Customer" badge</span>
+                  <span>Show "Verified Buyer" checkmark</span>
                 </label>
 
                 <label style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.9rem' }}>
@@ -796,7 +792,7 @@ const AdminReviews = () => {
                 </button>
                 <button 
                   type="submit"
-                  style={{ padding: '10px 24px', background: '#1a1a1a', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 600 }}
+                  style={{ padding: '10px 24px', background: 'var(--color-accent, #1a1a1a)', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 600 }}
                 >
                   {editingTestimonialId ? 'Save Changes' : 'Publish Review'}
                 </button>
