@@ -123,7 +123,7 @@ const TestimonialsSlider = () => {
                 <Star key={i} size={16} fill="currentColor" />
               ))}
             </div>
-            <span><strong>4.9 / 5</strong> Rating from 1,200+ Verified Buyers</span>
+            <span><strong>4.9 / 5</strong> Rating from Verified Buyers</span>
           </div>
         </motion.div>
       </div>
