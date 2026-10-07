@@ -192,10 +192,11 @@
 }
 
 .seoKeywordsSection {
-  padding: var(--space-4) 0;
-  border-top: 1px dashed var(--color-border);
-  margin-top: var(--space-3);
-  margin-bottom: var(--space-3);
+  padding: 30px 0 24px 0;
+  border-top: 1px solid var(--color-border, #eee);
+  margin-top: 0;
+  margin-bottom: 0;
+  width: 100%;
 }
 
 .seoKeywordsTitle {
@@ -203,48 +204,61 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1.2px;
-  color: var(--color-accent);
-  margin-bottom: 12px;
+  color: var(--color-accent, #5E0F2B);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.seoKeywordsTitle::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--color-border, #eee);
+  opacity: 0.6;
 }
 
 .seoKeywordsList {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px 14px;
-  margin-bottom: 12px;
+  gap: 8px 10px;
+  margin-bottom: 14px;
 }
 
 .seoKeywordsList a {
-  font-size: 0.82rem;
-  color: var(--color-text-secondary);
+  font-size: 0.80rem;
+  color: var(--color-text-secondary, #666);
   text-decoration: none;
-  background: var(--color-surface, #faf6f1);
-  padding: 4px 10px;
-  border-radius: var(--radius-sm, 4px);
-  border: 1px solid var(--color-border);
-  transition: all 0.2s ease;
+  background: var(--color-surface, #fafafa);
+  padding: 5px 12px;
+  border-radius: 50px;
+  border: 1px solid var(--color-border, #e5e5e5);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   line-height: 1.4;
+  white-space: nowrap;
 }
 
 .seoKeywordsList a:hover {
-  color: var(--color-brand-maroon, #5e0f2b);
-  border-color: var(--color-accent);
-  background: #ffffff;
+  color: #ffffff;
+  border-color: var(--color-accent, #5E0F2B);
+  background: var(--color-accent, #5E0F2B);
   transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(94, 15, 43, 0.18);
 }
 
 .seoBrandSummary {
-  font-size: 0.8rem;
-  color: var(--color-text-secondary);
-  line-height: 1.6;
-  margin: 10px 0 0;
-  opacity: 0.85;
+  font-size: 0.82rem;
+  color: var(--color-text-secondary, #777);
+  line-height: 1.65;
+  margin: 12px 0 0 0;
+  opacity: 0.9;
 }
 
 .bottomBar {
   padding: var(--space-4) 0;
-  border-top: 1px solid var(--color-border);
-  color: var(--color-text-secondary);
+  border-top: 1px solid var(--color-border, #eee);
+  color: var(--color-text-secondary, #888);
   font-size: 0.85rem;
 }
 
@@ -284,20 +298,58 @@
   .footerContent {
     grid-template-columns: 1fr;
     gap: var(--space-4);
+    margin-bottom: var(--space-5);
   }
   .footerLogoImg {
     height: 44px;
     max-width: 160px;
   }
+  .seoKeywordsSection {
+    padding: 22px 0 18px 0;
+  }
+  .seoKeywordsTitle {
+    font-size: 0.78rem;
+    letter-spacing: 0.8px;
+    margin-bottom: 12px;
+  }
+  .seoKeywordsList {
+    gap: 6px 8px;
+    margin-bottom: 12px;
+  }
+  .seoKeywordsList a {
+    font-size: 0.76rem;
+    padding: 4px 10px;
+    white-space: normal;
+  }
+  .seoBrandSummary {
+    font-size: 0.78rem;
+    line-height: 1.55;
+    margin-top: 10px;
+  }
   .bottomBarInner {
     flex-direction: column;
     text-align: center;
     justify-content: center;
+    gap: 12px;
   }
   .paymentIcons {
     justify-content: center;
   }
   .legalLinks {
     justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .seoKeywordsSection {
+    padding: 18px 0 16px 0;
+  }
+  .seoKeywordsTitle {
+    font-size: 0.75rem;
+  }
+  .seoKeywordsList a {
+    font-size: 0.74rem;
+    padding: 4px 8px;
+    border-radius: 4px;
   }
 }
