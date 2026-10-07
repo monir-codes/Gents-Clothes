@@ -148,10 +148,10 @@ export const About = () => {
               color: 'var(--color-text-secondary, #6c5a60)', 
               fontSize: 'clamp(1rem, 2.5vw, 1.2rem)', 
               maxWidth: '740px', 
-              margin: '0 auto 28px',
+              margin: '0 auto 28px', 
               lineHeight: 1.8 
             }}>
-              {settings?.staticPages?.about?.storyText || t('about.story')}
+              {isBn ? (settings?.staticPages?.about?.storyTextBn || t('about.story')) : (settings?.staticPages?.about?.storyText || t('about.story'))}
             </p>
           </motion.div>
         </div>
@@ -183,7 +183,7 @@ export const About = () => {
               {t('about.heritageText')}
             </p>
             <p style={{ color: 'var(--color-text-secondary)', lineHeight: 1.85, fontSize: '1.05rem', marginBottom: '30px' }}>
-              {settings?.staticPages?.about?.materialsText || t('about.materialsText')}
+              {isBn ? (settings?.staticPages?.about?.materialsTextBn || t('about.materialsText')) : (settings?.staticPages?.about?.materialsText || t('about.materialsText'))}
             </p>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>

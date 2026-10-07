@@ -67,11 +67,12 @@ export const BILINGUAL_SYNONYMS = {
 
 export const CATEGORY_TRANSLATIONS = {
   'Sarees': { bn: 'শাড়ি কালেকশন', en: 'Sarees' },
-  'Salwar Kameez': { bn: 'সালোয়ার কামিজ', en: 'Salwar Kameez' },
-  'Three Piece': { bn: 'থ্রি পিস', en: 'Three Piece' },
-  'Two Piece': { bn: 'টু পিস', en: 'Two Piece' },
+  'Salwar Kameez': { bn: 'সালোয়ার কামিজ ও ৩-পিস', en: 'Salwar Kameez' },
+  'Three Piece': { bn: 'থ্রি পিস কালেকশন', en: 'Three Piece' },
+  'Two Piece': { bn: 'টু পিস ড্রেস', en: 'Two Piece' },
   'Kurtis': { bn: 'ডিজাইনার কুর্তি', en: 'Kurtis' },
   'Kurtis & Tops': { bn: 'কুর্তি ও টপস', en: 'Kurtis & Tops' },
+  'Kurtis & Tunics': { bn: 'কুর্তি ও টিউনিক', en: 'Kurtis & Tunics' },
   'Tunics & Tops': { bn: 'টিউনিক ও টপস', en: 'Tunics & Tops' },
   'Lehengas': { bn: 'লেহেঙ্গা কালেকশন', en: 'Lehengas' },
   'Bridal Wear': { bn: 'ব্রাইডাল পোশাক', en: 'Bridal Wear' },
@@ -79,10 +80,116 @@ export const CATEGORY_TRANSLATIONS = {
   'Modest Wear': { bn: 'আবায়া ও বোরকা', en: 'Modest Wear' },
   'Abayas & Borka': { bn: 'আবায়া ও বোরকা', en: 'Abayas & Borka' },
   'Hijabs & Dupattas': { bn: 'হিজাব ও ওড়না', en: 'Hijabs & Dupattas' },
-  'Co-ord Sets': { bn: 'কর্ড সেট', en: 'Co-ord Sets' },
+  'Co-ord Sets': { bn: 'লেডিস কর্ড সেট', en: 'Co-ord Sets' },
+  'Western Wear': { bn: 'ওয়েস্টার্ন ওয়্যার ও শাল', en: 'Western Wear' },
   'New Arrivals': { bn: 'নতুন কালেকশন', en: 'New Arrivals' },
   'Premium': { bn: 'প্রিমিয়াম কালেকশন', en: 'Premium Collection' },
   'Sale': { bn: 'স্পেশাল অফার', en: 'Sale' }
+};
+
+export const PRODUCT_TRANSLATIONS = {
+  'Royal Heritage Jamdani Saree': {
+    name: 'রয়েল হেরিটেজ ঢাকাই জামদানি শাড়ি',
+    description: 'দক্ষ তাঁতিদের হাতে বোনা খাঁটি ঢাকাই জামদানি শাড়ি। এতে রয়েছে নান্দনিক ফ্লোরাল মোটিফ, উজ্জ্বল মেরুন শেড এবং সোনালী জরির অভিজাত বর্ডার।'
+  },
+  'Embroidered Georgette Salwar Kameez': {
+    name: 'এমব্রয়ডারি জর্জেট সালোয়ার কামিজ (৩-পিস)',
+    description: 'সূক্ষ্ম সুতার নিপুণ এমব্রয়ডারি কাজ করা প্রিমিয়াম জর্জেট থ্রি-পিস স্যুট ও সফট অরগাঞ্জা ওড়না। যেকোনো উৎসবের জন্য আভিজাত্যময় সাজ।'
+  },
+  'Contemporary Silk Kurti & Co-ord Set': {
+    name: 'কনটেম্পরারি সিল্ক কুর্তি ও কর্ড সেট',
+    description: 'আধুনিক ট্রেন্ড ও ঐতিহ্যবাহী রুচির মেলবন্ধনে তৈরি পিওর সিল্ক ব্লেন্ড কুর্তি ও কর্ড সেট। পরায় অত্যন্ত আরামদায়ক ও স্টাইলিশ।'
+  },
+  'Velvet Festive Shawl & Party Wrap': {
+    name: 'ভেলভেট ফেস্টিভ শাল ও পার্টি র‍্যাপ',
+    description: 'হাতে করা সূক্ষ্ম জরি এমব্রয়ডারি পাড়যুক্ত অত্যন্ত নরম মাইক্রো ভেলভেট শীতকালীন লাক্সারি শাল। উৎসব ও পার্টির পারফেক্ট অনুষঙ্গ।'
+  },
+  'Dhakai Jamdani Saree': {
+    name: 'ঐতিহ্যবাহী ঢাকাই জামদানি শাড়ি',
+    description: 'ঐতিহ্যবাহী বয়নশিল্পে বোনা খাঁটি ঢাকাই জামদানি শাড়ি। উৎসব ও বিয়েতে আভিজাত্যের সেরা প্রতীক।'
+  },
+  'Mirpur Katan Silk Saree': {
+    name: 'মিরপুর কাতান সিল্ক শাড়ি',
+    description: 'চকচকে ব্রাইডাল কাতান সিল্ক শাড়ি, নিখুঁত জরি কারুকার্য ও ঐতিহ্যবাহী আভিজাত্যে ভরপুর।'
+  },
+  'Pakistani Luxury Lawn 3-Piece': {
+    name: 'পাকিস্তানি লাক্সারি লন ৩-পিস স্যুট',
+    description: 'ডিজিটাল প্রিন্টেড ও ভারী এমব্রয়ডারি করা প্রিমিয়াম লন কামিজ, ডিজিটাল সিল্ক ওড়না ও ট্রাউজার।'
+  },
+  'Dubai Cherry Abaya with Hijab': {
+    name: 'দুবাই চেরি আবায়া সাথে প্রিমিয়াম হিজাব',
+    description: 'অরিজিনাল দুবাই চেরি জর্জেট ফেব্রিকের তৈরি মার্জিত ও প্রিমিয়াম ডিজাইনার আবায়া বোরকা।'
+  },
+  'Handcrafted Bridal Lehenga Choli': {
+    name: 'হ্যান্ডক্রাফটেড ব্রাইডাল লেহেঙ্গা চোলি',
+    description: 'ভারী জরি, সিকোয়েন্স ও জারদৌসি কাজ করা রাজকীয় ব্রাইডাল লেহেঙ্গা ও ব্লাউজ সেট।'
+  }
+};
+
+export const COLOR_TRANSLATIONS = {
+  'Maroon': 'মেরুন',
+  'Blush Rose': 'ব্লাশ রোজ',
+  'Ivory': 'আইভরি / অফ-হোয়াইট',
+  'Rose Gold': 'রোজ গোল্ড',
+  'Wine': 'ওয়াইন রেড',
+  'Champagne': 'শ্যাম্পেন গোল্ড',
+  'Burgundy': 'বারগান্ডি',
+  'Dusty Rose': 'ডাস্টি রোজ',
+  'Emerald': 'পান্না সবুজ',
+  'Deep Wine': 'ডিপ ওয়াইন',
+  'Midnight Black': 'মিডনাইট ব্ল্যাক',
+  'Red': 'লাল',
+  'Black': 'কালো',
+  'White': 'সাদা',
+  'Off White': 'অফ-হোয়াইট',
+  'Blue': 'নীল',
+  'Green': 'সবুজ',
+  'Yellow': 'হলুদ',
+  'Pink': 'গোলাপি',
+  'Purple': 'বেগুনী',
+  'Navy': 'নেভি ব্লু',
+  'Navy Blue': 'নেভি ব্লু',
+  'Gold': 'সোনালী',
+  'Silver': 'রূপালী',
+  'Peach': 'পীচ',
+  'Olive': 'অলিভ গ্রিন',
+  'Mustard': 'সরিষা হলুদ',
+  'Teal': 'টিল ব্লু',
+  'Coral': 'কোরাল',
+  'Magenta': 'ম্যাজেন্টা',
+  'Beige': 'বেইজ',
+  'Brown': 'বাদামী',
+  'Grey': 'ধূসর',
+  'Cream': 'ক্রিম',
+  'Orange': 'কমলা',
+  'Lavender': 'ল্যাভেন্ডার',
+  'Mint': 'মিন্ট গ্রিন',
+  'Turquoise': 'ফিরোজা'
+};
+
+export const FABRIC_TRANSLATIONS = {
+  '100% Fine Cotton & Gold Zari': '১০০% খাঁটি সুতি ও গোল্ডেন জরি',
+  'Pure Viscose Georgette with Silk Dupatta': 'পিওর ভিসকোস জর্জেট সাথে সিল্ক ওড়না',
+  'Mulberry Silk Blend': 'মালবেরি সিল্ক ব্লেন্ড',
+  'Micro Velvet with Zari Trim': 'মাইক্রো ভেলভেট সাথে জরি পাড়',
+  'Pure Cotton': '১০০% খাঁটি সুতি',
+  'Dhakai Jamdani Cotton': 'খাঁটি ঢাকাই জামদানি কটন',
+  'Pure Silk': 'খাঁটি পিওর সিল্ক',
+  'Katan Silk': 'কাতান সিল্ক',
+  'Georgette': 'প্রিমিয়াম জর্জেট',
+  'Organza': 'সফট অরগাঞ্জা',
+  'Chiffon': 'পিওর শিফন',
+  'Velvet': 'মাইক্রো ভেলভেট',
+  'Dubai Cherry': 'দুবাই চেরি জর্জেট',
+  'Dry clean only': 'শুধুমাত্র ড্রাই ওয়াশ',
+  'Gentle dry clean': 'হালকা ড্রাই ক্লিন',
+  'Hand wash cold or gentle machine wash': 'ঠান্ডা পানিতে মৃদু ওয়াশ অথবা হ্যান্ড ওয়াশ',
+  'Hand wash cold': 'ঠান্ডা পানিতে মৃদু হাত ধোয়া',
+  '80 GSM': '৮০ জিএসএম',
+  '120 GSM': '১২০ জিএসএম',
+  '140 GSM': '১৪০ জিএসএম',
+  '260 GSM': '২৬০ জিএসএম',
+  'Free Size': 'ফ্রি সাইজ'
 };
 
 export const translations = {

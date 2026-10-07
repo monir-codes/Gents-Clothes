@@ -40,7 +40,17 @@ const ProductDetails = () => {
   const { addToCart } = useCartStore();
   const { toggleWishlist, isInWishlist } = useWishlistStore();
   const { user, token } = useAuthStore();
-  const { t, language, formatPrice, formatNumber, localizeTitle, localizeCategory } = useLanguageStore();
+  const { 
+    t, 
+    language, 
+    formatPrice, 
+    formatNumber, 
+    localizeTitle, 
+    localizeDescription, 
+    localizeColor, 
+    localizeFabric, 
+    localizeCategory 
+  } = useLanguageStore();
 
   const handleAddToCart = () => {
     addToCart({
@@ -248,13 +258,13 @@ const ProductDetails = () => {
             {product.oldPrice && <span className={styles.oldPrice}>{formatPrice(product.oldPrice)}</span>}
           </div>
 
-          <p className={styles.shortDescription}>{product.description}</p>
+          <p className={styles.shortDescription}>{localizeDescription(product.description, product.name)}</p>
 
           <div className={styles.optionsContainer}>
             {product.colors && product.colors.length > 0 && (
               <div className={styles.optionGroup}>
                 <span className={styles.optionLabel}>
-                  {t('product.selectColor', 'Color')}: <strong>{selectedColor}</strong>
+                  {t('product.selectColor', 'Color')}: <strong>{localizeColor(selectedColor)}</strong>
                 </span>
                 <div className={styles.colorSelector}>
                   {product.colors.map(color => (
@@ -262,9 +272,9 @@ const ProductDetails = () => {
                       key={color}
                       className={`${styles.colorBtn} ${selectedColor === color ? styles.activeColor : ''}`}
                       onClick={() => setSelectedColor(color)}
-                      title={color}
+                      title={localizeColor(color)}
                     >
-                      {color.charAt(0)}
+                      {localizeColor(color).charAt(0)}
                     </button>
                   ))}
                 </div>
@@ -376,15 +386,18 @@ const ProductDetails = () => {
         
         <div className={styles.tabContent}>
           {activeTab === 'description' && (
-            <p>{product.description}</p>
+            <p style={{ lineHeight: 1.8 }}>{localizeDescription(product.description, product.name)}</p>
           )}
-          {activeTab === 'details' && product.fabricDetails && (
-            <ul style={{ paddingLeft: '20px' }}>
-              <li><strong>{language === 'bn' ? 'ম্যাটেরিয়াল:' : 'Material:'}</strong> {product.fabricDetails.material || 'Premium Fabric'}</li>
-              {product.fabricDetails.gsm && <li><strong>GSM:</strong> {product.fabricDetails.gsm}</li>}
-              {product.fabricDetails.washInstruction && <li><strong>{language === 'bn' ? 'ধোয়ার নির্দেশিকা:' : 'Wash Instruction:'}</strong> {product.fabricDetails.washInstruction}</li>}
-            </ul>
-          )}
+          {activeTab === 'details' && product.fabricDetails && (() => {
+            const fab = localizeFabric(product.fabricDetails);
+            return (
+              <ul style={{ paddingLeft: '20px', lineHeight: 2 }}>
+                <li><strong>{language === 'bn' ? 'ম্যাটেরিয়াল:' : 'Material:'}</strong> {fab?.material || 'Premium Fabric'}</li>
+                {fab?.gsm && <li><strong>{language === 'bn' ? 'জিএসএম (GSM):' : 'GSM:'}</strong> {fab.gsm}</li>}
+                {fab?.washInstruction && <li><strong>{language === 'bn' ? 'ধোয়ার নির্দেশিকা:' : 'Wash Instruction:'}</strong> {fab.washInstruction}</li>}
+              </ul>
+            );
+          })()}
           {activeTab === 'reviews' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
               <div>

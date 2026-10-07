@@ -8,7 +8,7 @@ import styles from './CartDrawer.module.css';
 
 const CartDrawer = () => {
   const { isCartOpen, toggleCart, cartItems, removeFromCart, updateQty } = useCartStore();
-  const { t, language, formatPrice, formatNumber, localizeTitle } = useLanguageStore();
+  const { t, language, formatPrice, formatNumber, localizeTitle, localizeColor } = useLanguageStore();
   const navigate = useNavigate();
 
   const handleCheckout = () => {
@@ -64,7 +64,7 @@ const CartDrawer = () => {
                     <div className={styles.itemDetails}>
                       <h4 className={styles.itemName}>{localizeTitle(item.name)}</h4>
                       <p className={styles.itemVariants}>
-                        {item.color && `${isBn ? 'রং:' : 'Color:'} ${item.color}`} 
+                        {item.color && `${isBn ? 'রং:' : 'Color:'} ${localizeColor(item.color)}`} 
                         {item.size && ` | ${isBn ? 'সাইজ:' : 'Size:'} ${item.size}`}
                       </p>
                       <div className={styles.priceRow}>
