@@ -263,19 +263,19 @@ export const About = () => {
           }}>
             {[
               {
-                icon: Feather,
-                title: t('about.artisanTitle', 'Artisanal Heritage'),
-                desc: t('about.artisanDesc', 'We work directly with traditional weaving communities across Bengal.')
+                icon: ShieldCheck,
+                title: t('about.artisanTitle', 'Verified Sourcing'),
+                desc: t('about.artisanDesc', 'We curate handpicked garments directly from verified trusted suppliers.')
+              },
+              {
+                icon: RefreshCcw,
+                title: t('about.modernGlamourTitle', 'Easy Doorstep Returns'),
+                desc: t('about.modernGlamourDesc', 'Return easily upon delivery with standard delivery charge if not satisfied.')
               },
               {
                 icon: Sparkles,
-                title: t('about.modernGlamourTitle', 'Modern Glamour'),
-                desc: t('about.modernGlamourDesc', 'Every creation is infused with chic contemporary cuts and opulent hues.')
-              },
-              {
-                icon: ShieldCheck,
-                title: t('about.uncompromisingQualityTitle', 'Uncompromising Quality'),
-                desc: t('about.uncompromisingQualityDesc', 'From pure silk threads to precise hand-finished hemlines.')
+                title: t('about.uncompromisingQualityTitle', 'Strict Quality Control'),
+                desc: t('about.uncompromisingQualityDesc', 'Multi-point inspection to ensure flaw-free premium fashion.')
               }
             ].map((pillar, i) => (
               <motion.div
@@ -796,6 +796,126 @@ export const LegalPage = ({ title }) => {
     titleBn = 'শর্তাবলী (Terms of Service)';
   }
 
+  const renderDefaultContent = () => {
+    if (contentKey === 'returns') {
+      return isBn ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          <div style={{
+            padding: '20px',
+            background: 'rgba(201, 162, 101, 0.1)',
+            borderLeft: '4px solid var(--color-accent, #c9a265)',
+            borderRadius: '8px'
+          }}>
+            <h3 style={{ color: 'var(--color-brand-maroon, #5e0f2b)', margin: '0 0 8px', fontSize: '1.2rem' }}>
+              🛍️ ডেলিভারির সময় চেক ও তাত্ক্ষণিক রিটার্ন সুবিধা
+            </h3>
+            <p style={{ margin: 0, lineHeight: 1.7, color: 'var(--color-text-primary)' }}>
+              রঙবতী থেকে অর্ডার করার পর ডেলিভারিম্যানের সামনে পার্সেলটি খুলে দেখে নেওয়ার পূর্ণ সুবিধা রয়েছে। পণ্যে কোনো ত্রুটি বা সমস্যা থাকলে কিংবা পোশাকটি আপনার মনের মতো পছন্দ না হলে, <strong>ডেলিভারিম্যানকে শুধুমাত্র ডেলিভারি চার্জ পরিশোধ করে সাথে সাথে সম্পূর্ণ পার্সেলটি রিটার্ন করতে পারবেন</strong>।
+            </p>
+          </div>
+
+          <div>
+            <h3 style={{ color: 'var(--color-brand-maroon, #5e0f2b)', fontSize: '1.25rem', marginBottom: '10px' }}>
+              ১. আমাদের সোর্সিং ও কোয়ালিটি নিশ্চয়তা
+            </h3>
+            <p style={{ lineHeight: 1.8 }}>
+              রঙবতী কোনো নিজস্ব উৎপাদন কারখানা নয়। আমরা দেশের শীর্ষস্থানীয় ও বিশ্বস্ত ভেরিফাইড সাপ্লায়ার (Verified Suppliers) ও সেরা তাঁত হাবগুলো থেকে কোয়ালিটিফুল শাড়ি, থ্রি-পিস ও পোশাক নিবিড়ভাবে বাছাই ও কোয়ালিটি চেক করে রিসেলিং করে থাকি। গ্রাহকের কাছে পাঠানোর আগে প্রতিটি পোশাক আমাদের এক্সপার্ট টিম দ্বারা খুঁটিনাটি চেক করা হয়।
+            </p>
+          </div>
+
+          <div>
+            <h3 style={{ color: 'var(--color-brand-maroon, #5e0f2b)', fontSize: '1.25rem', marginBottom: '10px' }}>
+              ২. রিটার্ন করার সহজ নিয়ম
+            </h3>
+            <ul style={{ paddingLeft: '20px', lineHeight: 1.9 }}>
+              <li><strong>ডেলিভারি গ্রহণের সময়:</strong> ডেলিভারিম্যান থাকা অবস্থায় পোশাকটি দেখে নিন। পছন্দ না হলে বা কোনো সমস্যা থাকলে সাথে সাথে তাকে শুধু ডেলিভারি ফি দিয়ে পার্সেল ফেরত দিন।</li>
+              <li><strong>ডেলিভারি পরবর্তী সমস্যা:</strong> ডেলিভারি গ্রহণের পর যদি কোনো বিশেষ ম্যানুফ্যাকচারিং ত্রুটি পরিলক্ষিত হয়, তবে ২৪ ঘণ্টার মধ্যে স্পষ্ট ছবি বা ভিডিওসহ আমাদের হটলাইন বা ফেসবুক পেজে জানান।</li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 style={{ color: 'var(--color-brand-maroon, #5e0f2b)', fontSize: '1.25rem', marginBottom: '10px' }}>
+              ৩. এক্সচেঞ্জ পলিসি (Size / Color Exchange)
+            </h3>
+            <p style={{ lineHeight: 1.8 }}>
+              সাইজ বা কালার পরিবর্তন করতে চাইলে পণ্য গ্রহণের ৪৮ ঘণ্টার মধ্যে আমাদের সাথে যোগাযোগ করুন। পোশাকটি অব্যবহৃত, অবিকৃত এবং আসল ট্যাগযুক্ত থাকতে হবে। এক্সচেঞ্জের ক্ষেত্রে রিটার্ন ও নতুন ডেলিভারির স্ট্যান্ডার্ড চার্জ প্রযোজ্য হবে।
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          <div style={{
+            padding: '20px',
+            background: 'rgba(201, 162, 101, 0.1)',
+            borderLeft: '4px solid var(--color-accent, #c9a265)',
+            borderRadius: '8px'
+          }}>
+            <h3 style={{ color: 'var(--color-brand-maroon, #5e0f2b)', margin: '0 0 8px', fontSize: '1.2rem' }}>
+              🛍️ Doorstep Inspection & Easy Return Guarantee
+            </h3>
+            <p style={{ margin: 0, lineHeight: 1.7, color: 'var(--color-text-primary)' }}>
+              You have the full right to inspect your parcel upon arrival in the presence of the delivery agent. If there is any defect or the item does not match your taste/expectation, <strong>you can return the parcel on the spot simply by paying the standard delivery charge</strong>.
+            </p>
+          </div>
+
+          <div>
+            <h3 style={{ color: 'var(--color-brand-maroon, #5e0f2b)', fontSize: '1.25rem', marginBottom: '10px' }}>
+              1. Curated Sourcing & Quality Assurance
+            </h3>
+            <p style={{ lineHeight: 1.8 }}>
+              Ronggoboti is a curated fashion boutique. We do not manufacture garments directly; instead, we handpick, inspect, and curate authentic, top-grade fashion from verified suppliers and renowned textile hubs. Every garment undergoes strict quality inspection before dispatch.
+            </p>
+          </div>
+
+          <div>
+            <h3 style={{ color: 'var(--color-brand-maroon, #5e0f2b)', fontSize: '1.25rem', marginBottom: '10px' }}>
+              2. Simple Return Process
+            </h3>
+            <ul style={{ paddingLeft: '20px', lineHeight: 1.9 }}>
+              <li><strong>At Delivery:</strong> Check your item upon receipt. If not satisfied, hand it back to the courier by paying only the delivery charge.</li>
+              <li><strong>Post-Delivery Support:</strong> In case of any unnoticed defect, reach out to our customer care team within 24 hours with photos/videos.</li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 style={{ color: 'var(--color-brand-maroon, #5e0f2b)', fontSize: '1.25rem', marginBottom: '10px' }}>
+              3. Exchange Policy
+            </h3>
+            <p style={{ lineHeight: 1.8 }}>
+              Need a size or color swap? Contact our hotline within 48 hours of delivery. Items must be unworn, unwashed, and in original packaging with tags intact. Standard delivery fees apply for exchanges.
+            </p>
+          </div>
+        </div>
+      );
+    }
+
+    if (contentKey === 'shipping') {
+      return isBn ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', lineHeight: 1.8 }}>
+          <h3 style={{ color: 'var(--color-brand-maroon)' }}>ডেলিভারি চার্জ ও সময়সীমা</h3>
+          <ul style={{ paddingLeft: '20px' }}>
+            <li><strong>ঢাকা সিটির ভিতরে:</strong> ২-৩ কার্যদিবস (ডেলিভারি চার্জ ৳৭০)</li>
+            <li><strong>সাব-ঢাকা (গাজীপুর, সাভার, নারায়ণগঞ্জ, কেরানীগঞ্জ):</strong> ২-৪ কার্যদিবস (ডেলিভারি চার্জ ৳১০০)</li>
+            <li><strong>ঢাকার বাইরে (সারা বাংলাদেশ):</strong> ৩-৫ কার্যদিবস (ডেলিভারি চার্জ ৳১২০)</li>
+          </ul>
+          <p><strong>ফ্রি ডেলিভারি অফার:</strong> ৳৫,০০০ বা তার বেশি মূল্যের অর্ডারে সারা বাংলাদেশে ফ্রি ডেলিভারি প্রদান করা হয়।</p>
+        </div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', lineHeight: 1.8 }}>
+          <h3 style={{ color: 'var(--color-brand-maroon)' }}>Shipping Charges & Delivery Timelines</h3>
+          <ul style={{ paddingLeft: '20px' }}>
+            <li><strong>Inside Dhaka City:</strong> 2-3 business days (Fee: ৳70)</li>
+            <li><strong>Sub-Dhaka (Gazipur, Savar, Narayanganj):</strong> 2-4 business days (Fee: ৳100)</li>
+            <li><strong>Outside Dhaka (Nationwide):</strong> 3-5 business days (Fee: ৳120)</li>
+          </ul>
+          <p><strong>Free Delivery Offer:</strong> Enjoy Free Nationwide Delivery on orders exceeding ৳5,000.</p>
+        </div>
+      );
+    }
+
+    return <p>{isBn ? 'পলিসির বিস্তারিত তথ্য লোড হচ্ছে...' : 'Loading document details...'}</p>;
+  };
+
   return (
     <StaticPageTemplate 
       title={title}
@@ -804,7 +924,7 @@ export const LegalPage = ({ title }) => {
       subtitleBn={subtitleBn}
       contentKey={contentKey}
     >
-      <p>{isBn ? 'পলিসির বিস্তারিত তথ্য লোড হচ্ছে...' : 'Loading document details...'}</p>
+      {renderDefaultContent()}
     </StaticPageTemplate>
   );
 };

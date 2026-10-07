@@ -352,6 +352,33 @@ const ProductDetails = () => {
               <span>{t('features.cod', 'Cash on Delivery')}</span>
             </div>
           </div>
+
+          {/* Sourcing & Doorstep Return Guarantee Box */}
+          <div style={{
+            marginTop: '20px',
+            padding: '14px 18px',
+            background: 'rgba(201, 162, 101, 0.08)',
+            border: '1px solid rgba(201, 162, 101, 0.25)',
+            borderRadius: 'var(--radius-md, 8px)',
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: '12px',
+            fontSize: '0.88rem',
+            lineHeight: 1.6,
+            color: 'var(--color-text-primary)'
+          }}>
+            <RefreshCcw size={18} color="var(--color-accent, #c9a265)" style={{ flexShrink: 0, marginTop: '3px' }} />
+            <div>
+              <strong style={{ color: 'var(--color-brand-maroon, #5e0f2b)', display: 'block', marginBottom: '2px' }}>
+                {language === 'bn' ? 'ডেলিভারি চেক ও সহজ রিটার্ন গ্যারান্টি:' : 'Doorstep Check & Easy Return Guarantee:'}
+              </strong>
+              <span>
+                {language === 'bn' 
+                  ? 'পণ্য হাতে পেয়ে চেক করার পর কোনো ত্রুটি পেলে বা মনের মতো পছন্দ না হলে ডেলিভারিম্যানকে শুধুমাত্র ডেলিভারি চার্জ পরিশোধ করে সাথে সাথে রিটার্ন করতে পারবেন।'
+                  : 'Check your item upon arrival. If defective or not to your liking, simply pay the delivery charge and return it on the spot.'}
+              </span>
+            </div>
+          </div>
         </motion.div>
       </div>
 

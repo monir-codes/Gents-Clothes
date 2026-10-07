@@ -288,10 +288,12 @@ export const translations = {
       selectSize: 'সাইজ নির্বাচন করুন',
       selectColor: 'রং নির্বাচন করুন',
       fabricDetails: 'ফ্যাব্রিক ও কাপড়ের বিবরণ',
-      deliveryInfo: 'ডেলিভারি তথ্য',
-      cashOnDeliveryAvailable: 'সারা বাংলাদেশে ক্যাশ অন ডেলিভারি সুবিধা',
-      easyReturns: '৭ দিনের সহজ রিটার্ন ও এক্সচেঞ্জ গ্যারান্টি',
+      deliveryInfo: 'ডেলিভারি ও রিটার্ন তথ্য',
+      cashOnDeliveryAvailable: 'সারা বাংলাদেশে ক্যাশ অন ডেলিভারি ও পার্সেল চেক সুবিধা',
+      easyReturns: 'পছন্দ না হলে বা ত্রুটি থাকলে শুধু ডেলিভারি চার্জ দিয়ে রিটার্ন',
       fastDeliveryTime: 'ঢাকায় ২-৩ দিন, ঢাকার বাইরে ৩-৫ দিনে ডেলিভারি',
+      returnNotice: 'পণ্য হাতে পেয়ে চেক করে যদি পছন্দ না হয় বা কোনো সমস্যা থাকে, তবে ডেলিভারিম্যানকে কেবল ডেলিভারি চার্জ পরিশোধ করে সাথে সাথে রিটার্ন করতে পারবেন।',
+      sourcingNotice: 'আমরা যাচাইকৃত বিশ্বস্ত সাপ্লায়ারদের কাছ থেকে সেরা মানের পণ্য বাছাই করে রিসেলিং করি।',
       share: 'শেয়ার করুন',
       reviews: 'রিভিউ',
       onlyLeft: 'টি বাকি'
@@ -337,35 +339,35 @@ export const translations = {
 
     // About Us Page
     about: {
-      tagline: 'বাংলার ঐতিহ্য ও আভিজাত্যের প্রতীক',
-      title: 'প্রতিটি নারীর জন্য নিখুঁত সৌন্দর্য ও আধুনিক ফ্যাশন',
-      story: 'রঙবতী (Ronggoboti) বাংলার সমৃদ্ধ ঐতিহ্য ও আধুনিক ফ্যাশনের মেলবন্ধনে প্রতিষ্ঠিত একটি প্রিমিয়াম ফ্যাশন হাউস। প্রতিটি সুতা, নকশা ও রঙে আমরা নারীর অনন্য ব্যক্তিত্ব, সৌন্দর্য ও আত্মবিশ্বাসকে ফুটিয়ে তুলতে প্রতিশ্রুতিবদ্ধ।',
-      heritageTitle: 'বাংলার ঐতিহ্যবাহী সূক্ষ্ম কারুশিল্প',
-      heritageText: 'ঐতিহ্যবাহী ঢাকাই জামদানি থেকে শুরু করে খাঁটি সিল্ক, কাতান ও মসৃণ জর্জেট—আমাদের দক্ষ তাঁতি ও ডিজাইনারদের হাত ধরে তৈরি হয় প্রতিটি অনবদ্য মাস্টারপিস।',
-      materialsText: 'আমরা সম্পূর্ণ আপসহীনভাবে সেরা মানের কাপড় ও ফেব্রিক নির্বাচন করি। রঙবতীর প্রতিটি পোশাকে জড়িয়ে থাকে ঐতিহ্য, আভিজাত্য এবং পরম আরামের অনুভূতি।',
-      authenticStat: '১০০% আসল কাপড়',
-      happyClientsStat: '১০,০০০+ সন্তুষ্ট নারী',
-      valuesTitle: 'আমাদের মূল দর্শন ও স্তম্ভ',
-      artisanTitle: 'ঐতিহ্যবাহী তাঁত শিল্প',
-      artisanDesc: 'আমরা সরাসরি বাংলার তৃণমূল কারিগর ও তাঁতিদের সাথে কাজ করি, যা আমাদের শতাব্দী প্রাচীন বুনন শিল্পকে টিকিয়ে রাখতে ভূমিকা রাখে।',
-      modernGlamourTitle: 'আধুনিক গ্ল্যামার',
-      modernGlamourDesc: 'উৎসব, বিয়ে বা দৈনন্দিন জীবনের প্রতিটি মুহূর্তকে রাঙিয়ে তুলতে আধুনিক কাট ও নজরকাড়া কালার প্যালেট আমাদের বিশেষত্ব।',
-      uncompromisingQualityTitle: 'আপসহীন প্রিমিয়াম কোয়ালিটি',
-      uncompromisingQualityDesc: 'সুতার নির্বাচন থেকে শুরু করে হ্যান্ড-ফিনিশিং ও নিখুঁত সেলাই—প্রতিটি ধাপে আমরা নিশ্চিত করি সর্বোচ্চ মান।',
-      ctaTitle: 'রঙবতীর জাদুকরী অভিজ্ঞতায় আপনাকে স্বাগতম',
-      ctaDesc: 'আপনার বিশেষ মুহূর্তগুলো স্মরণীয় করে রাখতে বেছে নিন আমাদের এক্সক্লুসিভ শাড়ি, সালোয়ার কামিজ ও উৎসব কালেকশন।'
+      tagline: 'বিশ্বস্ত ফ্যাশন কিউরেশন ও কোয়ালিটি নিশ্চয়তা',
+      title: 'যাচাইকৃত সরবরাহকারী থেকে সেরা কোয়ালিটির পোশাক',
+      story: 'রঙবতী (Ronggoboti) হলো একটি বিশ্বস্ত ও প্রিমিয়াম ফ্যাশন শপ। আমরা নিজস্ব কারখানায় পোশাক তৈরি করিনা, বরং দেশের শীর্ষস্থানীয় ও বিশ্বস্ত ভেরিফাইড সাপ্লায়ার (Verified Suppliers) ও সেরা তাঁত হাবগুলো থেকে প্রতিটি শাড়ি, থ্রি-পিস ও পোশাক নিবিড়ভাবে কোয়ালিটি যাচাই (Handpicked & Quality-checked) করে রিসেলিং করে থাকি।',
+      heritageTitle: 'যাচাইকৃত সোর্সিং ও কোয়ালিটি কন্ট্রোল',
+      heritageText: 'ঐতিহ্যবাহী ঢাকাই জামদানি, মিরপুর কাতান, পিওর সিল্ক, পাকিস্তানি লন থ্রি-পিস ও ডিজাইনার কুর্তি—প্রতিটি পোশাক আমরা বিশ্বস্ত ও অভিজ্ঞ সরবরাহকারীদের কাছ থেকে নিখুঁত কোয়ালিটি চেকের মাধ্যমে সংগ্রহ করি, যাতে আপনি পান শতভাগ প্রিমিয়াম মান।',
+      materialsText: 'আমরা প্রতিটি পণ্যের ফেব্রিক, সুতা, প্রিন্ট ও ফিনিশিং ব্যক্তিগতভাবে যাচাই করি। কোনো পণ্যে ত্রুটি থাকলে বা হাতে পেয়ে মনের মতো পছন্দ না হলে ক্রেতারা শুধুমাত্র ডেলিভারি চার্জ দিয়ে অনায়াসে রিটার্ন করতে পারেন।',
+      authenticStat: '১০০% কোয়ালিটি চেকড',
+      happyClientsStat: '১০,০০০+ সন্তুষ্ট ক্রেতা',
+      valuesTitle: 'আমাদের মূল দর্শন ও ব্যবসায়িক নীতি',
+      artisanTitle: 'ভেরিফাইড সাপ্লায়ার সোর্সিং',
+      artisanDesc: 'আমরা দেশের সেরা ও অভিজ্ঞ বিশ্বস্ত সাপ্লায়ারদের সাথে পার্টনারশিপে কাজ করি, যা প্রতিটি পোশাকের আসল ফেব্রিক ও প্রিমিয়াম কোয়ালিটি নিশ্চিত করে।',
+      modernGlamourTitle: 'সহজ রিটার্ন সুবিধা',
+      modernGlamourDesc: 'পণ্য হাতে পেয়ে চেক করার পর কোনো ত্রুটি পেলে বা পছন্দ না হলে ডেলিভারিম্যানকে শুধুমাত্র ডেলিভারি চার্জ দিয়ে সাথে সাথে রিটার্ন করা যায়।',
+      uncompromisingQualityTitle: 'আপসহীন মান নিয়ন্ত্রণ',
+      uncompromisingQualityDesc: 'সাপ্লায়ার থেকে পোশাক সংগ্রহের পর প্রতিটি পিস আলাদাভাবে নিরীক্ষা করা হয় যাতে কোনো ত্রুটিপূর্ণ পণ্য গ্রাহকের কাছে না যায়।',
+      ctaTitle: 'শতভাগ নিশ্চিন্তে কেনাকাটা করুন রঙবতীতে',
+      ctaDesc: 'পণ্য হাতে পেয়ে দেখে নেওয়ার সুবিধা এবং পছন্দ না হলে শুধু ডেলিভারি চার্জ দিয়ে সহজ রিটার্ন পলিসির মাধ্যমে উপভোগ করুন সেরা শপিং অভিজ্ঞতা।'
     },
 
     // Features Bar
     features: {
       fastDelivery: 'দ্রুত ডেলিভারি',
       fastDeliveryDesc: 'সারা বাংলাদেশে হোম ডেলিভারি',
-      authentic: '১০০% আসল পোশাক',
-      authenticDesc: 'প্রিমিয়াম কোয়ালিটি ও সূক্ষ্ম ফিনিশিং',
-      support: '২৪/৭ কাস্টমার সাপোর্ট',
-      supportDesc: 'যেকোনো প্রয়োজনে সার্বক্ষণিক পাশে',
+      authentic: 'যাচাইকৃত সেরা কোয়ালিটি',
+      authenticDesc: 'ভেরিফাইড সাপ্লায়ার থেকে বাছাইকৃত',
+      support: 'সহজ রিটার্ন সুবিধা',
+      supportDesc: 'পছন্দ না হলে শুধু ডেলিভারি চার্জে রিটার্ন',
       cod: 'ক্যাশ অন ডেলিভারি',
-      codDesc: 'পণ্য দেখে মূল্য পরিশোধের নিশ্চয়তা'
+      codDesc: 'পণ্য দেখে নিয়ে মূল্য পরিশোধের নিশ্চয়তা'
     },
 
     // Footer
@@ -475,10 +477,12 @@ export const translations = {
       selectSize: 'Select Size',
       selectColor: 'Select Color',
       fabricDetails: 'Fabric & Material Details',
-      deliveryInfo: 'Delivery Information',
-      cashOnDeliveryAvailable: 'Nationwide Cash on Delivery across Bangladesh',
-      easyReturns: '7-Day Hassle-Free Return & Exchange Policy',
+      deliveryInfo: 'Delivery & Return Information',
+      cashOnDeliveryAvailable: 'Nationwide Cash on Delivery with Doorstep Inspection',
+      easyReturns: 'Easy Doorstep Return with Delivery Charge if not satisfied',
       fastDeliveryTime: '2-3 days in Dhaka, 3-5 days outside Dhaka',
+      returnNotice: 'Check your parcel upon arrival. If you find any defect or change your mind, return it directly to the delivery agent by only paying the delivery fee.',
+      sourcingNotice: 'We carefully curate and quality-check garments sourced directly from verified suppliers.',
       share: 'Share',
       reviews: 'Reviews',
       onlyLeft: 'Left'
@@ -524,35 +528,35 @@ export const translations = {
 
     // About Us Page
     about: {
-      tagline: 'The Art of Elegance',
-      title: 'Crafting Timeless Grace for Every Woman',
-      story: 'Ronggoboti was born from an unwavering passion to celebrate the timeless beauty of Bengali heritage and modern feminine elegance. Every silhouette is a canvas of craftsmanship, emotion, and individuality.',
-      heritageTitle: 'A Legacy of Fine Artistry',
-      heritageText: 'From the delicate threads of authentic Dhakai Jamdani to luxurious pure silks and fluid georgettes, we bring together Bangladesh\'s master weavers and modern designers under one visionary atelier.',
-      materialsText: 'We handpick each fabric with uncompromising standards. Our designs honor our cultural roots while empowering the contemporary woman to express herself boldly and beautifully.',
-      authenticStat: '100% Authentic Fabrics',
-      happyClientsStat: '10,000+ Delighted Muses',
-      valuesTitle: 'The Pillars of Ronggoboti',
-      artisanTitle: 'Artisanal Heritage',
-      artisanDesc: 'We work directly with traditional weaving communities across Bengal, sustaining generational artistry and empowering local artisans.',
-      modernGlamourTitle: 'Modern Glamour',
-      modernGlamourDesc: 'Every creation is infused with chic contemporary cuts, opulent hues, and flattering draping suited for grand celebrations and everyday luxury.',
-      uncompromisingQualityTitle: 'Uncompromising Quality',
-      uncompromisingQualityDesc: 'From the finest pure silk threads to precise hand-finished hemlines, we never cut corners on quality, comfort, or endurance.',
-      ctaTitle: 'Experience the Magic of Ronggoboti',
-      ctaDesc: 'Explore our curated collections of sarees, salwar kameez, and contemporary festive wear designed for your special moments.'
+      tagline: 'Verified Curation & Quality Assurance',
+      title: 'Premium Handpicked Fashion from Verified Suppliers',
+      story: 'Ronggoboti is a trusted online boutique and fashion curator. We do not manufacture garments ourselves; instead, we handpick, inspect, and curate authentic, top-grade Sarees, Salwar Kameez, and dresses from verified suppliers and premier textile hubs across the country.',
+      heritageTitle: 'Verified Sourcing & Quality Inspection',
+      heritageText: 'From traditional Dhakai Jamdani and Mirpur Katan to pure silks and designer three-piece suits — every single item is meticulously vetted and quality-checked from our verified network of trusted suppliers before delivery.',
+      materialsText: 'We personally inspect the fabric quality, color fastness, embroidery, and hemlines. If you find any defect or are not completely satisfied upon delivery, you can easily return the parcel on the spot simply by paying the delivery charge.',
+      authenticStat: '100% Quality Inspected',
+      happyClientsStat: '10,000+ Satisfied Shoppers',
+      valuesTitle: 'Our Values & Operating Principles',
+      artisanTitle: 'Verified Supplier Sourcing',
+      artisanDesc: 'We partner with established, vetted suppliers and trusted weaving hubs to deliver authentic, premium-grade fashion at the fairest prices.',
+      modernGlamourTitle: 'Easy Doorstep Returns',
+      modernGlamourDesc: 'Inspect your order upon delivery. If it does not match your expectations, return it instantly by paying the delivery fee.',
+      uncompromisingQualityTitle: 'Strict Quality Control',
+      uncompromisingQualityDesc: 'Every piece undergoes individual multi-point inspection before dispatch so you always receive flaw-free luxury fashion.',
+      ctaTitle: 'Shop with Complete Peace of Mind',
+      ctaDesc: 'Enjoy doorstep parcel inspection and a hassle-free return policy with standard delivery charges.'
     },
 
     // Features Bar
     features: {
       fastDelivery: 'Fast Home Delivery',
       fastDeliveryDesc: 'Nationwide delivery across all 64 districts',
-      authentic: '100% Authentic Quality',
-      authenticDesc: 'Finest handpicked fabrics & craftsmanship',
-      support: '24/7 Dedicated Support',
-      supportDesc: 'Ready to assist with styling & orders',
+      authentic: 'Verified Quality Guaranteed',
+      authenticDesc: 'Curated from top verified suppliers',
+      support: 'Easy Doorstep Returns',
+      supportDesc: 'Return with delivery charge if not satisfied',
       cod: 'Cash on Delivery',
-      codDesc: 'Pay upon checking your delivery'
+      codDesc: 'Inspect at doorstep before payment'
     },
 
     // Footer
