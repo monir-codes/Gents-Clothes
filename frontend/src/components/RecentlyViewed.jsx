@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import ProductCard from './ProductCard';
+import useLanguageStore from '../store/useLanguageStore';
 
 const RecentlyViewed = ({ currentProductId }) => {
   const [recentProducts, setRecentProducts] = useState([]);
+  const { language } = useLanguageStore();
 
   useEffect(() => {
     // Read from local storage
@@ -30,7 +32,9 @@ const RecentlyViewed = ({ currentProductId }) => {
       viewport={{ once: true }}
       transition={{ duration: 0.6 }}
     >
-      <h2 style={{ fontSize: '2rem', fontWeight: 600, textAlign: 'center', marginBottom: 'var(--space-4)' }}>Recently Viewed</h2>
+      <h2 style={{ fontSize: '2rem', fontWeight: 600, textAlign: 'center', marginBottom: 'var(--space-4)' }}>
+        {language === 'bn' ? 'সম্প্রতি দেখা কালেকশন' : 'Recently Viewed'}
+      </h2>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: 'var(--space-3)' }}>
         {recentProducts.map(p => (
           <ProductCard key={p._id} product={p} />
@@ -41,3 +45,4 @@ const RecentlyViewed = ({ currentProductId }) => {
 };
 
 export default RecentlyViewed;
+

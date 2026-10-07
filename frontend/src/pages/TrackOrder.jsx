@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Package, Truck, CheckCircle, Clock, AlertCircle } from 'lucide-react';
 import axios from 'axios';
 import SEO from '../components/SEO';
+import useLanguageStore from '../store/useLanguageStore';
 
 const TrackOrder = () => {
   const [orderId, setOrderId] = useState('');
@@ -11,6 +12,9 @@ const TrackOrder = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [orderData, setOrderData] = useState(null);
+
+  const { language, formatPrice, formatNumber, localizeTitle } = useLanguageStore();
+  const isBn = language === 'bn';
 
   const handleTrack = async (e) => {
     e.preventDefault();
@@ -22,7 +26,7 @@ const TrackOrder = () => {
         setOrderData(data);
         setIsTracking(true);
       } catch (err) {
-        setError(err.response?.data?.message || 'Failed to track order. Please check your details.');
+        setError(err.response?.data?.message || (isBn ? 'অর্ডারের তথ্য পাওয়া যায়নি। অনুগ্রহ করে সঠিক তথ্য দিন।' : 'Failed to track order. Please check your details.'));
       } finally {
         setLoading(false);
       }
@@ -49,15 +53,22 @@ const TrackOrder = () => {
 
   return (
     <div className="container" style={{ padding: '60px 0', minHeight: '80vh', maxWidth: '600px', margin: '0 auto' }}>
-      <SEO title="Track Order" description="Track your রঙবতী delivery status." />
+      <SEO 
+        title={isBn ? "অর্ডার ট্র্যাক করুন | রঙবতী" : "Track Order | Ronggoboti"} 
+        description={isBn ? "আপনার রঙবতী পার্সেল ডেলিভারি স্ট্যাটাস ট্র্যাক করুন।" : "Track your রঙবতী delivery status."} 
+      />
       
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         style={{ textAlign: 'center', marginBottom: '40px' }}
       >
-        <h1 style={{ fontSize: '2.5rem', fontWeight: 600 }}>Track Your Order</h1>
-        <p style={{ color: 'var(--color-text-secondary)', marginTop: '8px' }}>Enter your order details below</p>
+        <h1 style={{ fontSize: '2.5rem', fontWeight: 600 }}>
+          {isBn ? 'অর্ডার ট্র্যাক করুন' : 'Track Your Order'}
+        </h1>
+        <p style={{ color: 'var(--color-text-secondary)', marginTop: '8px' }}>
+          {isBn ? 'আপনার অর্ডার নম্বর ও ফোন নম্বর দিয়ে স্ট্যাটাস জানুন' : 'Enter your order details below'}
+        </p>
       </motion.div>
 
       {!isTracking ? (
@@ -69,7 +80,9 @@ const TrackOrder = () => {
         >
           {error && <div style={{ padding: '10px', background: '#ffebee', color: '#c62828', borderRadius: '4px', display: 'flex', alignItems: 'center', gap: '8px' }}><AlertCircle size={18} /> {error}</div>}
           <div>
-            <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.9rem', fontWeight: 500 }}>Order ID</label>
+            <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.9rem', fontWeight: 500 }}>
+              {isBn ? 'অর্ডার নম্বর (Order ID)' : 'Order ID'}
+            </label>
             <input 
               type="text" 
               placeholder="e.g. Rumman-1 or 64d9f7..."
@@ -80,7 +93,9 @@ const TrackOrder = () => {
             />
           </div>
           <div>
-            <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.9rem', fontWeight: 500 }}>Phone Number</label>
+            <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.9rem', fontWeight: 500 }}>
+              {isBn ? 'মোবাইল নম্বর' : 'Phone Number'}
+            </label>
             <input 
               type="tel" 
               placeholder="e.g. 017xxxxxxxx"
@@ -91,7 +106,7 @@ const TrackOrder = () => {
             />
           </div>
           <button type="submit" disabled={loading} style={{ padding: '14px', background: 'var(--color-accent)', color: '#fff', border: 'none', borderRadius: '4px', fontWeight: 600, cursor: loading ? 'not-allowed' : 'pointer', marginTop: '10px' }}>
-            {loading ? 'Tracking...' : 'Track Order'}
+            {loading ? (isBn ? 'ট্র্যাক করা হচ্ছে...' : 'Tracking...') : (isBn ? 'অর্ডার ট্র্যাক করুন' : 'Track Order')}
           </button>
         </motion.form>
       ) : (
@@ -103,8 +118,10 @@ const TrackOrder = () => {
           {getStatusStage(orderData?.status) === -1 ? (
              <div style={{ color: 'var(--color-error)' }}>
                <AlertCircle size={50} style={{ margin: '0 auto', marginBottom: '15px' }} />
-               <h3 style={{ fontSize: '1.5rem', marginBottom: '10px' }}>Order {orderData.status}</h3>
-               <p>Your order has been {orderData.status.toLowerCase()}. Please contact support if you need assistance.</p>
+               <h3 style={{ fontSize: '1.5rem', marginBottom: '10px' }}>
+                 {isBn ? `অর্ডার ${orderData.status}` : `Order ${orderData.status}`}
+               </h3>
+               <p>{isBn ? 'আপনার অর্ডারটি বাতিল বা ফেরত পাঠানো হয়েছে। বিস্তারিত জানতে কাস্টমার কেয়ারে যোগাযোগ করুন।' : `Your order has been ${orderData.status.toLowerCase()}. Please contact support if you need assistance.`}</p>
              </div>
           ) : (
             <>
@@ -115,22 +132,26 @@ const TrackOrder = () => {
                 <div style={{ height: '2px', flex: 1, minWidth: '30px', maxWidth: '60px', background: getStatusStage(orderData?.status) >= 3 ? 'var(--color-accent)' : 'var(--color-border)', alignSelf: 'center', transition: '0.3s' }}></div>
                 <CheckCircle size={40} color={getStatusStage(orderData?.status) >= 3 ? 'var(--color-accent)' : 'var(--color-border)'} />
               </div>
-              <h3 style={{ fontSize: '1.5rem', marginBottom: '10px' }}>Status: {orderData?.status}</h3>
+              <h3 style={{ fontSize: '1.5rem', marginBottom: '10px' }}>
+                {isBn ? `স্ট্যাটাস: ${orderData?.status}` : `Status: ${orderData?.status}`}
+              </h3>
               <p style={{ color: 'var(--color-text-secondary)', marginBottom: '20px' }}>
-                Order placed on {new Date(orderData?.createdAt).toLocaleDateString()}
+                {isBn ? `অর্ডার তারিখ: ${new Date(orderData?.createdAt).toLocaleDateString()}` : `Order placed on ${new Date(orderData?.createdAt).toLocaleDateString()}`}
               </p>
               
               <div style={{ textAlign: 'left', background: 'var(--color-background)', padding: '20px', borderRadius: '8px', marginBottom: '20px' }}>
-                <h4 style={{ marginBottom: '15px', paddingBottom: '10px', borderBottom: '1px solid var(--color-border)' }}>Items</h4>
+                <h4 style={{ marginBottom: '15px', paddingBottom: '10px', borderBottom: '1px solid var(--color-border)' }}>
+                  {isBn ? 'অর্ডারের পণ্যসমূহ' : 'Items'}
+                </h4>
                 {orderData?.orderItems.map((item, index) => (
                   <div key={index} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', fontSize: '0.9rem' }}>
-                    <span>{item.qty}x {item.name} {item.size ? `(${item.size})` : ''}</span>
-                    <span>৳{item.price * item.qty}</span>
+                    <span>{formatNumber(item.qty)}x {localizeTitle(item.name)} {item.size ? `(${item.size})` : ''}</span>
+                    <span>{formatPrice(item.price * item.qty)}</span>
                   </div>
                 ))}
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '15px', paddingTop: '10px', borderTop: '1px solid var(--color-border)', fontWeight: 600 }}>
-                  <span>Total</span>
-                  <span>৳{orderData?.totalPrice}</span>
+                  <span>{isBn ? 'সর্বমোট' : 'Total'}</span>
+                  <span>{formatPrice(orderData?.totalPrice)}</span>
                 </div>
               </div>
             </>
@@ -140,7 +161,7 @@ const TrackOrder = () => {
             onClick={() => { setIsTracking(false); setOrderData(null); }}
             style={{ marginTop: '10px', padding: '10px 20px', background: 'transparent', border: '1px solid var(--color-border)', borderRadius: '4px', cursor: 'pointer' }}
           >
-            Track Another Order
+            {isBn ? 'অন্য অর্ডার ট্র্যাক করুন' : 'Track Another Order'}
           </button>
         </motion.div>
       )}
@@ -149,3 +170,4 @@ const TrackOrder = () => {
 };
 
 export default TrackOrder;
+

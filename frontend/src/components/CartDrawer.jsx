@@ -8,7 +8,7 @@ import styles from './CartDrawer.module.css';
 
 const CartDrawer = () => {
   const { isCartOpen, toggleCart, cartItems, removeFromCart, updateQty } = useCartStore();
-  const { t, language } = useLanguageStore();
+  const { t, language, formatPrice, formatNumber, localizeTitle } = useLanguageStore();
   const navigate = useNavigate();
 
   const handleCheckout = () => {
@@ -41,7 +41,7 @@ const CartDrawer = () => {
           >
             <div className={styles.header}>
               <h2 className={styles.title}>
-                {t('cart.title', 'Your Shopping Bag')} ({cartItems.length})
+                {t('cart.title', 'Your Shopping Bag')} ({formatNumber(cartItems.length)})
               </h2>
               <button className={styles.closeBtn} onClick={toggleCart} aria-label="Close Cart"><X /></button>
             </div>
@@ -62,7 +62,7 @@ const CartDrawer = () => {
                   <div key={`${item.product}-${item.size}-${item.color}-${index}`} className={styles.cartItem}>
                     <img src={item.image} alt={item.name} className={styles.itemImage} />
                     <div className={styles.itemDetails}>
-                      <h4 className={styles.itemName}>{item.name}</h4>
+                      <h4 className={styles.itemName}>{localizeTitle(item.name)}</h4>
                       <p className={styles.itemVariants}>
                         {item.color && `${isBn ? 'রং:' : 'Color:'} ${item.color}`} 
                         {item.size && ` | ${isBn ? 'সাইজ:' : 'Size:'} ${item.size}`}
@@ -74,14 +74,14 @@ const CartDrawer = () => {
                             onClick={() => updateQty(item.product, item.size, item.color, Math.max(1, item.qty - 1))}
                             aria-label="Decrease quantity"
                           >-</button>
-                          <input type="text" value={item.qty} readOnly className={styles.qtyInput} />
+                          <input type="text" value={formatNumber(item.qty)} readOnly className={styles.qtyInput} />
                           <button 
                             className={styles.qtyBtn}
                             onClick={() => updateQty(item.product, item.size, item.color, item.qty + 1)}
                             aria-label="Increase quantity"
                           >+</button>
                         </div>
-                        <div style={{fontWeight: 600}}>৳{item.price * item.qty}</div>
+                        <div style={{fontWeight: 600}}>{formatPrice(item.price * item.qty)}</div>
                       </div>
                       <button 
                         className={styles.removeBtn}
@@ -101,7 +101,7 @@ const CartDrawer = () => {
               <div className={styles.footer}>
                 <div className={styles.subtotalRow}>
                   <span>{t('cart.subtotal', 'Subtotal')}</span>
-                  <span>৳{subtotal}</span>
+                  <span>{formatPrice(subtotal)}</span>
                 </div>
                 <button className={styles.checkoutBtn} onClick={handleCheckout}>
                   {t('cart.checkoutBtn', 'Proceed to Checkout')}

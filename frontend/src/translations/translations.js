@@ -65,6 +65,26 @@ export const BILINGUAL_SYNONYMS = {
   'co-ord': ['কর্ড সেট', 'কো-অর্ড']
 };
 
+export const CATEGORY_TRANSLATIONS = {
+  'Sarees': { bn: 'শাড়ি কালেকশন', en: 'Sarees' },
+  'Salwar Kameez': { bn: 'সালোয়ার কামিজ', en: 'Salwar Kameez' },
+  'Three Piece': { bn: 'থ্রি পিস', en: 'Three Piece' },
+  'Two Piece': { bn: 'টু পিস', en: 'Two Piece' },
+  'Kurtis': { bn: 'ডিজাইনার কুর্তি', en: 'Kurtis' },
+  'Kurtis & Tops': { bn: 'কুর্তি ও টপস', en: 'Kurtis & Tops' },
+  'Tunics & Tops': { bn: 'টিউনিক ও টপস', en: 'Tunics & Tops' },
+  'Lehengas': { bn: 'লেহেঙ্গা কালেকশন', en: 'Lehengas' },
+  'Bridal Wear': { bn: 'ব্রাইডাল পোশাক', en: 'Bridal Wear' },
+  'Gowns': { bn: 'গাউন ও ম্যাক্সি ড্রেস', en: 'Gowns & Maxi' },
+  'Modest Wear': { bn: 'আবায়া ও বোরকা', en: 'Modest Wear' },
+  'Abayas & Borka': { bn: 'আবায়া ও বোরকা', en: 'Abayas & Borka' },
+  'Hijabs & Dupattas': { bn: 'হিজাব ও ওড়না', en: 'Hijabs & Dupattas' },
+  'Co-ord Sets': { bn: 'কর্ড সেট', en: 'Co-ord Sets' },
+  'New Arrivals': { bn: 'নতুন কালেকশন', en: 'New Arrivals' },
+  'Premium': { bn: 'প্রিমিয়াম কালেকশন', en: 'Premium Collection' },
+  'Sale': { bn: 'স্পেশাল অফার', en: 'Sale' }
+};
+
 export const translations = {
   bn: {
     // Top Announcement & Branding
@@ -166,7 +186,8 @@ export const translations = {
       easyReturns: '৭ দিনের সহজ রিটার্ন ও এক্সচেঞ্জ গ্যারান্টি',
       fastDeliveryTime: 'ঢাকায় ২-৩ দিন, ঢাকার বাইরে ৩-৫ দিনে ডেলিভারি',
       share: 'শেয়ার করুন',
-      reviews: 'রিভিউ'
+      reviews: 'রিভিউ',
+      onlyLeft: 'টি বাকি'
     },
 
     // Cart Drawer & Checkout
@@ -201,10 +222,31 @@ export const translations = {
       couponCode: 'কুপন কোড',
       applyCoupon: 'প্রয়োগ করুন',
       orderSummary: 'অর্ডারের বিবরণ',
-      placeOrder: 'অর্ডার নিশ্চিত করুন (Confirm Order)',
+      placeOrder: 'অর্ডার নিশ্চিত করুন',
       placingOrder: 'অর্ডার প্রক্রিয়াধীন...',
       orderSuccessTitle: 'ধন্যবাদ! আপনার অর্ডারটি সফলভাবে গৃহীত হয়েছে।',
       orderSuccessSubtitle: 'আমাদের প্রতিনিধি শীঘ্রই আপনার সাথে যোগাযোগ করবেন।'
+    },
+
+    // About Us Page
+    about: {
+      tagline: 'বাংলার ঐতিহ্য ও আভিজাত্যের প্রতীক',
+      title: 'প্রতিটি নারীর জন্য নিখুঁত সৌন্দর্য ও আধুনিক ফ্যাশন',
+      story: 'রঙবতী (Ronggoboti) বাংলার সমৃদ্ধ ঐতিহ্য ও আধুনিক ফ্যাশনের মেলবন্ধনে প্রতিষ্ঠিত একটি প্রিমিয়াম ফ্যাশন হাউস। প্রতিটি সুতা, নকশা ও রঙে আমরা নারীর অনন্য ব্যক্তিত্ব, সৌন্দর্য ও আত্মবিশ্বাসকে ফুটিয়ে তুলতে প্রতিশ্রুতিবদ্ধ।',
+      heritageTitle: 'বাংলার ঐতিহ্যবাহী সূক্ষ্ম কারুশিল্প',
+      heritageText: 'ঐতিহ্যবাহী ঢাকাই জামদানি থেকে শুরু করে খাঁটি সিল্ক, কাতান ও মসৃণ জর্জেট—আমাদের দক্ষ তাঁতি ও ডিজাইনারদের হাত ধরে তৈরি হয় প্রতিটি অনবদ্য মাস্টারপিস।',
+      materialsText: 'আমরা সম্পূর্ণ আপসহীনভাবে সেরা মানের কাপড় ও ফেব্রিক নির্বাচন করি। রঙবতীর প্রতিটি পোশাকে জড়িয়ে থাকে ঐতিহ্য, আভিজাত্য এবং পরম আরামের অনুভূতি।',
+      authenticStat: '১০০% আসল কাপড়',
+      happyClientsStat: '১০,০০০+ সন্তুষ্ট নারী',
+      valuesTitle: 'আমাদের মূল দর্শন ও স্তম্ভ',
+      artisanTitle: 'ঐতিহ্যবাহী তাঁত শিল্প',
+      artisanDesc: 'আমরা সরাসরি বাংলার তৃণমূল কারিগর ও তাঁতিদের সাথে কাজ করি, যা আমাদের শতাব্দী প্রাচীন বুনন শিল্পকে টিকিয়ে রাখতে ভূমিকা রাখে।',
+      modernGlamourTitle: 'আধুনিক গ্ল্যামার',
+      modernGlamourDesc: 'উৎসব, বিয়ে বা দৈনন্দিন জীবনের প্রতিটি মুহূর্তকে রাঙিয়ে তুলতে আধুনিক কাট ও নজরকাড়া কালার প্যালেট আমাদের বিশেষত্ব।',
+      uncompromisingQualityTitle: 'আপসহীন প্রিমিয়াম কোয়ালিটি',
+      uncompromisingQualityDesc: 'সুতার নির্বাচন থেকে শুরু করে হ্যান্ড-ফিনিশিং ও নিখুঁত সেলাই—প্রতিটি ধাপে আমরা নিশ্চিত করি সর্বোচ্চ মান।',
+      ctaTitle: 'রঙবতীর জাদুকরী অভিজ্ঞতায় আপনাকে স্বাগতম',
+      ctaDesc: 'আপনার বিশেষ মুহূর্তগুলো স্মরণীয় করে রাখতে বেছে নিন আমাদের এক্সক্লুসিভ শাড়ি, সালোয়ার কামিজ ও উৎসব কালেকশন।'
     },
 
     // Features Bar
@@ -331,7 +373,8 @@ export const translations = {
       easyReturns: '7-Day Hassle-Free Return & Exchange Policy',
       fastDeliveryTime: '2-3 days in Dhaka, 3-5 days outside Dhaka',
       share: 'Share',
-      reviews: 'Reviews'
+      reviews: 'Reviews',
+      onlyLeft: 'Left'
     },
 
     // Cart Drawer & Checkout
@@ -370,6 +413,27 @@ export const translations = {
       placingOrder: 'Processing order...',
       orderSuccessTitle: 'Thank you! Your order has been placed.',
       orderSuccessSubtitle: 'Our customer support will contact you shortly to confirm delivery.'
+    },
+
+    // About Us Page
+    about: {
+      tagline: 'The Art of Elegance',
+      title: 'Crafting Timeless Grace for Every Woman',
+      story: 'Ronggoboti was born from an unwavering passion to celebrate the timeless beauty of Bengali heritage and modern feminine elegance. Every silhouette is a canvas of craftsmanship, emotion, and individuality.',
+      heritageTitle: 'A Legacy of Fine Artistry',
+      heritageText: 'From the delicate threads of authentic Dhakai Jamdani to luxurious pure silks and fluid georgettes, we bring together Bangladesh\'s master weavers and modern designers under one visionary atelier.',
+      materialsText: 'We handpick each fabric with uncompromising standards. Our designs honor our cultural roots while empowering the contemporary woman to express herself boldly and beautifully.',
+      authenticStat: '100% Authentic Fabrics',
+      happyClientsStat: '10,000+ Delighted Muses',
+      valuesTitle: 'The Pillars of Ronggoboti',
+      artisanTitle: 'Artisanal Heritage',
+      artisanDesc: 'We work directly with traditional weaving communities across Bengal, sustaining generational artistry and empowering local artisans.',
+      modernGlamourTitle: 'Modern Glamour',
+      modernGlamourDesc: 'Every creation is infused with chic contemporary cuts, opulent hues, and flattering draping suited for grand celebrations and everyday luxury.',
+      uncompromisingQualityTitle: 'Uncompromising Quality',
+      uncompromisingQualityDesc: 'From the finest pure silk threads to precise hand-finished hemlines, we never cut corners on quality, comfort, or endurance.',
+      ctaTitle: 'Experience the Magic of Ronggoboti',
+      ctaDesc: 'Explore our curated collections of sarees, salwar kameez, and contemporary festive wear designed for your special moments.'
     },
 
     // Features Bar

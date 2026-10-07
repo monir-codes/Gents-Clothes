@@ -1,12 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Sparkles, Heart, Feather, ShieldCheck, ArrowRight, ChevronDown, Search, HelpCircle } from 'lucide-react';
+import { Sparkles, Heart, Feather, ShieldCheck, ArrowRight, ChevronDown, Search, HelpCircle, Phone, Mail, MapPin, Clock } from 'lucide-react';
 import axios from 'axios';
 import SEO from '../components/SEO';
+import useLanguageStore from '../store/useLanguageStore';
 
-const StaticPageTemplate = ({ title, subtitle, children, contentKey, schemaMarkup }) => {
+const StaticPageTemplate = ({ title, titleBn, subtitle, subtitleBn, children, contentKey, schemaMarkup }) => {
   const [settings, setSettings] = useState(null);
+  const { language } = useLanguageStore();
+  const isBn = language === 'bn';
+
+  const displayTitle = isBn ? (titleBn || title) : title;
+  const displaySubtitle = isBn ? (subtitleBn || subtitle) : subtitle;
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -23,8 +29,8 @@ const StaticPageTemplate = ({ title, subtitle, children, contentKey, schemaMarku
   return (
     <div style={{ background: 'var(--color-background)', minHeight: '80vh', paddingBottom: '80px' }}>
       <SEO 
-        title={title} 
-        description={subtitle || `${title} - রঙবতী (Ronggoboti) Women's Fashion & Lifestyle in Bangladesh.`} 
+        title={displayTitle} 
+        description={displaySubtitle || `${displayTitle} - রঙবতী (Ronggoboti) Women's Fashion & Lifestyle in Bangladesh.`} 
         schemaMarkup={schemaMarkup}
       />
       {/* Header Banner */}
@@ -36,19 +42,19 @@ const StaticPageTemplate = ({ title, subtitle, children, contentKey, schemaMarku
       }}>
         <div className="container" style={{ maxWidth: '800px', margin: '0 auto' }}>
           <div style={{ fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '2px', color: 'var(--color-accent, #c9a265)', marginBottom: '12px' }}>
-            <Link to="/" style={{ color: 'var(--color-text-secondary)' }}>Home</Link> / {title}
+            <Link to="/" style={{ color: 'var(--color-text-secondary)' }}>{isBn ? 'হোম' : 'Home'}</Link> / {displayTitle}
           </div>
           <h1 style={{ 
             fontSize: 'clamp(2rem, 5vw, 2.8rem)', 
             fontWeight: 700, 
             color: 'var(--color-brand-maroon, #5e0f2b)', 
-            marginBottom: subtitle ? '12px' : '0' 
+            marginBottom: displaySubtitle ? '12px' : '0' 
           }}>
-            {title}
+            {displayTitle}
           </h1>
-          {subtitle && (
+          {displaySubtitle && (
             <p style={{ color: 'var(--color-text-secondary)', fontSize: '1.05rem', margin: 0 }}>
-              {subtitle}
+              {displaySubtitle}
             </p>
           )}
         </div>
@@ -79,6 +85,8 @@ const StaticPageTemplate = ({ title, subtitle, children, contentKey, schemaMarku
 
 export const About = () => {
   const [settings, setSettings] = useState(null);
+  const { t, language } = useLanguageStore();
+  const isBn = language === 'bn';
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -95,8 +103,8 @@ export const About = () => {
   return (
     <div style={{ background: 'var(--color-background)', overflowX: 'hidden' }}>
       <SEO 
-        title="About Us | Our Story" 
-        description="Discover the heritage, artistry, and philosophy behind রঙবতী (Ronggoboti) — Bangladesh's premier luxury women's fashion house." 
+        title={isBn ? "আমাদের সম্পর্কে | রঙবতী" : "About Us | Our Story"} 
+        description={isBn ? "রঙবতী (Ronggoboti) — ঐতিহ্য ও আধুনিক নারীর আভিজাত্যের মেলবন্ধন। আমাদের ইতিহাস, কারুশিল্প ও দর্শন সম্পর্কে জানুন।" : "Discover the heritage, artistry, and philosophy behind রঙবতী (Ronggoboti) — Bangladesh's premier luxury women's fashion house."} 
       />
 
       {/* Hero Section */}
@@ -124,27 +132,26 @@ export const About = () => {
               borderRadius: '20px',
               background: 'rgba(201, 162, 101, 0.12)'
             }}>
-              The Art of Elegance
+              {t('about.tagline', 'The Art of Elegance')}
             </span>
             <h1 style={{ 
               fontSize: 'clamp(2.2rem, 6vw, 3.6rem)', 
               fontWeight: 700, 
               color: 'var(--color-brand-maroon, #5e0f2b)', 
-              lineHeight: 1.2,
+              lineHeight: 1.25,
               marginBottom: '20px',
               fontFamily: 'var(--font-family-primary)'
             }}>
-              Crafting Timeless Grace for Every Woman
+              {t('about.title', 'Crafting Timeless Grace for Every Woman')}
             </h1>
             <p style={{ 
               color: 'var(--color-text-secondary, #6c5a60)', 
-              fontSize: 'clamp(1rem, 2.5vw, 1.25rem)', 
-              maxWidth: '720px', 
+              fontSize: 'clamp(1rem, 2.5vw, 1.2rem)', 
+              maxWidth: '740px', 
               margin: '0 auto 28px',
-              lineHeight: 1.7 
+              lineHeight: 1.8 
             }}>
-              {settings?.staticPages?.about?.storyText || 
-                'রঙবতী (Ronggoboti) was born from an unwavering passion to celebrate the timeless beauty of Bengali heritage and modern feminine elegance. Every silhouette is a canvas of craftsmanship, emotion, and individuality.'}
+              {settings?.staticPages?.about?.storyText || t('about.story')}
             </p>
           </motion.div>
         </div>
@@ -170,14 +177,13 @@ export const About = () => {
               fontWeight: 700, 
               marginBottom: '20px' 
             }}>
-              A Legacy of Fine Artistry
+              {t('about.heritageTitle', 'A Legacy of Fine Artistry')}
             </h2>
             <p style={{ color: 'var(--color-text-secondary)', lineHeight: 1.85, fontSize: '1.05rem', marginBottom: '20px' }}>
-              From the delicate threads of authentic Dhakai Jamdani to luxurious pure silks and fluid georgettes, we bring together Bangladesh's master weavers and modern designers under one visionary atelier.
+              {t('about.heritageText')}
             </p>
             <p style={{ color: 'var(--color-text-secondary)', lineHeight: 1.85, fontSize: '1.05rem', marginBottom: '30px' }}>
-              {settings?.staticPages?.about?.materialsText || 
-                'We handpick each fabric with uncompromising standards. Our designs honor our cultural roots while empowering the contemporary woman to express herself boldly and beautifully.'}
+              {settings?.staticPages?.about?.materialsText || t('about.materialsText')}
             </p>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
@@ -187,8 +193,12 @@ export const About = () => {
                 borderRadius: 'var(--radius-md, 8px)',
                 border: '1px solid var(--color-border, #ebdcd0)' 
               }}>
-                <h3 style={{ fontSize: '1.6rem', fontWeight: 700, color: 'var(--color-brand-maroon)', margin: '0 0 4px' }}>100%</h3>
-                <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--color-text-secondary)' }}>Authentic Fabrics</p>
+                <h3 style={{ fontSize: '1.6rem', fontWeight: 700, color: 'var(--color-brand-maroon)', margin: '0 0 4px' }}>
+                  {isBn ? '১০০%' : '100%'}
+                </h3>
+                <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--color-text-secondary)' }}>
+                  {t('about.authenticStat', 'Authentic Fabrics')}
+                </p>
               </div>
               <div style={{ 
                 padding: '20px', 
@@ -196,8 +206,12 @@ export const About = () => {
                 borderRadius: 'var(--radius-md, 8px)',
                 border: '1px solid var(--color-border, #ebdcd0)' 
               }}>
-                <h3 style={{ fontSize: '1.6rem', fontWeight: 700, color: 'var(--color-brand-maroon)', margin: '0 0 4px' }}>10K+</h3>
-                <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--color-text-secondary)' }}>Delighted Muses</p>
+                <h3 style={{ fontSize: '1.6rem', fontWeight: 700, color: 'var(--color-brand-maroon)', margin: '0 0 4px' }}>
+                  {isBn ? '১০,০০০+' : '10K+'}
+                </h3>
+                <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--color-text-secondary)' }}>
+                  {t('about.happyClientsStat', 'Delighted Muses')}
+                </p>
               </div>
             </div>
           </motion.div>
@@ -235,10 +249,10 @@ export const About = () => {
         <div className="container">
           <div style={{ textAlign: 'center', maxWidth: '700px', margin: '0 auto 60px' }}>
             <span style={{ fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '2px', color: 'var(--color-accent, #c9a265)', fontWeight: 600 }}>
-              Our Values
+              {isBn ? 'মূল দর্শন' : 'Our Values'}
             </span>
             <h2 style={{ fontSize: 'clamp(2rem, 4vw, 2.6rem)', color: 'var(--color-brand-maroon, #5e0f2b)', marginTop: '8px', fontWeight: 700 }}>
-              The Pillars of রঙবতী
+              {t('about.valuesTitle', 'The Pillars of রঙবতী')}
             </h2>
           </div>
 
@@ -250,18 +264,18 @@ export const About = () => {
             {[
               {
                 icon: Feather,
-                title: "Artisanal Heritage",
-                desc: "We work directly with traditional weaving communities across Bengal, sustaining generational artistry and empowering local artisans."
+                title: t('about.artisanTitle', 'Artisanal Heritage'),
+                desc: t('about.artisanDesc', 'We work directly with traditional weaving communities across Bengal.')
               },
               {
                 icon: Sparkles,
-                title: "Modern Glamour",
-                desc: "Every creation is infused with chic contemporary cuts, opulent hues, and flattering draping suited for grand celebrations and everyday luxury."
+                title: t('about.modernGlamourTitle', 'Modern Glamour'),
+                desc: t('about.modernGlamourDesc', 'Every creation is infused with chic contemporary cuts and opulent hues.')
               },
               {
                 icon: ShieldCheck,
-                title: "Uncompromising Quality",
-                desc: "From the finest pure silk threads to precise hand-finished hemlines, we never cut corners on quality, comfort, or endurance."
+                title: t('about.uncompromisingQualityTitle', 'Uncompromising Quality'),
+                desc: t('about.uncompromisingQualityDesc', 'From pure silk threads to precise hand-finished hemlines.')
               }
             ].map((pillar, i) => (
               <motion.div
@@ -309,10 +323,10 @@ export const About = () => {
       <section className="container" style={{ padding: '80px 20px' }}>
         <div style={{ textAlign: 'center', marginBottom: '50px' }}>
           <h2 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.4rem)', color: 'var(--color-brand-maroon, #5e0f2b)', fontWeight: 700 }}>
-            Every Thread Tells a Story
+            {isBn ? 'প্রতিটি সুতায় জড়ানো শিল্পকলা' : 'Every Thread Tells a Story'}
           </h2>
           <p style={{ color: 'var(--color-text-secondary)', marginTop: '8px' }}>
-            A glimpse into the elegance, fabrics, and craft behind রঙবতী.
+            {isBn ? 'রঙবতীর নান্দনিক আভিজাত্য ও সমৃদ্ধ কারুকার্যের এক ঝলক।' : 'A glimpse into the elegance, fabrics, and craft behind রঙবতী.'}
           </p>
         </div>
 
@@ -322,9 +336,9 @@ export const About = () => {
           gap: '24px' 
         }}>
           {[
-            { img: 'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&q=80&w=800', title: 'Royal Silk Weaves' },
-            { img: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&q=80&w=800', title: 'Contemporary Silhouettes' },
-            { img: 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?auto=format&fit=crop&q=80&w=800', title: 'Festive Allure' }
+            { img: 'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&q=80&w=800', title: isBn ? 'রয়েল সিল্ক কালেকশন' : 'Royal Silk Weaves' },
+            { img: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&q=80&w=800', title: isBn ? 'আধুনিক ফ্যাশন ডিজাইন' : 'Contemporary Silhouettes' },
+            { img: 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?auto=format&fit=crop&q=80&w=800', title: isBn ? 'উৎসবের এক্সক্লুসিভ সাজ' : 'Festive Allure' }
           ].map((item, idx) => (
             <motion.div
               key={idx}
@@ -367,10 +381,10 @@ export const About = () => {
           boxShadow: '0 15px 40px rgba(94, 15, 43, 0.25)'
         }}>
           <h3 style={{ fontSize: 'clamp(1.6rem, 3.5vw, 2.2rem)', fontWeight: 700, marginBottom: '14px' }}>
-            Experience the Magic of রঙবতী
+            {t('about.ctaTitle', 'Experience the Magic of রঙবতী')}
           </h3>
           <p style={{ color: 'rgba(255,255,255,0.85)', maxWidth: '600px', margin: '0 auto 28px', fontSize: '1.05rem' }}>
-            Explore our curated collections of sarees, salwar kameez, and contemporary festive wear designed for your special moments.
+            {t('about.ctaDesc')}
           </p>
           <Link to="/shop">
             <button style={{
@@ -388,7 +402,7 @@ export const About = () => {
               alignItems: 'center',
               gap: '8px'
             }}>
-              Shop All Collections <ArrowRight size={18} />
+              {isBn ? 'সকল কালেকশন দেখুন' : 'Shop All Collections'} <ArrowRight size={18} />
             </button>
           </Link>
         </div>
@@ -403,6 +417,8 @@ export const FAQ = () => {
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [openId, setOpenId] = useState(null);
+  const { language } = useLanguageStore();
+  const isBn = language === 'bn';
 
   useEffect(() => {
     const fetchFaqs = async () => {
@@ -421,7 +437,21 @@ export const FAQ = () => {
     fetchFaqs();
   }, []);
 
-  const categories = ['All', 'General', 'Orders & Payment', 'Delivery & Shipping', 'Fabric & Sizing', 'Returns & Exchange'];
+  const categories = isBn ? [
+    { key: 'All', label: 'সকল' },
+    { key: 'General', label: 'সাধারণ' },
+    { key: 'Orders & Payment', label: 'অর্ডার ও পেমেন্ট' },
+    { key: 'Delivery & Shipping', label: 'ডেলিভারি ও শিপিং' },
+    { key: 'Fabric & Sizing', label: 'ফেব্রিক ও সাইজিং' },
+    { key: 'Returns & Exchange', label: 'রিটার্ন ও এক্সচেঞ্জ' }
+  ] : [
+    { key: 'All', label: 'All' },
+    { key: 'General', label: 'General' },
+    { key: 'Orders & Payment', label: 'Orders & Payment' },
+    { key: 'Delivery & Shipping', label: 'Delivery & Shipping' },
+    { key: 'Fabric & Sizing', label: 'Fabric & Sizing' },
+    { key: 'Returns & Exchange', label: 'Returns & Exchange' }
+  ];
 
   const filteredFaqs = faqs.filter(faq => {
     const matchesCat = activeCategory === 'All' || (faq.category || 'General') === activeCategory;
@@ -447,8 +477,8 @@ export const FAQ = () => {
   return (
     <div style={{ background: 'var(--color-background)', minHeight: '85vh', paddingBottom: '80px' }}>
       <SEO 
-        title="Frequently Asked Questions (FAQ) | রঙবতী" 
-        description="Find answers to questions about ordering authentic Sarees, Salwar Kameez, Kurtis, shipping across Bangladesh, payment methods, returns, and fabric care at রঙবতী (Ronggoboti)." 
+        title={isBn ? "সাধারণ জিজ্ঞাসা ও প্রশ্নোত্তর (FAQ) | রঙবতী" : "Frequently Asked Questions (FAQ) | Ronggoboti"} 
+        description={isBn ? "রঙবতী (Ronggoboti) থেকে শাড়ি, থ্রি পিস কেনাকাটা, ডেলিভারি সময়, পেমেন্ট পদ্ধতি ও রিটার্ন সম্পর্কিত প্রশ্নের উত্তর জেনে নিন।" : "Find answers to questions about ordering authentic Sarees, Salwar Kameez, Kurtis, shipping across Bangladesh, payment methods, returns, and fabric care at রঙবতী (Ronggoboti)."} 
         keywords="রঙবতী FAQ, Ronggoboti questions, online saree shopping bangladesh faq, cash on delivery questions, return policy ronggoboti, dress sizes bd, jamdani saree care"
         schemaMarkup={dynamicFaqSchema}
       />
@@ -462,7 +492,7 @@ export const FAQ = () => {
       }}>
         <div className="container" style={{ maxWidth: '850px', margin: '0 auto' }}>
           <div style={{ fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '2px', color: 'var(--color-accent, #c9a265)', marginBottom: '12px' }}>
-            <Link to="/" style={{ color: 'var(--color-text-secondary)' }}>Home</Link> / FAQ
+            <Link to="/" style={{ color: 'var(--color-text-secondary)' }}>{isBn ? 'হোম' : 'Home'}</Link> / {isBn ? 'সাধারণ জিজ্ঞাসা' : 'FAQ'}
           </div>
           <h1 style={{ 
             fontSize: 'clamp(2rem, 5vw, 2.8rem)', 
@@ -470,10 +500,10 @@ export const FAQ = () => {
             color: 'var(--color-brand-maroon, #5e0f2b)', 
             marginBottom: '12px' 
           }}>
-            সাধারণ জিজ্ঞাসা ও প্রশ্নোত্তর (FAQ)
+            {isBn ? 'সাধারণ জিজ্ঞাসা ও প্রশ্নোত্তর (FAQ)' : 'Frequently Asked Questions (FAQ)'}
           </h1>
           <p style={{ color: 'var(--color-text-secondary)', fontSize: '1.05rem', margin: '0 auto 24px', maxWidth: '650px' }}>
-            রঙবতী (Ronggoboti) থেকে কেনাকাটা, ডেলিভারি, পেমেন্ট ও ফেব্রিক সম্পর্কিত সাধারণ প্রশ্নগুলোর সহজ উত্তর জেনে নিন।
+            {isBn ? 'রঙবতী (Ronggoboti) থেকে কেনাকাটা, ডেলিভারি, পেমেন্ট ও ফেব্রিক সম্পর্কিত সাধারণ প্রশ্নগুলোর সহজ উত্তর জেনে নিন।' : 'Quick answers to common questions about ordering, nationwide shipping, payments, returns, and premium fabric care.'}
           </p>
 
           {/* Search Box */}
@@ -485,7 +515,7 @@ export const FAQ = () => {
             <Search size={18} style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-secondary)' }} />
             <input 
               type="text" 
-              placeholder="প্রশ্ন বা বিষয় খুঁজুন (যেমন: ডেলিভারি, ক্যাশ অন ডেলিভারি, রিটার্ন)..."
+              placeholder={isBn ? "প্রশ্ন বা বিষয় খুঁজুন (যেমন: ডেলিভারি, ক্যাশ অন ডেলিভারি, রিটার্ন)..." : "Search questions (e.g. delivery, payment, return, sizing)..."}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               style={{
@@ -514,12 +544,12 @@ export const FAQ = () => {
           marginBottom: '36px'
         }}>
           {categories.map(cat => {
-            const count = cat === 'All' ? faqs.length : faqs.filter(f => (f.category || 'General') === cat).length;
-            const isActive = activeCategory === cat;
+            const count = cat.key === 'All' ? faqs.length : faqs.filter(f => (f.category || 'General') === cat.key).length;
+            const isActive = activeCategory === cat.key;
             return (
               <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
+                key={cat.key}
+                onClick={() => setActiveCategory(cat.key)}
                 style={{
                   padding: '8px 18px',
                   borderRadius: '24px',
@@ -535,7 +565,7 @@ export const FAQ = () => {
                   gap: '6px'
                 }}
               >
-                <span>{cat}</span>
+                <span>{cat.label}</span>
                 <span style={{
                   fontSize: '0.75rem',
                   padding: '1px 6px',
@@ -543,7 +573,7 @@ export const FAQ = () => {
                   background: isActive ? 'rgba(255,255,255,0.25)' : 'var(--color-surface, #faf6f1)',
                   color: isActive ? '#ffffff' : 'var(--color-text-secondary)'
                 }}>
-                  {count}
+                  {isBn ? String(count).replace(/[0-9]/g, d => ['০','১','২','৩','৪','৫','৬','৭','৮','৯'][Number(d)]) : count}
                 </span>
               </button>
             );
@@ -553,7 +583,7 @@ export const FAQ = () => {
         {/* FAQ Accordion List */}
         {loading ? (
           <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--color-text-secondary)' }}>
-            <p>FAQ লোড হচ্ছে...</p>
+            <p>{isBn ? 'FAQ লোড হচ্ছে...' : 'Loading FAQs...'}</p>
           </div>
         ) : filteredFaqs.length === 0 ? (
           <div style={{
@@ -564,9 +594,11 @@ export const FAQ = () => {
             border: '1px solid var(--color-border, #ebdcd0)'
           }}>
             <HelpCircle size={44} style={{ color: 'var(--color-accent, #c9a265)', marginBottom: '12px' }} />
-            <h3 style={{ color: 'var(--color-brand-maroon)', fontSize: '1.2rem', marginBottom: '8px' }}>কোনো ফলাফল পাওয়া যায়নি</h3>
+            <h3 style={{ color: 'var(--color-brand-maroon)', fontSize: '1.2rem', marginBottom: '8px' }}>
+              {isBn ? 'কোনো ফলাফল পাওয়া যায়নি' : 'No matching questions found'}
+            </h3>
             <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.95rem' }}>
-              অন্য কোনো কিওয়ার্ড দিয়ে খুঁজুন অথবা সরাসরি আমাদের সাথে যোগাযোগ করুন।
+              {isBn ? 'অন্য কোনো কিওয়ার্ড দিয়ে খুঁজুন অথবা সরাসরি আমাদের সাথে যোগাযোগ করুন।' : 'Try adjusting your search terms or contact customer support.'}
             </p>
           </div>
         ) : (
@@ -674,10 +706,10 @@ export const FAQ = () => {
         }}>
           <div>
             <h3 style={{ fontSize: '1.3rem', fontWeight: 700, color: 'var(--color-brand-maroon, #5e0f2b)', margin: '0 0 6px' }}>
-              আরও কোনো প্রশ্ন বা বিশেষ সাহায্য প্রয়োজন?
+              {isBn ? 'আরও কোনো প্রশ্ন বা বিশেষ সাহায্য প্রয়োজন?' : 'Have more questions or need styling advice?'}
             </h3>
             <p style={{ margin: 0, color: 'var(--color-text-secondary)', fontSize: '0.95rem' }}>
-              আমাদের কাস্টমার কেয়ার টিম আপনাকে সার্বক্ষণিক সহায়তা করার জন্য প্রস্তুত।
+              {isBn ? 'আমাদের কাস্টমার কেয়ার টিম আপনাকে সার্বক্ষণিক সহায়তা করার জন্য প্রস্তুত।' : 'Our dedicated fashion consultants are ready to assist you anytime.'}
             </p>
           </div>
           <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
@@ -695,7 +727,7 @@ export const FAQ = () => {
                 alignItems: 'center',
                 gap: '8px'
               }}>
-                Contact Support <ArrowRight size={16} />
+                {isBn ? 'যোগাযোগ করুন' : 'Contact Support'} <ArrowRight size={16} />
               </button>
             </Link>
           </div>
@@ -705,31 +737,74 @@ export const FAQ = () => {
   );
 };
 
-export const Contact = () => (
-  <StaticPageTemplate 
-    title="Contact Us" 
-    subtitle="We would love to hear from you. Reach out to our customer care team anytime."
-    contentKey="contact"
-  >
-    <p>Loading contact info...</p>
-  </StaticPageTemplate>
-);
-
-export const LegalPage = ({ title }) => {
-  let contentKey = '';
-  if (title === 'Shipping Policy') contentKey = 'shipping';
-  if (title === 'Return & Exchange Policy') contentKey = 'returns';
-  if (title === 'Size Guide') contentKey = 'sizeGuide';
-  if (title === 'Privacy Policy') contentKey = 'privacy';
-  if (title === 'Terms of Service') contentKey = 'terms';
+export const Contact = () => {
+  const { language } = useLanguageStore();
+  const isBn = language === 'bn';
 
   return (
     <StaticPageTemplate 
-      title={title} 
-      subtitle="Important terms, policies, and guidance regarding your shopping experience."
+      title="Contact Us"
+      titleBn="যোগাযোগ করুন"
+      subtitle="We would love to hear from you. Reach out to our customer care team anytime."
+      subtitleBn="আপনার যেকোনো প্রশ্ন, পরামর্শ বা অর্ডারের সহায়তায় রঙবতী কাস্টমার কেয়ার সার্বক্ষণিক প্রস্তুত।"
+      contentKey="contact"
+    >
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '24px', margin: '20px 0' }}>
+        <div style={{ padding: '20px', background: 'var(--color-surface, #faf6f1)', borderRadius: '12px', border: '1px solid var(--color-border)' }}>
+          <Phone size={24} color="var(--color-brand-maroon, #5e0f2b)" style={{ marginBottom: '10px' }} />
+          <h4 style={{ margin: '0 0 6px', color: 'var(--color-brand-maroon)' }}>{isBn ? 'হটলাইন / মোবাইল' : 'Direct Helpline'}</h4>
+          <p style={{ margin: 0, fontWeight: 600, color: 'var(--color-text-primary)' }}>+880 1700-000000</p>
+        </div>
+        <div style={{ padding: '20px', background: 'var(--color-surface, #faf6f1)', borderRadius: '12px', border: '1px solid var(--color-border)' }}>
+          <Mail size={24} color="var(--color-brand-maroon, #5e0f2b)" style={{ marginBottom: '10px' }} />
+          <h4 style={{ margin: '0 0 6px', color: 'var(--color-brand-maroon)' }}>{isBn ? 'ইমেইল সাপোর্ট' : 'Email Support'}</h4>
+          <p style={{ margin: 0, fontWeight: 600, color: 'var(--color-text-primary)' }}>support@ronggoboti.shop</p>
+        </div>
+        <div style={{ padding: '20px', background: 'var(--color-surface, #faf6f1)', borderRadius: '12px', border: '1px solid var(--color-border)' }}>
+          <MapPin size={24} color="var(--color-brand-maroon, #5e0f2b)" style={{ marginBottom: '10px' }} />
+          <h4 style={{ margin: '0 0 6px', color: 'var(--color-brand-maroon)' }}>{isBn ? 'হেড অফিস' : 'Headquarters'}</h4>
+          <p style={{ margin: 0, fontWeight: 500 }}>{isBn ? 'ঢাকা, বাংলাদেশ' : 'Dhaka, Bangladesh'}</p>
+        </div>
+      </div>
+    </StaticPageTemplate>
+  );
+};
+
+export const LegalPage = ({ title }) => {
+  const { language } = useLanguageStore();
+  const isBn = language === 'bn';
+
+  let contentKey = '';
+  let titleBn = '';
+  let subtitle = 'Important terms, policies, and guidance regarding your shopping experience.';
+  let subtitleBn = 'রঙবতী থেকে শপিং করার নিয়মাবলী, পলিসি ও দিকনির্দেশনা।';
+
+  if (title === 'Shipping Policy') {
+    contentKey = 'shipping';
+    titleBn = 'ডেলিভারি ও শিপিং পলিসি';
+  } else if (title === 'Return & Exchange Policy' || title === 'Return & Exchange') {
+    contentKey = 'returns';
+    titleBn = 'রিটার্ন ও এক্সচেঞ্জ পলিসি';
+  } else if (title === 'Size Guide') {
+    contentKey = 'sizeGuide';
+    titleBn = 'সাইজ নির্দেশিকা (Size Guide)';
+  } else if (title === 'Privacy Policy') {
+    contentKey = 'privacy';
+    titleBn = 'গোপনীয়তা নীতি (Privacy Policy)';
+  } else if (title === 'Terms of Service') {
+    contentKey = 'terms';
+    titleBn = 'শর্তাবলী (Terms of Service)';
+  }
+
+  return (
+    <StaticPageTemplate 
+      title={title}
+      titleBn={titleBn}
+      subtitle={subtitle}
+      subtitleBn={subtitleBn}
       contentKey={contentKey}
     >
-      <p>Loading document...</p>
+      <p>{isBn ? 'পলিসির বিস্তারিত তথ্য লোড হচ্ছে...' : 'Loading document details...'}</p>
     </StaticPageTemplate>
   );
 };

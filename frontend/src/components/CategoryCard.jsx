@@ -1,9 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import useLanguageStore from '../store/useLanguageStore';
 import styles from './CategoryCard.module.css';
 
 const CategoryCard = ({ title, image, link }) => {
+  const { language, localizeCategory } = useLanguageStore();
+  const isBn = language === 'bn';
+
   return (
     <motion.div 
       className={styles.card}
@@ -16,8 +20,10 @@ const CategoryCard = ({ title, image, link }) => {
           <div className={styles.overlay}></div>
         </div>
         <div className={styles.content}>
-          <h3 className={styles.title}>{title}</h3>
-          <span className={styles.linkText}>Shop Now &rarr;</span>
+          <h3 className={styles.title}>{localizeCategory(title)}</h3>
+          <span className={styles.linkText}>
+            {isBn ? 'কালেকশন দেখুন →' : 'Shop Now →'}
+          </span>
         </div>
       </Link>
     </motion.div>
@@ -25,3 +31,4 @@ const CategoryCard = ({ title, image, link }) => {
 };
 
 export default CategoryCard;
+

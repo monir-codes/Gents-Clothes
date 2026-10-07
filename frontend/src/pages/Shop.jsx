@@ -22,7 +22,7 @@ const CATEGORY_OPTIONS = [
 const Shop = ({ hideHeader }) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { t, language, getSearchSynonyms } = useLanguageStore();
+  const { t, language, formatNumber, formatPrice, getSearchSynonyms } = useLanguageStore();
   
   // Filter States
   const [selectedCategories, setSelectedCategories] = useState([]);
@@ -246,7 +246,7 @@ const Shop = ({ hideHeader }) => {
                   <h1 className={styles.title}>
                     {searchTerm ? `${t('search.resultsFor', 'Search:')} "${searchTerm}"` : t('shop.allProducts', 'All Products')}
                   </h1>
-                  <p className={styles.resultCount}>{totalProducts} {language === 'bn' ? 'টি পোশাক পাওয়া গেছে' : 'Items Found'}</p>
+                  <p className={styles.resultCount}>{formatNumber(totalProducts)} {language === 'bn' ? 'টি পোশাক পাওয়া গেছে' : 'Items Found'}</p>
                 </div>
               )}
             </div>
@@ -306,7 +306,7 @@ const Shop = ({ hideHeader }) => {
                   {language === 'bn' ? 'পূর্ববর্তী' : 'Prev'}
                 </button>
                 <span style={{ display: 'flex', alignItems: 'center', fontWeight: 600 }}>
-                  {language === 'bn' ? `পৃষ্ঠা ${page} এর ${totalPages}` : `Page ${page} of ${totalPages}`}
+                  {language === 'bn' ? `পৃষ্ঠা ${formatNumber(page)} এর ${formatNumber(totalPages)}` : `Page ${page} of ${totalPages}`}
                 </span>
                 <button 
                   onClick={() => setPage(p => Math.min(totalPages, p + 1))}

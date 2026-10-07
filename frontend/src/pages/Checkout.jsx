@@ -14,7 +14,7 @@ import Swal from 'sweetalert2';
 const Checkout = () => {
   const { cartItems, clearCart } = useCartStore();
   const { user } = useAuthStore();
-  const { t, language } = useLanguageStore();
+  const { t, language, formatPrice, formatNumber, localizeTitle } = useLanguageStore();
   const isBn = language === 'bn';
   const navigate = useNavigate();
 
@@ -381,7 +381,7 @@ const Checkout = () => {
                     {freeShippingThreshold > 0 && itemsPrice >= freeShippingThreshold ? (
                       <span style={{ color: '#16a34a', fontSize: '0.95rem' }}>{isBn ? 'ফ্রি' : 'FREE'}</span>
                     ) : (
-                      `৳${zone.charge}`
+                      formatPrice(zone.charge)
                     )}
                   </div>
                 </div>
@@ -415,8 +415,8 @@ const Checkout = () => {
                   </div>
                   <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginTop: '2px' }}>
                     {isBn 
-                      ? <>পণ্য হাতে পেয়ে সর্বমোট <strong>৳{totalPrice}</strong> পরিশোধ করুন।</> 
-                      : <>Pay in cash when your order is delivered (Total: <strong>৳{totalPrice}</strong>).</>}
+                      ? <>পণ্য হাতে পেয়ে সর্বমোট <strong>{formatPrice(totalPrice)}</strong> পরিশোধ করুন।</> 
+                      : <>Pay in cash when your order is delivered (Total: <strong>{formatPrice(totalPrice)}</strong>).</>}
                   </div>
                 </div>
               </div>
@@ -492,7 +492,7 @@ const Checkout = () => {
                             {currentAdvanceMethod.name} ({currentAdvanceMethod.type || 'Personal'}):
                           </span>
                           <span style={{ fontSize: '0.8rem', color: '#16a34a', fontWeight: 600 }}>
-                            {isBn ? `অগ্রিম প্রদেয়: ৳${shippingPrice > 0 ? shippingPrice : totalPrice}` : `Advance payable: ৳${shippingPrice > 0 ? shippingPrice : totalPrice}`}
+                            {isBn ? `অগ্রিম প্রদেয়: ${formatPrice(shippingPrice > 0 ? shippingPrice : totalPrice)}` : `Advance payable: ${formatPrice(shippingPrice > 0 ? shippingPrice : totalPrice)}`}
                           </span>
                         </div>
 
@@ -555,7 +555,7 @@ const Checkout = () => {
           </div>
 
           <button type="submit" className={styles.placeOrderBtn}>
-            {isBn ? `অর্ডার নিশ্চিত করুন (৳${totalPrice})` : `Confirm Order (৳${totalPrice})`}
+            {isBn ? `অর্ডার নিশ্চিত করুন (${formatPrice(totalPrice)})` : `Confirm Order (${formatPrice(totalPrice)})`}
           </button>
         </form>
       </div>
@@ -570,12 +570,12 @@ const Checkout = () => {
             <div key={index} style={{ display: 'flex', gap: '14px', marginBottom: '14px', alignItems: 'center' }}>
               <img src={item.image} alt={item.name} style={{ width: '55px', height: '70px', objectFit: 'cover', borderRadius: '4px' }} />
               <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 600, fontSize: '0.95rem' }}>{item.name}</div>
+                <div style={{ fontWeight: 600, fontSize: '0.95rem' }}>{localizeTitle(item.name)}</div>
                 <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>
                   {item.color && `${item.color} `}{item.size && `| ${item.size}`}
                 </div>
                 <div style={{ fontSize: '0.85rem', fontWeight: 500 }}>
-                  {isBn ? 'পরিমাণ:' : 'Qty:'} {item.qty} x ৳{item.price}
+                  {isBn ? 'পরিমাণ:' : 'Qty:'} {formatNumber(item.qty)} x {formatPrice(item.price)}
                 </div>
               </div>
             </div>
@@ -594,7 +594,7 @@ const Checkout = () => {
                 <CheckCircle2 size={18} className={styles.couponSuccessIcon} />
                 <div>
                   <strong>{appliedCoupon.code}</strong>
-                  <span className={styles.couponDiscountText}> ({appliedCoupon.discountPercentage}% OFF)</span>
+                  <span className={styles.couponDiscountText}> ({formatNumber(appliedCoupon.discountPercentage)}% OFF)</span>
                 </div>
               </div>
               <button 
@@ -640,24 +640,24 @@ const Checkout = () => {
         {/* Pricing Breakdown */}
         <div className={styles.summaryItem}>
           <span>{isBn ? 'সাবটোটাল' : 'Subtotal'}</span>
-          <span>৳{itemsPrice}</span>
+          <span>{formatPrice(itemsPrice)}</span>
         </div>
 
         {appliedCoupon && (
           <div className={`${styles.summaryItem} ${styles.discountItem}`}>
-            <span>{isBn ? `ছাড় (${appliedCoupon.discountPercentage}%)` : `Discount (${appliedCoupon.discountPercentage}%)`}</span>
-            <span style={{ color: '#16a34a', fontWeight: 600 }}>-৳{discountAmount}</span>
+            <span>{isBn ? `ছাড় (${formatNumber(appliedCoupon.discountPercentage)}%)` : `Discount (${appliedCoupon.discountPercentage}%)`}</span>
+            <span style={{ color: '#16a34a', fontWeight: 600 }}>-{formatPrice(discountAmount)}</span>
           </div>
         )}
 
         <div className={styles.summaryItem}>
           <span>{isBn ? `ডেলিভারি চার্জ (${activeZone.name})` : `Shipping (${activeZone.nameEn})`}</span>
-          <span>{shippingPrice === 0 ? <span style={{ color: '#16a34a', fontWeight: 600 }}>{isBn ? 'ফ্রি' : 'Free'}</span> : `৳${shippingPrice}`}</span>
+          <span>{shippingPrice === 0 ? <span style={{ color: '#16a34a', fontWeight: 600 }}>{isBn ? 'ফ্রি' : 'Free'}</span> : formatPrice(shippingPrice)}</span>
         </div>
 
         <div className={styles.totalRow}>
           <span>{isBn ? 'সর্বমোট' : 'Total'}</span>
-          <span style={{ color: 'var(--color-brand-maroon, #5e0f2b)' }}>৳{totalPrice}</span>
+          <span style={{ color: 'var(--color-brand-maroon, #5e0f2b)' }}>{formatPrice(totalPrice)}</span>
         </div>
 
         <div style={{ marginTop: '16px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>

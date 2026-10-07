@@ -11,7 +11,7 @@ import styles from './ProductCard.module.css';
 const ProductCard = ({ product }) => {
   const { addToCart } = useCartStore();
   const { toggleWishlist, isInWishlist } = useWishlistStore();
-  const { language } = useLanguageStore();
+  const { language, formatPrice, formatNumber, localizeTitle } = useLanguageStore();
   const isWishlisted = isInWishlist(product._id);
 
   const handleQuickAdd = (e) => {
@@ -56,7 +56,7 @@ const ProductCard = ({ product }) => {
           )}
           {product.countInStock < 5 && product.countInStock > 0 && (
             <div className={styles.stockBadge}>
-              {isBn ? `মাত্র ${product.countInStock}টি বাকি` : `Only ${product.countInStock} Left`}
+              {isBn ? `মাত্র ${formatNumber(product.countInStock)}টি বাকি` : `Only ${product.countInStock} Left`}
             </div>
           )}
         </Link>
@@ -81,12 +81,12 @@ const ProductCard = ({ product }) => {
 
       <div className={styles.details}>
         <Link to={getProductUrl(product)}>
-          <h3 className={styles.name}>{product.name}</h3>
+          <h3 className={styles.name}>{localizeTitle(product.name)}</h3>
         </Link>
         <div className={styles.priceContainer}>
-          <span className={styles.price}>৳{product.price}</span>
+          <span className={styles.price}>{formatPrice(product.price)}</span>
           {product.oldPrice && (
-            <span className={styles.oldPrice}>৳{product.oldPrice}</span>
+            <span className={styles.oldPrice}>{formatPrice(product.oldPrice)}</span>
           )}
         </div>
       </div>
@@ -95,3 +95,4 @@ const ProductCard = ({ product }) => {
 };
 
 export default ProductCard;
+

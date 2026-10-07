@@ -40,6 +40,7 @@ const ProductDetails = () => {
   const { addToCart } = useCartStore();
   const { toggleWishlist, isInWishlist } = useWishlistStore();
   const { user, token } = useAuthStore();
+  const { t, language, formatPrice, formatNumber, localizeTitle, localizeCategory } = useLanguageStore();
 
   const handleAddToCart = () => {
     addToCart({
@@ -203,7 +204,7 @@ const ProductDetails = () => {
     <div className={`container ${styles.productContainer}`}>
       {/* Breadcrumbs */}
       <div className={styles.breadcrumbs}>
-        <Link to="/">Home</Link> / <Link to="/shop">Shop</Link> / <span>{product.name}</span>
+        <Link to="/">{language === 'bn' ? 'হোম' : 'Home'}</Link> / <Link to="/shop">{language === 'bn' ? 'শপ' : 'Shop'}</Link> {product.category && <> / <Link to={`/shop?category=${encodeURIComponent(product.category)}`}>{localizeCategory(product.category)}</Link></>} / <span>{localizeTitle(product.name)}</span>
       </div>
 
       <div className={styles.mainSection}>
@@ -215,12 +216,12 @@ const ProductDetails = () => {
           transition={{ duration: 0.6 }}
         >
           <div className={styles.mainImageContainer}>
-            <img src={displayImage || product.image} alt={`${product.name} - Front View`} className={styles.mainImage} />
+            <img src={displayImage || product.image} alt={`${localizeTitle(product.name)} - Front View`} className={styles.mainImage} />
           </div>
           <div className={styles.thumbnailList}>
-            <img src={product.image} alt={`${product.name} Thumbnail 1`} className={styles.thumbnail} onClick={() => setDisplayImage(product.image)} style={{ borderColor: displayImage === product.image ? 'var(--color-accent)' : 'transparent' }} />
+            <img src={product.image} alt={`${localizeTitle(product.name)} Thumbnail 1`} className={styles.thumbnail} onClick={() => setDisplayImage(product.image)} style={{ borderColor: displayImage === product.image ? 'var(--color-accent)' : 'transparent' }} />
             {product.hoverImage && (
-              <img src={product.hoverImage} alt={`${product.name} Thumbnail 2`} className={styles.thumbnail} onClick={() => setDisplayImage(product.hoverImage)} style={{ borderColor: displayImage === product.hoverImage ? 'var(--color-accent)' : 'transparent' }} />
+              <img src={product.hoverImage} alt={`${localizeTitle(product.name)} Thumbnail 2`} className={styles.thumbnail} onClick={() => setDisplayImage(product.hoverImage)} style={{ borderColor: displayImage === product.hoverImage ? 'var(--color-accent)' : 'transparent' }} />
             )}
           </div>
         </motion.div>
@@ -232,19 +233,19 @@ const ProductDetails = () => {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
         >
-          <h1 className={styles.title}>{product.name}</h1>
+          <h1 className={styles.title}>{localizeTitle(product.name)}</h1>
           <div className={styles.ratingBox}>
             <div className={styles.stars}>
               {[...Array(5)].map((_, i) => (
-                <Star key={i} size={16} fill={i < Math.floor(product.rating) ? 'var(--color-accent)' : 'none'} color="var(--color-accent)" />
+                <Star key={i} size={16} fill={i < Math.floor(product.rating || 5) ? 'var(--color-accent)' : 'none'} color="var(--color-accent)" />
               ))}
             </div>
-            <span>{product.numReviews} Reviews</span>
+            <span>{formatNumber(product.numReviews || 0)} {language === 'bn' ? 'টি রিভিউ' : 'Reviews'}</span>
           </div>
           
           <div className={styles.priceContainer}>
-            <span className={styles.price}>৳{product.price}</span>
-            {product.oldPrice && <span className={styles.oldPrice}>৳{product.oldPrice}</span>}
+            <span className={styles.price}>{formatPrice(product.price)}</span>
+            {product.oldPrice && <span className={styles.oldPrice}>{formatPrice(product.oldPrice)}</span>}
           </div>
 
           <p className={styles.shortDescription}>{product.description}</p>
@@ -302,7 +303,7 @@ const ProductDetails = () => {
           <div className={styles.actionContainer}>
             <div className={styles.qtyBox}>
               <button onClick={() => setQty(Math.max(1, qty - 1))} aria-label="Decrease quantity">-</button>
-              <input type="number" value={qty} readOnly aria-label="Quantity" />
+              <input type="text" value={formatNumber(qty)} readOnly aria-label="Quantity" />
               <button onClick={() => setQty(Math.min(product.countInStock, qty + 1))} aria-label="Increase quantity">+</button>
             </div>
             
@@ -369,7 +370,7 @@ const ProductDetails = () => {
             className={`${styles.tabHeader} ${activeTab === 'reviews' ? styles.activeTab : ''}`}
             onClick={() => setActiveTab('reviews')}
           >
-            {language === 'bn' ? `রিভিউ (${product.numReviews})` : `Reviews (${product.numReviews})`}
+            {language === 'bn' ? `রিভিউ (${formatNumber(product.numReviews || 0)})` : `Reviews (${product.numReviews || 0})`}
           </button>
         </div>
         
