@@ -11,6 +11,7 @@ import 'swiper/css/pagination';
 import 'swiper/css/effect-fade';
 import CategoryCard from '../components/CategoryCard';
 import ProductCard from '../components/ProductCard';
+import TestimonialsSlider from '../components/TestimonialsSlider';
 import SEO from '../components/SEO';
 import Loader from '../components/Loader';
 import styles from './Home.module.css';
@@ -386,41 +387,8 @@ const Home = () => {
         </section>
       )}
 
-      {/* Pocket Friendly / Best Value Deals Section (Lowest Price Products) */}
-      {affordableProducts && affordableProducts.length > 0 && (
-        <section className="container" style={{ padding: 'var(--space-8) var(--space-4)' }}>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.5 }}
-            className={styles.sectionHeader}
-          >
-            <div className={styles.sectionHeaderTitleGroup}>
-              <h2 className={styles.sectionTitleLeft}>Pocket Friendly Finds</h2>
-              <p className={styles.sectionSubtitle}>
-                Explore our best-loved luxury styles at our most affordable prices.
-              </p>
-            </div>
-            <Link to="/shop" className={styles.viewAllLink}>
-              View All Deals &rarr;
-            </Link>
-          </motion.div>
-          <div className={styles.productGrid}>
-            {affordableProducts.map((p, i) => (
-              <motion.div 
-                key={p._id + '-budget'} 
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: (i % 4) * 0.1, duration: 0.4 }}
-              >
-                <ProductCard product={p} />
-              </motion.div>
-            ))}
-          </div>
-        </section>
-      )}
+      {/* Customer Testimonials / Social Proof Auto-Slider Section */}
+      <TestimonialsSlider />
 
       {/* Newsletter Section */}
       <motion.section 
