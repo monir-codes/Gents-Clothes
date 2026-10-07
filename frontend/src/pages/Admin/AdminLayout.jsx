@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Package, ShoppingCart, Users, Sparkles, Settings, Menu, X, ExternalLink, LogOut } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingCart, Users, Sparkles, Settings, Menu, X, ExternalLink, LogOut, HelpCircle, MessageSquare } from 'lucide-react';
 import styles from './Admin.module.css';
 import useAuthStore from '../../store/useAuthStore';
 
@@ -92,8 +92,12 @@ const AdminLayout = () => {
               <span>Products Database</span>
             </Link>
             <Link to="/boss/reviews" onClick={closeSidebar} className={`${styles.navItem} ${location.pathname.includes('/reviews') ? styles.active : ''}`}>
-              <Sparkles size={19} />
+              <MessageSquare size={19} />
               <span>Reviews</span>
+            </Link>
+            <Link to="/boss/faqs" onClick={closeSidebar} className={`${styles.navItem} ${location.pathname.includes('/faqs') ? styles.active : ''}`}>
+              <HelpCircle size={19} />
+              <span>FAQ Manager</span>
             </Link>
             <Link to="/boss/orders" onClick={closeSidebar} className={`${styles.navItem} ${location.pathname.includes('/orders') ? styles.active : ''}`}>
               <ShoppingCart size={19} />

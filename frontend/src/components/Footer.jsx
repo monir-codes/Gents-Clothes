@@ -154,20 +154,24 @@ const Footer = () => {
           </div>
           <div className={styles.seoKeywordsList}>
             <Link to="/shop?category=Sarees">শাড়ি কালেকশন (Sarees BD)</Link>
-            <Link to="/shop?category=Salwar+Kameez">সালোয়ার কামিজ (Salwar Kameez)</Link>
-            <Link to="/shop?category=Kurtis+%26+Tunics">ডিজাইনার কুর্তি (Kurtis)</Link>
-            <Link to="/shop?category=Lehengas+%26+Gowns">লেহেঙ্গা ও গাউন (Lehenga BD)</Link>
-            <Link to="/shop?category=Modest+Wear">মডেস্ট ওয়্যার ও আবায়া (Abaya BD)</Link>
-            <Link to="/shop?category=Co-ord+Sets">কর্ড সেট (Co-ord Sets)</Link>
-            <Link to="/shop?search=Jamdani">জামদানি শাড়ি (Jamdani Saree)</Link>
+            <Link to="/shop?search=Jamdani">ঢাকাই জামদানি শাড়ি (Dhakai Jamdani)</Link>
             <Link to="/shop?search=Katan">কাতান শাড়ি (Katan Saree)</Link>
+            <Link to="/shop?search=Benarasi">বেনারসি শাড়ি (Benarasi Saree)</Link>
             <Link to="/shop?search=Silk">সিল্ক শাড়ি (Pure Silk Saree)</Link>
-            <Link to="/shop?category=Salwar+Kameez">থ্রি পিস ডিজাইন (Three Piece)</Link>
-            <Link to="/shop?collection=festive">ঈদ কালেকশন ২০২৬ (Eid Collection)</Link>
-            <Link to="/shop">Women's Clothing Online Shopping BD</Link>
+            <Link to="/shop?category=Salwar+Kameez">সালোয়ার কামিজ (Salwar Kameez)</Link>
+            <Link to="/shop?search=Pakistani+Lawn">পাকিস্তানি লন ৩-পিস (Pakistani Lawn 3 Piece)</Link>
+            <Link to="/shop?category=Three+Piece">থ্রি পিস কালেকশন (Three Piece BD)</Link>
+            <Link to="/shop?category=Two+Piece">টু পিস ড্রেস (Two Piece Collection)</Link>
+            <Link to="/shop?category=Kurtis">ডিজাইনার কুর্তি (Kurtis & Tunics)</Link>
+            <Link to="/shop?category=Modest+Wear">দুবাই চেরি আবায়া (Dubai Abaya & Borka)</Link>
+            <Link to="/shop?category=Lehengas">ব্রাইডাল ও পার্টি লেহেঙ্গা (Bridal Lehenga)</Link>
+            <Link to="/shop?category=Co-ord+Sets">লেডিস কর্ড সেট (Co-ord Sets)</Link>
+            <Link to="/shop?collection=festive">ঈদ কালেকশন ২০২৬ (Eid Dress 2026)</Link>
+            <Link to="/faq">সাধারণ জিজ্ঞাসা (FAQ)</Link>
+            <Link to="/shop">Women's Clothing Online Shopping Bangladesh</Link>
           </div>
           <p className={styles.seoBrandSummary}>
-            রঙবতী (Ronggoboti) - বাংলাদেশের শীর্ষস্থানীয় প্রিমিয়াম ওমেন ফ্যাশন ও লাইফস্টাইল ব্র্যান্ড। আমাদের এক্সক্লুসিভ ডিজাইনার শাড়ি, সালোয়ার কামিজ, কুর্তি, লেহেঙ্গা ও মডেস্ট ওয়্যার অনলাইন অর্ডার করুন সবচেয়ে বিশ্বস্ত কোয়ালিটি এবং হোম ডেলিভারি সুবিধায়।
+            রঙবতী (Ronggoboti.shop) - বাংলাদেশের শীর্ষস্থানীয় প্রিমিয়াম উইমেন ফ্যাশন ও লাইফস্টাইল ব্র্যান্ড। আমাদের এক্সক্লুসিভ ঢাকাই জামদানি, কাতান, সিল্ক শাড়ি, পাকিস্তানি লন থ্রি পিস, ডিজাইনার কুর্তি, দুবাই আবায়া ও লেহেঙ্গা অনলাইন অর্ডার করুন ক্যাশ অন ডেলিভারি সুবিধায়।
           </p>
         </div>
       </div>

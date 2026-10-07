@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Sparkles, Heart, Feather, ShieldCheck, ArrowRight } from 'lucide-react';
+import { Sparkles, Heart, Feather, ShieldCheck, ArrowRight, ChevronDown, Search, HelpCircle } from 'lucide-react';
 import axios from 'axios';
 import SEO from '../components/SEO';
 
@@ -398,54 +398,310 @@ export const About = () => {
 };
 
 export const FAQ = () => {
-  const faqSchema = {
+  const [faqs, setFaqs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [activeCategory, setActiveCategory] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [openId, setOpenId] = useState(null);
+
+  useEffect(() => {
+    const fetchFaqs = async () => {
+      try {
+        const { data } = await axios.get('/api/faqs');
+        if (Array.isArray(data) && data.length > 0) {
+          setFaqs(data);
+          setOpenId(data[0]?._id);
+        }
+      } catch (error) {
+        console.error('Error fetching FAQs:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchFaqs();
+  }, []);
+
+  const categories = ['All', 'General', 'Orders & Payment', 'Delivery & Shipping', 'Fabric & Sizing', 'Returns & Exchange'];
+
+  const filteredFaqs = faqs.filter(faq => {
+    const matchesCat = activeCategory === 'All' || (faq.category || 'General') === activeCategory;
+    const matchesSearch = !searchQuery.trim() || 
+      faq.question.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      faq.answer.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCat && matchesSearch;
+  });
+
+  const dynamicFaqSchema = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    "mainEntity": [
-      {
-        "@type": "Question",
-        "name": "How can I order products from রঙবতী (Ronggoboti)?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "You can easily order online by selecting your desired saree, salwar kameez, or kurti, adding it to your shopping cart, and checking out with Cash on Delivery, bKash, or Card payment."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "What is the delivery time across Bangladesh?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Delivery takes 2-3 business days inside Dhaka and 3-5 business days outside Dhaka."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "Are the fabrics 100% authentic and premium quality?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Yes, every fabric at রঙবতী is handpicked and crafted using genuine silks, authentic Dhakai Jamdani weaves, pure cotton, and premium georgettes."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "What is your return & exchange policy?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "We offer a hassle-free 7-day return and exchange policy for any unworn items with tags attached."
-        }
+    "mainEntity": faqs.map(item => ({
+      "@type": "Question",
+      "name": item.question,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": item.answer.replace(/<[^>]+>/g, '')
       }
-    ]
+    }))
   };
 
   return (
-    <StaticPageTemplate 
-      title="Frequently Asked Questions (FAQ) | রঙবতী" 
-      subtitle="Find answers to common questions about orders, shipping, sizes, and styling."
-      contentKey="faq"
-      schemaMarkup={faqSchema}
-    >
-      <p>Loading FAQ...</p>
-    </StaticPageTemplate>
+    <div style={{ background: 'var(--color-background)', minHeight: '85vh', paddingBottom: '80px' }}>
+      <SEO 
+        title="Frequently Asked Questions (FAQ) | রঙবতী" 
+        description="Find answers to questions about ordering authentic Sarees, Salwar Kameez, Kurtis, shipping across Bangladesh, payment methods, returns, and fabric care at রঙবতী (Ronggoboti)." 
+        keywords="রঙবতী FAQ, Ronggoboti questions, online saree shopping bangladesh faq, cash on delivery questions, return policy ronggoboti, dress sizes bd, jamdani saree care"
+        schemaMarkup={dynamicFaqSchema}
+      />
+
+      {/* Header Banner */}
+      <div style={{
+        background: 'linear-gradient(180deg, var(--color-surface, #faf6f1) 0%, var(--color-background, #ffffff) 100%)',
+        padding: '60px 20px 40px',
+        textAlign: 'center',
+        borderBottom: '1px solid var(--color-border, #ebdcd0)'
+      }}>
+        <div className="container" style={{ maxWidth: '850px', margin: '0 auto' }}>
+          <div style={{ fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '2px', color: 'var(--color-accent, #c9a265)', marginBottom: '12px' }}>
+            <Link to="/" style={{ color: 'var(--color-text-secondary)' }}>Home</Link> / FAQ
+          </div>
+          <h1 style={{ 
+            fontSize: 'clamp(2rem, 5vw, 2.8rem)', 
+            fontWeight: 700, 
+            color: 'var(--color-brand-maroon, #5e0f2b)', 
+            marginBottom: '12px' 
+          }}>
+            সাধারণ জিজ্ঞাসা ও প্রশ্নোত্তর (FAQ)
+          </h1>
+          <p style={{ color: 'var(--color-text-secondary)', fontSize: '1.05rem', margin: '0 auto 24px', maxWidth: '650px' }}>
+            রঙবতী (Ronggoboti) থেকে কেনাকাটা, ডেলিভারি, পেমেন্ট ও ফেব্রিক সম্পর্কিত সাধারণ প্রশ্নগুলোর সহজ উত্তর জেনে নিন।
+          </p>
+
+          {/* Search Box */}
+          <div style={{
+            position: 'relative',
+            maxWidth: '540px',
+            margin: '0 auto'
+          }}>
+            <Search size={18} style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-secondary)' }} />
+            <input 
+              type="text" 
+              placeholder="প্রশ্ন বা বিষয় খুঁজুন (যেমন: ডেলিভারি, ক্যাশ অন ডেলিভারি, রিটার্ন)..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '14px 16px 14px 44px',
+                borderRadius: '30px',
+                border: '1.5px solid var(--color-border, #ebdcd0)',
+                background: '#ffffff',
+                fontSize: '0.95rem',
+                outline: 'none',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.04)'
+              }}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Main FAQ Content */}
+      <div className="container" style={{ maxWidth: '920px', margin: '40px auto 0', padding: '0 20px' }}>
+        {/* Category Pills */}
+        <div style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: '10px',
+          justifyContent: 'center',
+          marginBottom: '36px'
+        }}>
+          {categories.map(cat => {
+            const count = cat === 'All' ? faqs.length : faqs.filter(f => (f.category || 'General') === cat).length;
+            const isActive = activeCategory === cat;
+            return (
+              <button
+                key={cat}
+                onClick={() => setActiveCategory(cat)}
+                style={{
+                  padding: '8px 18px',
+                  borderRadius: '24px',
+                  border: isActive ? '1.5px solid var(--color-brand-maroon, #5e0f2b)' : '1px solid var(--color-border, #ebdcd0)',
+                  background: isActive ? 'var(--color-brand-maroon, #5e0f2b)' : '#ffffff',
+                  color: isActive ? '#ffffff' : 'var(--color-text-primary, #333333)',
+                  fontSize: '0.88rem',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}
+              >
+                <span>{cat}</span>
+                <span style={{
+                  fontSize: '0.75rem',
+                  padding: '1px 6px',
+                  borderRadius: '10px',
+                  background: isActive ? 'rgba(255,255,255,0.25)' : 'var(--color-surface, #faf6f1)',
+                  color: isActive ? '#ffffff' : 'var(--color-text-secondary)'
+                }}>
+                  {count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* FAQ Accordion List */}
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--color-text-secondary)' }}>
+            <p>FAQ লোড হচ্ছে...</p>
+          </div>
+        ) : filteredFaqs.length === 0 ? (
+          <div style={{
+            textAlign: 'center',
+            padding: '60px 20px',
+            background: '#ffffff',
+            borderRadius: 'var(--radius-lg, 16px)',
+            border: '1px solid var(--color-border, #ebdcd0)'
+          }}>
+            <HelpCircle size={44} style={{ color: 'var(--color-accent, #c9a265)', marginBottom: '12px' }} />
+            <h3 style={{ color: 'var(--color-brand-maroon)', fontSize: '1.2rem', marginBottom: '8px' }}>কোনো ফলাফল পাওয়া যায়নি</h3>
+            <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.95rem' }}>
+              অন্য কোনো কিওয়ার্ড দিয়ে খুঁজুন অথবা সরাসরি আমাদের সাথে যোগাযোগ করুন।
+            </p>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            {filteredFaqs.map((faq, idx) => {
+              const isOpen = openId === faq._id;
+              return (
+                <div
+                  key={faq._id || idx}
+                  style={{
+                    background: '#ffffff',
+                    borderRadius: 'var(--radius-md, 12px)',
+                    border: isOpen ? '1.5px solid var(--color-accent, #c9a265)' : '1px solid var(--color-border, #ebdcd0)',
+                    boxShadow: isOpen ? '0 6px 20px rgba(201, 162, 101, 0.12)' : '0 2px 10px rgba(0,0,0,0.02)',
+                    overflow: 'hidden',
+                    transition: 'all 0.25s ease'
+                  }}
+                >
+                  <button
+                    onClick={() => setOpenId(isOpen ? null : faq._id)}
+                    style={{
+                      width: '100%',
+                      padding: '20px 24px',
+                      background: 'none',
+                      border: 'none',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      textAlign: 'left',
+                      cursor: 'pointer',
+                      gap: '16px'
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <span style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: '28px',
+                        height: '28px',
+                        borderRadius: '50%',
+                        background: isOpen ? 'var(--color-brand-maroon, #5e0f2b)' : 'var(--color-surface, #faf6f1)',
+                        color: isOpen ? '#ffffff' : 'var(--color-brand-maroon, #5e0f2b)',
+                        fontSize: '0.85rem',
+                        fontWeight: 700,
+                        flexShrink: 0
+                      }}>
+                        Q
+                      </span>
+                      <span style={{
+                        fontSize: '1.05rem',
+                        fontWeight: 600,
+                        color: isOpen ? 'var(--color-brand-maroon, #5e0f2b)' : 'var(--color-text-primary, #2d2424)',
+                        lineHeight: 1.4
+                      }}>
+                        {faq.question}
+                      </span>
+                    </div>
+                    <ChevronDown
+                      size={20}
+                      style={{
+                        transform: isOpen ? 'rotate(180deg)' : 'rotate(0)',
+                        transition: 'transform 0.3s ease',
+                        color: isOpen ? 'var(--color-accent, #c9a265)' : 'var(--color-text-secondary)',
+                        flexShrink: 0
+                      }}
+                    />
+                  </button>
+                  
+                  {isOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.25 }}
+                      style={{
+                        padding: '0 24px 22px 64px',
+                        color: 'var(--color-text-secondary, #6c5a60)',
+                        fontSize: '0.98rem',
+                        lineHeight: 1.8,
+                        borderTop: '1px solid rgba(0,0,0,0.04)'
+                      }}
+                    >
+                      <div dangerouslySetInnerHTML={{ __html: faq.answer }} />
+                    </motion.div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Need Help Support Banner */}
+        <div style={{
+          marginTop: '60px',
+          padding: '36px 30px',
+          borderRadius: 'var(--radius-lg, 16px)',
+          background: 'linear-gradient(135deg, var(--color-surface, #faf6f1) 0%, #ffffff 100%)',
+          border: '1px solid var(--color-border, #ebdcd0)',
+          display: 'flex',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '24px'
+        }}>
+          <div>
+            <h3 style={{ fontSize: '1.3rem', fontWeight: 700, color: 'var(--color-brand-maroon, #5e0f2b)', margin: '0 0 6px' }}>
+              আরও কোনো প্রশ্ন বা বিশেষ সাহায্য প্রয়োজন?
+            </h3>
+            <p style={{ margin: 0, color: 'var(--color-text-secondary)', fontSize: '0.95rem' }}>
+              আমাদের কাস্টমার কেয়ার টিম আপনাকে সার্বক্ষণিক সহায়তা করার জন্য প্রস্তুত।
+            </p>
+          </div>
+          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+            <Link to="/contact">
+              <button style={{
+                padding: '12px 24px',
+                borderRadius: '8px',
+                background: 'var(--color-brand-maroon, #5e0f2b)',
+                color: '#ffffff',
+                fontWeight: 600,
+                fontSize: '0.9rem',
+                border: 'none',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}>
+                Contact Support <ArrowRight size={16} />
+              </button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

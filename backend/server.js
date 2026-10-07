@@ -16,6 +16,7 @@ const settingsRoutes = require('./routes/settingsRoutes');
 const statsRoutes = require('./routes/statsRoutes');
 const aiRoutes = require('./routes/aiRoutes');
 const testimonialRoutes = require('./routes/testimonialRoutes');
+const faqRoutes = require('./routes/faqRoutes');
 const sitemapRoutes = require('./routes/sitemapRoutes');
 
 // Universal CORS for Vercel, localhost, and custom domains
@@ -55,6 +56,7 @@ app.use('/api/settings', settingsRoutes);
 app.use('/api/stats', statsRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/testimonials', testimonialRoutes);
+app.use('/api/faqs', faqRoutes);
 app.use('/sitemap.xml', sitemapRoutes);
 
 // Health check
