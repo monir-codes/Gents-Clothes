@@ -2,9 +2,9 @@ import React, { useEffect, useState, useMemo } from 'react';
 import axios from 'axios';
 import styles from './Admin.module.css';
 import { 
-  Plus, Edit, Trash2, X, Upload, Sparkles, Wand2, Search, 
-  Check, RefreshCw, Link as LinkIcon, Image as ImageIcon, AlertCircle, 
-  Layers, Star, Eye
+  Plus, Edit, Trash2, X, Upload, Sparkles, Search, 
+  RefreshCw, Link as LinkIcon, Image as ImageIcon,
+  CheckCircle2, ArrowRight, Wand2
 } from 'lucide-react';
 import Swal from 'sweetalert2';
 import useAuthStore from '../../store/useAuthStore';
@@ -12,67 +12,136 @@ import useAuthStore from '../../store/useAuthStore';
 // ImgBB API Key
 const IMGBB_API_KEY = "affe71bc1ff1277c7d83bc8e9dfe4c3c";
 
-// Comprehensive Women's Fashion Categories in Bangladesh
+// Comprehensive Women's Fashion Categories in Bangladesh & South Asia
 const CATEGORIES = [
+  // 2-Piece & 3-Piece Suits
+  "Two Piece Sets",
+  "Three Piece Salwar Kameez",
+  "Unstitched Three Piece",
+  "Readymade Stitched Suits",
+  "Pakistani Lawn & Silk Suits",
+  "Indian Boutique Suits",
+  
+  // Sarees
   "Sarees",
   "Jamdani Sarees",
   "Katan & Silk Sarees",
   "Cotton & Handloom Sarees",
   "Georgette & Chiffon Sarees",
-  "Organza & Net Sarees",
-  "Salwar Kameez & Three Piece",
-  "Unstitched Three Piece",
-  "Readymade Suits & Boutique Sets",
-  "Kurtis & Tunics",
+  "Organza & Tissue Sarees",
+  "Muslin & Linen Sarees",
+  "Tangail & Monipuri Sarees",
+  "Bridal & Party Sarees",
+
+  // Kurtis & Tops
+  "Single Kurtis",
+  "Short Kurtis & Fusion Tops",
+  "Long & A-Line Kurtis",
+  "Frock & Anarkali Kurtis",
+  "Casual Tops & Shirts",
+  "Tunics & Kaftans",
+
+  // Lehengas & Gowns
   "Lehengas & Bridal Wear",
+  "Party Lehengas",
   "Gowns & Anarkali",
+  "Maxi & Western Gowns",
+
+  // Modest Wear & Abaya
   "Modest Wear & Abaya",
-  "Borka & Hijab Collection",
+  "Dubai Cherry Abayas",
+  "Front-Open & Kimono Abayas",
+  "Borka & Modest Sets",
+  "Hijabs, Dupattas & Khimar",
+
+  // Co-ords, Western & Nightwear
   "Co-ord Sets",
-  "Western Wear & Tops",
-  "Shawls & Winter Wear",
+  "Western Wear & Jumpsuits",
+  "Nightwear & Loungewear",
+
+  // Bottoms & Pants
+  "Palazzos & Culottes",
+  "Cigarette & Trousers",
+  "Dhoti & Salwar Bottoms",
+  "Skirts & Ghagras",
+
+  // Winter & Accessories
+  "Shawls & Pashmina",
+  "Winter Jackets & Shrugs",
+  "Dupattas & Stoles",
   "Jewellery & Accessories"
 ];
 
 // Quick Category-Specific Size Presets
 const SIZE_PRESETS = {
+  "Two Piece Sets": ["Unstitched (Free Size)", "36, 38, 40, 42", "38, 40, 42, 44", "S, M, L, XL", "Free Size"],
+  "Three Piece Salwar Kameez": ["Unstitched (Free Size)", "Semi-Stitched", "36, 38, 40, 42, 44", "38, 40, 42, 44, 46", "S, M, L, XL, XXL"],
+  "Unstitched Three Piece": ["Unstitched (Free Size)", "Kamiz 3 yds, Salwar 2.5 yds, Orna 2.5 yds", "Kamiz 3.5 yds, Salwar 2.5 yds, Orna 2.5 yds"],
+  "Readymade Stitched Suits": ["36, 38, 40, 42, 44", "38, 40, 42, 44, 46", "S, M, L, XL"],
+  "Pakistani Lawn & Silk Suits": ["Unstitched (Free Size)", "36, 38, 40, 42, 44", "Semi-Stitched"],
+  "Indian Boutique Suits": ["Unstitched (Free Size)", "38, 40, 42, 44", "Semi-Stitched"],
   "Sarees": ["12 Haat with Unstitched Blouse Piece", "12 Haat (Free Size)", "14 Haat with Blouse Piece", "Without Blouse Piece"],
   "Jamdani Sarees": ["12 Haat with Blouse Piece", "12 Haat (Free Size)", "Pure Handloom 12 Haat"],
   "Katan & Silk Sarees": ["12 Haat with Running Blouse Piece", "12 Haat with Contrast Blouse Piece"],
   "Cotton & Handloom Sarees": ["12 Haat (Free Size)", "12 Haat with Blouse Piece"],
   "Georgette & Chiffon Sarees": ["12 Haat with Heavy Embroidered Blouse Piece", "12 Haat (Free Size)"],
-  "Organza & Net Sarees": ["12 Haat with Designer Blouse Piece"],
-  "Salwar Kameez & Three Piece": ["Unstitched (Free Size)", "Semi-Stitched", "36, 38, 40, 42, 44", "38, 40, 42, 44, 46", "S, M, L, XL, XXL"],
-  "Unstitched Three Piece": ["Unstitched (Free Size)", "Kamiz 3 yds, Salwar 2.5 yds, Orna 2.5 yds", "Kamiz 3.5 yds, Salwar 2.5 yds"],
-  "Readymade Suits & Boutique Sets": ["36, 38, 40, 42, 44", "38, 40, 42, 44, 46", "S, M, L, XL"],
-  "Kurtis & Tunics": ["36, 38, 40, 42, 44", "38, 40, 42", "S, M, L, XL, XXL", "Free Size"],
+  "Organza & Tissue Sarees": ["12 Haat with Designer Blouse Piece"],
+  "Muslin & Linen Sarees": ["12 Haat with Running Blouse Piece", "12 Haat (Free Size)"],
+  "Tangail & Monipuri Sarees": ["12 Haat (Free Size)", "12 Haat with Blouse Piece"],
+  "Bridal & Party Sarees": ["12 Haat with Heavy Embroidered Blouse Piece"],
+  "Single Kurtis": ["36, 38, 40, 42, 44", "38, 40, 42", "S, M, L, XL, XXL", "Free Size"],
+  "Short Kurtis & Fusion Tops": ["36, 38, 40, 42", "S, M, L, XL", "Free Size"],
+  "Long & A-Line Kurtis": ["36, 38, 40, 42, 44", "S, M, L, XL, XXL"],
+  "Frock & Anarkali Kurtis": ["36, 38, 40, 42, 44", "Free Size"],
+  "Casual Tops & Shirts": ["S, M, L, XL", "XS, S, M, L, XL, XXL", "Free Size"],
+  "Tunics & Kaftans": ["Free Size (Standard)", "S, M, L, XL"],
   "Lehengas & Bridal Wear": ["Semi-Stitched (Free Size)", "Custom Stitch (36-44)", "Ready-to-Wear"],
+  "Party Lehengas": ["Semi-Stitched (Free Size)", "Ready-to-Wear"],
   "Gowns & Anarkali": ["38, 40, 42, 44", "Semi-Stitched (Free Size)", "Custom Fit"],
+  "Maxi & Western Gowns": ["S, M, L, XL", "38, 40, 42, 44", "Free Size"],
   "Modest Wear & Abaya": ["52, 54, 56", "52, 54, 56, 58", "54, 56, 58", "Free Size with Hijab"],
-  "Borka & Hijab Collection": ["52, 54, 56", "54, 56, 58", "Free Size (Standard)"],
+  "Dubai Cherry Abayas": ["52, 54, 56", "52, 54, 56, 58", "Free Size with Matching Hijab"],
+  "Front-Open & Kimono Abayas": ["52, 54, 56", "54, 56, 58"],
+  "Borka & Modest Sets": ["52, 54, 56", "54, 56, 58", "Free Size (Standard)"],
+  "Hijabs, Dupattas & Khimar": ["Standard Free Size", "Long Stole (72 x 30 inch)"],
   "Co-ord Sets": ["S, M, L, XL", "Free Size", "36, 38, 40, 42"],
-  "Western Wear & Tops": ["S, M, L, XL", "XS, S, M, L, XL, XXL", "Free Size"],
-  "Shawls & Winter Wear": ["Standard (Free Size)", "Long Stole (2.5 yds)"],
+  "Western Wear & Jumpsuits": ["S, M, L, XL", "XS, S, M, L", "Free Size"],
+  "Nightwear & Loungewear": ["Free Size (Comfort Fit)", "M, L, XL, XXL"],
+  "Palazzos & Culottes": ["Free Size (Elastic Waist 28-38)", "Length 38 inch", "Length 40 inch"],
+  "Cigarette & Trousers": ["28, 30, 32, 34, 36", "M, L, XL, XXL"],
+  "Dhoti & Salwar Bottoms": ["Free Size (Standard)"],
+  "Skirts & Ghagras": ["Free Size (Adjustable Dori)"],
+  "Shawls & Pashmina": ["Standard (Free Size 2.5 yds)", "Long Stole (2.5 yds)"],
+  "Winter Jackets & Shrugs": ["S, M, L, XL", "Free Size"],
+  "Dupattas & Stoles": ["Standard 2.5 yds", "2.75 yds Extra Long"],
   "Jewellery & Accessories": ["Free Size", "Adjustable", "Standard Size"]
 };
 
 // Quick Example Prompts for Magic AI
 const MAGIC_EXAMPLES = [
   {
-    label: "🥻 Saree (Bangla)",
-    text: "লাল ঢাকাই জামদানি শাড়ি ৮৪ কাউন্ট পিওর কটন। সাথে ম্যাচিং আনস্টিচড ব্লাউজ পিস আছে। শাড়ির সাইজ ১২ হাত। দাম ৩৫০০ টাকা, আগের দাম ছিল ৪২০০ টাকা। গোল্ডেন জরির কাজ করা। ড্রাই ওয়াশ করতে হবে।"
+    label: "👗 2-Piece Set (Bangla/Messy)",
+    text: "ডিজাইনার এমব্রয়ডারি ২-পিস কটন কুর্তি ও সাথে ম্যাচিং অরনা। জামার কাপড় ৩ গজ, অরনা ২.৫ গজ। সাইজ ৩৮, ৪০, ৪২, ৪৪। রেগুলার প্রাইস ২৩০০ টাকা, ডিসকাউন্ট প্রাইস ১৯৫০ টাকা। কালার নেভি ব্লু ও মাস্টার্ড ইয়েলো। নরম সুতি ফেব্রিক, হ্যান্ড ওয়াশ।"
   },
   {
     label: "👗 3-Piece Salwar Kameez",
     text: "Pakistani Luxury Embroidered Lawn 3-Piece Salwar Kameez with pure chiffon dupatta. Kamiz 3 yards, salwar 2.5 yards, dupatta 2.5 yards. Color: Emerald Green, Pastel Pink. Price 2850 BDT, regular 3400. Delicate cold wash."
   },
   {
-    label: "👚 Kurti & Tunic",
-    text: "Designer Hand Embroidery Cotton Kurti in Mustard Yellow and Maroon. Available chest sizes 38, 40, 42, 44. Price 1450 Tk. Hand wash."
+    label: "🥻 Dhakai Jamdani Saree",
+    text: "লাল ঢাকাই জামদানি শাড়ি ৮৪ কাউন্ট পিওর কটন। সাথে ম্যাচিং আনস্টিচড ব্লাউজ পিস আছে। শাড়ির সাইজ ১২ হাত। দাম ৩৫০০ টাকা, আগের দাম ছিল ৪২০০ টাকা। গোল্ডেন জরির কাজ করা। ড্রাই ওয়াশ করতে হবে।"
   },
   {
-    label: "🧕 Abaya / Modest Wear",
-    text: "Premium Dubai Cherry Silk Abaya with matching Hijab. Available sizes: 52, 54, 56. Colors: Jet Black, Olive, Plum. Price 3200 Tk. Dry clean recommended."
+    label: "🧕 Dubai Cherry Abaya",
+    text: "Premium Dubai Cherry Silk Front Open Abaya with matching Hijab. Available sizes: 52, 54, 56. Colors: Jet Black, Olive Green, Plum. Price 3200 Tk, old price 3800. Dry clean recommended."
+  },
+  {
+    label: "👚 Designer Kurti",
+    text: "Hand embroidery pure cotton single kurti. Available chest sizes 38, 40, 42, 44. Price 1450 Tk, previous price 1800 Tk. Gentle wash."
+  },
+  {
+    label: "✨ Ethnic Co-ord Set",
+    text: "Printed premium viscose silk 2-piece co-ord set top and palazzo pant. Size S, M, L, XL. Price 2250 Tk. Color: Teal Green, Coral."
   }
 ];
 
@@ -81,7 +150,6 @@ const AdminProducts = () => {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  const [isGenerating, setIsGenerating] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [imageInputMode, setImageInputMode] = useState('upload'); // 'upload' or 'url'
   const [newImageUrl, setNewImageUrl] = useState('');
@@ -92,7 +160,7 @@ const AdminProducts = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState('ALL');
 
-  // AI Magic State
+  // AI Magic State (Single Top Master Auto-Fill)
   const [magicText, setMagicText] = useState('');
   const [isMagicLoading, setIsMagicLoading] = useState(false);
 
@@ -100,7 +168,7 @@ const AdminProducts = () => {
     name: '',
     price: '',
     oldPrice: '',
-    category: 'Sarees',
+    category: 'Two Piece Sets',
     brand: 'রঙবতী',
     countInStock: 10,
     description: '',
@@ -180,22 +248,19 @@ const AdminProducts = () => {
 
       if (uploadedUrls.length > 0) {
         setFormData(prev => {
-          const mainImg = prev.image || uploadedUrls[0];
-          const hoverImg = prev.hoverImage || (uploadedUrls.length > 1 ? uploadedUrls[1] : (prev.image ? uploadedUrls[0] : ''));
           const currentImages = Array.isArray(prev.images) ? prev.images : [];
-          const combinedImages = Array.from(new Set([...currentImages, ...uploadedUrls]));
-
+          const combined = Array.from(new Set([...currentImages, ...uploadedUrls]));
           return {
             ...prev,
-            image: mainImg,
-            hoverImage: hoverImg,
-            images: combinedImages
+            image: prev.image || combined[0] || '',
+            hoverImage: prev.hoverImage || combined[1] || '',
+            images: combined
           };
         });
 
         Swal.fire({ 
-          title: `Uploaded ${uploadedUrls.length} image(s)!`, 
-          text: 'Images successfully added to product gallery.', 
+          title: 'Images Uploaded!', 
+          text: `Added ${uploadedUrls.length} photos to product gallery.`, 
           icon: 'success', 
           toast: true, 
           position: 'top-end', 
@@ -259,47 +324,10 @@ const AdminProducts = () => {
     });
   };
 
-  const generateDetails = async () => {
-    const context = formData.name || formData.description || formData.category;
-    if (!context) {
-      Swal.fire('Missing Product Info', 'Please enter a product title or basic notes first.', 'warning');
-      return;
-    }
-    
-    setIsGenerating(true);
-    try {
-      const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
-      const { data } = await axios.post('/api/ai/generate', { type: 'product_details', context }, config);
-      
-      const parsed = data.data || (typeof data.result === 'string' ? JSON.parse(data.result.replace(/```json/gi, '').replace(/```/g, '').trim()) : null);
-
-      if (parsed) {
-        setFormData(prev => ({
-          ...prev,
-          description: parsed.description || prev.description,
-          category: parsed.category || prev.category,
-          sizes: parsed.sizes || prev.sizes,
-          fabricDetails: {
-            material: parsed.material || prev.fabricDetails?.material || '',
-            gsm: parsed.gsm || prev.fabricDetails?.gsm || '',
-            washInstruction: parsed.washInstruction || prev.fabricDetails?.washInstruction || ''
-          }
-        }));
-        Swal.fire({ title: 'AI Details Generated!', text: 'Informative description, sizing and fabric specifications updated.', icon: 'success', toast: true, position: 'top-end', showConfirmButton: false, timer: 2500 });
-      } else {
-        Swal.fire('Notice', 'AI responded in plain text. Please review.', 'info');
-      }
-    } catch (error) {
-      console.error(error);
-      Swal.fire('Error', error.response?.data?.message || 'Failed to generate details. Please check connection.', 'error');
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-
+  // Single Master AI Auto-Fill Handler
   const handleMagicFill = async () => {
     if (!magicText.trim()) {
-      Swal.fire('Empty Input', 'Please paste raw product details or click one of the quick examples below.', 'warning');
+      Swal.fire('Empty Input', 'Please paste raw product text or click one of the quick examples below.', 'warning');
       return;
     }
     
@@ -341,8 +369,8 @@ const AdminProducts = () => {
         }));
 
         Swal.fire({ 
-          title: '✨ Magic Auto-Fill Success!', 
-          text: `Form successfully populated for "${parsedData.name || 'Product'}".`, 
+          title: '✨ Master Auto-Fill Success!', 
+          text: `All fields populated in English for "${parsedData.name || 'Product'}".`, 
           icon: 'success', 
           toast: true, 
           position: 'top-end', 
@@ -354,7 +382,7 @@ const AdminProducts = () => {
       }
     } catch (error) {
       console.error(error);
-      Swal.fire('Error', error.response?.data?.message || 'Failed to extract product details.', 'error');
+      Swal.fire('Error', error.response?.data?.message || 'Failed to auto-fill product details.', 'error');
     } finally {
       setIsMagicLoading(false);
     }
@@ -434,7 +462,7 @@ const AdminProducts = () => {
     setFormData({
       name: product.name || '',
       price: product.price || 0,
-      category: product.category || 'Sarees',
+      category: product.category || 'Two Piece Sets',
       brand: product.brand || 'রঙবতী',
       countInStock: product.countInStock !== undefined ? product.countInStock : 0,
       description: product.description || '',
@@ -460,42 +488,39 @@ const AdminProducts = () => {
       text: `Are you sure you want to delete "${name}"? This action cannot be undone.`,
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
-      confirmButtonText: 'Yes, delete it!'
+      confirmButtonColor: '#e11d48',
+      confirmButtonText: 'Yes, Delete'
     });
 
     if (result.isConfirmed) {
       try {
-        const config = {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        };
-        await axios.delete(`/api/products/${id}`, config);
-        Swal.fire('Deleted!', 'Product removed from database.', 'success');
+        await axios.delete(`/api/products/${id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        Swal.fire('Deleted!', 'Product has been removed from catalog.', 'success');
         fetchProducts();
       } catch (error) {
-        Swal.fire('Error', error.response?.data?.message || 'Failed to delete product', 'error');
+        console.error('Delete error:', error);
+        Swal.fire('Error', 'Failed to delete product', 'error');
       }
     }
   };
 
-  // Filtered Products
+  // Filter products by search and category
   const filteredProducts = useMemo(() => {
     return products.filter(p => {
-      const matchSearch = searchQuery === '' || 
-        p.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
-        p.sku?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.category?.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSearch = !searchQuery || 
+        (p.name && p.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (p.sku && p.sku.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (p.category && p.category.toLowerCase().includes(searchQuery.toLowerCase()));
 
-      const matchCategory = selectedCategoryFilter === 'ALL' || p.category === selectedCategoryFilter;
-
-      return matchSearch && matchCategory;
+      const matchesCat = selectedCategoryFilter === 'ALL' || p.category === selectedCategoryFilter;
+      return matchesSearch && matchesCat;
     });
   }, [products, searchQuery, selectedCategoryFilter]);
 
-  const activeCategoryPresets = SIZE_PRESETS[formData.category] || SIZE_PRESETS["Sarees"];
+  // Current Category Size Presets
+  const activeCategoryPresets = SIZE_PRESETS[formData.category] || SIZE_PRESETS["Two Piece Sets"] || [];
 
   // Aggregate current images for display
   const allCurrentImages = Array.from(new Set([
@@ -511,7 +536,7 @@ const AdminProducts = () => {
         <div>
           <h1 className={styles.dashboardTitle}>Products Catalog</h1>
           <p style={{ margin: 0, color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>
-            Manage women's fashion, sarees, three-piece sets, kurtis & exclusive couture
+            Manage two-piece, three-piece sets, sarees, kurtis, abayas, gowns & luxury couture
           </p>
         </div>
         <button 
@@ -731,170 +756,220 @@ const AdminProducts = () => {
                 {editingId ? 'Edit Product' : 'Add New Product'}
               </h2>
               <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>
-                {editingId ? 'Update product specifications, gallery images, and live storefront data.' : 'Fill in the details manually or use AI Magic Paste to auto-populate the entire form.'}
+                {editingId ? 'Update product specifications, gallery images, and live storefront data.' : 'Paste raw notes in the box below to auto-populate the entire form in English, or fill manually.'}
               </p>
             </div>
             
-            {/* AI Magic Paste Section */}
+            {/* SINGLE MASTER GEMINI AI AUTO-FILL SECTION */}
             <div style={{ 
-              background: 'linear-gradient(135deg, rgba(94, 15, 43, 0.04) 0%, rgba(94, 15, 43, 0.09) 100%)', 
-              padding: '16px', 
-              borderRadius: '10px', 
-              marginBottom: '24px', 
-              border: '1px solid rgba(94, 15, 43, 0.2)' 
+              background: 'linear-gradient(135deg, rgba(94, 15, 43, 0.04) 0%, rgba(94, 15, 43, 0.1) 100%)', 
+              padding: '18px', 
+              borderRadius: '12px', 
+              marginBottom: '26px', 
+              border: '1.5px solid rgba(94, 15, 43, 0.25)',
+              boxShadow: '0 4px 16px rgba(94, 15, 43, 0.06)'
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', flexWrap: 'wrap', gap: '8px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <Sparkles size={18} color="var(--color-accent)" />
-                  <span style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--color-accent)' }}>
-                    AI Magic Paste (Gemini AI)
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Sparkles size={20} color="var(--color-accent)" />
+                  <span style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--color-accent)' }}>
+                    ✨ Gemini Master Auto-Fill (বাংলা / English / Messy Text → Complete English Form)
                   </span>
                 </div>
-                <button 
-                  type="button" 
-                  onClick={handleMagicFill}
-                  disabled={isMagicLoading}
-                  style={{ 
-                    background: 'var(--color-accent)', 
-                    color: 'white', 
-                    border: 'none', 
-                    padding: '7px 16px', 
-                    borderRadius: '6px', 
-                    fontSize: '0.88rem', 
-                    cursor: isMagicLoading ? 'wait' : 'pointer',
-                    fontWeight: 600,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    opacity: isMagicLoading ? 0.7 : 1,
-                    boxShadow: '0 2px 6px rgba(94, 15, 43, 0.2)'
-                  }}
-                >
-                  <Wand2 size={16} />
-                  {isMagicLoading ? '✨ Analyzing with AI...' : '✨ Auto-Fill Entire Form'}
-                </button>
+                <span style={{ fontSize: '0.78rem', background: 'var(--color-accent)', color: '#fff', padding: '3px 9px', borderRadius: '50px', fontWeight: 600 }}>
+                  Single Master AI
+                </span>
               </div>
 
-              <textarea 
-                placeholder="Paste raw unstructured notes, supplier details, WhatsApp/FB copy (Bangla, English, Banglish) e.g. 'Pure cotton red jamdani saree 12 haat with blouse piece, price 3500, regular 4200, dry clean only'..."
+              <p style={{ margin: '0 0 12px 0', fontSize: '0.86rem', color: 'var(--color-text-secondary)', lineHeight: '1.5' }}>
+                যে কোনো এলোমেলো টেক্সট (বাংলা, বাংলিশ বা ইংরেজি, ফেসবুক পোস্ট, সাপ্লায়ার নোট, দাম ও সাইজের বিবরণ) এখানে পেস্ট করুন। Gemini AI স্বয়ংক্রিয়ভাবে সবকিছু প্রফেশনাল <strong>ইংরেজিতে</strong> নিচের প্রতিটি বক্সে বসিয়ে দেবে!
+              </p>
+
+              <textarea
+                rows={4}
                 value={magicText}
                 onChange={(e) => setMagicText(e.target.value)}
-                style={{ 
-                  width: '100%', 
-                  padding: '12px', 
-                  border: '1px solid var(--color-border)', 
-                  borderRadius: '6px', 
-                  minHeight: '75px', 
-                  fontFamily: 'inherit', 
-                  fontSize: '0.88rem',
+                placeholder="Paste raw vendor message, product specs, or notes in Bangla / English... (e.g. লাল রঙের ঢাকাই জামদানি শাড়ি ৮৪ কাউন্ট পিওর কটন ১২ হাত ব্লাউজ পিস সহ দাম ৩৫০০ টাকা রেগুলার ৪২০০ টাকা ড্রাই ক্লিন)"
+                style={{
+                  width: '100%',
+                  padding: '12px 14px',
+                  borderRadius: '8px',
+                  border: '1px solid rgba(94, 15, 43, 0.3)',
+                  fontSize: '0.90rem',
+                  fontFamily: 'inherit',
+                  marginBottom: '12px',
+                  background: 'var(--color-surface)',
                   resize: 'vertical',
-                  background: 'var(--color-background)'
+                  lineHeight: '1.5'
                 }}
               />
 
-              {/* Example Prompts */}
-              <div style={{ marginTop: '10px', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                <span style={{ fontSize: '0.78rem', color: 'var(--color-text-secondary)', fontWeight: 600 }}>Quick Examples:</span>
-                {MAGIC_EXAMPLES.map((ex, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => setMagicText(ex.text)}
-                    style={{
-                      background: 'var(--color-surface)',
-                      border: '1px solid var(--color-border)',
-                      borderRadius: '4px',
-                      padding: '3px 8px',
-                      fontSize: '0.75rem',
-                      cursor: 'pointer',
-                      color: 'var(--color-text-primary)'
-                    }}
-                  >
-                    {ex.label}
-                  </button>
-                ))}
+              {/* Quick Prompt Samples */}
+              <div style={{ marginBottom: '14px' }}>
+                <div style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--color-text-secondary)', marginBottom: '6px' }}>
+                  💡 Try Quick Sample Text (click to paste):
+                </div>
+                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                  {MAGIC_EXAMPLES.map((sample, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => setMagicText(sample.text)}
+                      style={{
+                        background: 'var(--color-surface)',
+                        border: '1px solid rgba(94, 15, 43, 0.25)',
+                        borderRadius: '6px',
+                        padding: '5px 10px',
+                        fontSize: '0.76rem',
+                        cursor: 'pointer',
+                        color: 'var(--color-text-primary)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px'
+                      }}
+                    >
+                      <span>{sample.label}</span>
+                    </button>
+                  ))}
+                </div>
               </div>
+
+              {/* Master Auto-Fill Button */}
+              <button
+                type="button"
+                onClick={handleMagicFill}
+                disabled={isMagicLoading}
+                style={{
+                  width: '100%',
+                  padding: '12px 20px',
+                  background: 'var(--color-accent)',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontWeight: 700,
+                  fontSize: '0.95rem',
+                  cursor: isMagicLoading ? 'not-allowed' : 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  boxShadow: '0 4px 14px rgba(94, 15, 43, 0.3)',
+                  opacity: isMagicLoading ? 0.75 : 1
+                }}
+              >
+                {isMagicLoading ? (
+                  <>
+                    <RefreshCw size={18} className={styles.spin} />
+                    <span>Gemini AI is analyzing & translating to English...</span>
+                  </>
+                ) : (
+                  <>
+                    <Sparkles size={18} />
+                    <span>✨ Auto-Fill All Form Fields with Gemini AI</span>
+                  </>
+                )}
+              </button>
             </div>
 
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
               
-              {/* Product Multi-Image Gallery */}
-              <div style={{ border: '1px solid var(--color-border)', padding: '16px', borderRadius: '8px', background: 'var(--color-surface)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
+              {/* Product Images & Multiple Gallery Management */}
+              <div style={{ border: '1px solid var(--color-border)', padding: '16px', borderRadius: '8px', background: 'var(--color-surface-dim, #fafafa)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', flexWrap: 'wrap', gap: '8px' }}>
                   <div>
-                    <label style={{ fontWeight: 700, fontSize: '0.92rem', display: 'block' }}>Product Photos & Gallery</label>
-                    <span style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>
-                      Upload multiple high-res product photos. The first image will be Main, second will be Hover.
+                    <label style={{ fontWeight: 700, fontSize: '0.92rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <ImageIcon size={16} color="var(--color-accent)" />
+                      <span>Product Images & Gallery (Multiple Photos) *</span>
+                    </label>
+                    <span style={{ fontSize: '0.78rem', color: 'var(--color-text-secondary)' }}>
+                      Upload multiple high-resolution photos. First photo will be main, second will be hover.
                     </span>
                   </div>
-                  <div style={{ display: 'flex', gap: '6px' }}>
+
+                  {/* Mode Toggle: Upload vs Direct URL */}
+                  <div style={{ display: 'flex', gap: '6px', background: 'var(--color-surface)', padding: '3px', borderRadius: '6px', border: '1px solid var(--color-border)' }}>
                     <button
                       type="button"
                       onClick={() => setImageInputMode('upload')}
                       style={{
-                        padding: '4px 12px',
+                        padding: '4px 10px',
                         fontSize: '0.78rem',
+                        border: 'none',
                         borderRadius: '4px',
-                        border: '1px solid var(--color-border)',
-                        background: imageInputMode === 'upload' ? 'var(--color-text-primary)' : 'var(--color-surface)',
+                        background: imageInputMode === 'upload' ? 'var(--color-accent)' : 'transparent',
                         color: imageInputMode === 'upload' ? '#fff' : 'var(--color-text-primary)',
                         cursor: 'pointer',
                         fontWeight: 600
                       }}
                     >
-                      Batch Upload
+                      Upload Files
                     </button>
                     <button
                       type="button"
                       onClick={() => setImageInputMode('url')}
                       style={{
-                        padding: '4px 12px',
+                        padding: '4px 10px',
                         fontSize: '0.78rem',
+                        border: 'none',
                         borderRadius: '4px',
-                        border: '1px solid var(--color-border)',
-                        background: imageInputMode === 'url' ? 'var(--color-text-primary)' : 'var(--color-surface)',
+                        background: imageInputMode === 'url' ? 'var(--color-accent)' : 'transparent',
                         color: imageInputMode === 'url' ? '#fff' : 'var(--color-text-primary)',
                         cursor: 'pointer',
                         fontWeight: 600
                       }}
                     >
-                      Paste Image URLs
+                      Paste URLs
                     </button>
                   </div>
                 </div>
 
-                {/* Upload or URL input area */}
+                {/* Upload Input Mode */}
                 {imageInputMode === 'upload' ? (
-                  <div style={{ border: '2px dashed rgba(94, 15, 43, 0.3)', padding: '18px', textAlign: 'center', borderRadius: '8px', background: 'var(--color-background)', marginBottom: '14px' }}>
-                    <Upload size={32} color="var(--color-accent)" style={{ marginBottom: '8px' }} />
-                    <label style={{ cursor: 'pointer', color: 'var(--color-accent)', fontWeight: 700, fontSize: '0.9rem', display: 'block' }}>
-                      {isUploading ? '⏳ Uploading Images to Server...' : '+ Click to Select & Upload Multiple Photos'}
+                  <div style={{ marginBottom: '14px' }}>
+                    <label 
+                      style={{ 
+                        border: '2px dashed var(--color-border)', 
+                        borderRadius: '8px', 
+                        padding: '16px', 
+                        display: 'flex', 
+                        flexDirection: 'column', 
+                        alignItems: 'center', 
+                        justifyContent: 'center', 
+                        cursor: 'pointer',
+                        background: 'var(--color-background)',
+                        transition: 'border-color 0.2s'
+                      }}
+                    >
+                      <Upload size={24} color="var(--color-accent)" style={{ marginBottom: '6px' }} />
+                      <span style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--color-text-primary)' }}>
+                        {isUploading ? 'Uploading to ImgBB...' : 'Click to select and upload photos'}
+                      </span>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', marginTop: '2px' }}>
+                        Supports JPG, PNG, WEBP. You can select multiple photos at once.
+                      </span>
                       <input 
                         type="file" 
                         multiple 
                         accept="image/*" 
-                        disabled={isUploading}
-                        style={{ display: 'none' }} 
                         onChange={handleMultipleImageUpload} 
+                        disabled={isUploading} 
+                        style={{ display: 'none' }} 
                       />
                     </label>
-                    <span style={{ fontSize: '0.76rem', color: 'var(--color-text-secondary)', marginTop: '4px', display: 'block' }}>
-                      PNG, JPG, WEBP supported. You can select multiple images at once.
-                    </span>
                   </div>
                 ) : (
                   <div style={{ display: 'flex', gap: '8px', marginBottom: '14px' }}>
                     <input 
                       type="url" 
-                      placeholder="Paste image direct URL (e.g. https://.../photo.jpg)" 
+                      placeholder="https://... direct image URL" 
                       value={newImageUrl} 
                       onChange={(e) => setNewImageUrl(e.target.value)} 
-                      style={{ flex: 1, padding: '8px 12px', border: '1px solid var(--color-border)', borderRadius: '4px', fontSize: '0.88rem' }}
+                      style={{ flex: 1, padding: '9px 12px', border: '1px solid var(--color-border)', borderRadius: '6px', fontSize: '0.9rem' }} 
                     />
                     <button 
                       type="button" 
-                      onClick={handleAddImageUrl}
-                      style={{ padding: '8px 16px', background: 'var(--color-accent)', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem' }}
+                      onClick={handleAddImageUrl} 
+                      style={{ padding: '9px 16px', background: 'var(--color-accent)', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem' }}
                     >
                       + Add Photo
                     </button>
@@ -983,7 +1058,7 @@ const AdminProducts = () => {
               {/* Title & SKU */}
               <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
                 <div style={{ flex: '1 1 350px' }}>
-                  <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '5px', fontWeight: 600 }}>Product Title / Name *</label>
+                  <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '5px', fontWeight: 600 }}>Product Title / Name (English) *</label>
                   <input 
                     type="text" 
                     name="name" 
@@ -1105,11 +1180,13 @@ const AdminProducts = () => {
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '5px', fontWeight: 600 }}>Colors (comma separated)</label>
+                  <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '5px', fontWeight: 600 }}>
+                    Colors (comma separated)
+                  </label>
                   <input 
                     type="text" 
                     name="colors" 
-                    placeholder="e.g. Maroon, Antique Gold, Royal Blue" 
+                    placeholder="e.g. Crimson Red, Antique Gold, Forest Green" 
                     value={formData.colors} 
                     onChange={handleInputChange} 
                     style={{ width: '100%', padding: '10px 12px', border: '1px solid var(--color-border)', borderRadius: '6px', fontSize: '0.92rem' }} 
@@ -1147,29 +1224,8 @@ const AdminProducts = () => {
               
               {/* Fabric & Craft Details */}
               <div style={{ border: '1px solid var(--color-border)', padding: '16px', borderRadius: '8px', background: 'var(--color-surface-dim, #fafafa)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
-                  <label style={{ fontWeight: 700, fontSize: '0.92rem' }}>Fabric, Material & Care Details</label>
-                  <button 
-                    type="button" 
-                    onClick={generateDetails}
-                    disabled={isGenerating}
-                    style={{ 
-                      background: 'var(--color-accent)', 
-                      color: 'white', 
-                      border: 'none', 
-                      padding: '5px 12px', 
-                      borderRadius: '4px', 
-                      fontSize: '0.8rem', 
-                      cursor: 'pointer',
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      gap: '4px',
-                      opacity: isGenerating ? 0.7 : 1
-                    }}
-                  >
-                    <Sparkles size={14} />
-                    {isGenerating ? 'Generating...' : '✨ Generate AI Specs & Copy'}
-                  </button>
+                <div style={{ marginBottom: '12px' }}>
+                  <label style={{ fontWeight: 700, fontSize: '0.92rem' }}>Fabric, Material & Care Details (English)</label>
                 </div>
                 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px', marginBottom: '14px' }}>
@@ -1209,10 +1265,10 @@ const AdminProducts = () => {
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.82rem', marginBottom: '4px', fontWeight: 600 }}>Informative Luxury Product Description *</label>
+                  <label style={{ display: 'block', fontSize: '0.82rem', marginBottom: '4px', fontWeight: 600 }}>Informative Luxury Product Description (English) *</label>
                   <textarea 
                     name="description" 
-                    placeholder="Rich description detailing fabric weave, embroidery motifs, drape, matching pieces, styling and occasion advice..." 
+                    placeholder="Rich 2-paragraph description detailing fabric weave, embroidery motifs, drape, matching pieces, styling and occasion advice..." 
                     value={formData.description} 
                     onChange={handleInputChange} 
                     required 
@@ -1252,26 +1308,23 @@ const AdminProducts = () => {
                 <button 
                   type="submit" 
                   style={{ 
-                    padding: '12px 28px', 
-                    background: 'var(--color-text-primary)', 
+                    padding: '12px 26px', 
+                    background: 'var(--color-accent)', 
                     color: 'white', 
                     border: 'none', 
                     borderRadius: '6px', 
                     fontWeight: 600, 
-                    fontSize: '0.95rem', 
-                    cursor: 'pointer', 
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)' 
+                    cursor: 'pointer',
+                    boxShadow: '0 2px 8px rgba(94, 15, 43, 0.25)'
                   }}
                 >
-                  {editingId ? 'Save & Update Product' : 'Publish Product to Store'}
+                  {editingId ? 'Save Changes' : 'Publish Product'}
                 </button>
               </div>
-
             </form>
           </div>
         </div>
       )}
-
     </div>
   );
 };
