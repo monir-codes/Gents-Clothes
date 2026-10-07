@@ -128,6 +128,60 @@
   color: var(--color-brand-maroon, #5e0f2b);
 }
 
+/* Luxury Floating Tooltips on Hover */
+.iconBtn[data-tooltip],
+.mobileMenuBtn[data-tooltip] {
+  position: relative;
+}
+
+.iconBtn[data-tooltip]::before,
+.mobileMenuBtn[data-tooltip]::before {
+  content: '';
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%) translateY(-4px);
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent transparent rgba(26, 20, 22, 0.96) transparent;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1002;
+}
+
+.iconBtn[data-tooltip]::after,
+.mobileMenuBtn[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: calc(100% + 14px);
+  left: 50%;
+  transform: translateX(-50%) translateY(-4px);
+  background: rgba(26, 20, 22, 0.96);
+  backdrop-filter: blur(8px);
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 5px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1001;
+  letter-spacing: 0.3px;
+}
+
+.iconBtn[data-tooltip]:hover::before,
+.iconBtn[data-tooltip]:hover::after,
+.mobileMenuBtn[data-tooltip]:hover::before,
+.mobileMenuBtn[data-tooltip]:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
 .badge {
   position: absolute;
   top: 2px;
@@ -261,6 +315,12 @@
   }
   .desktopUserIcon {
     display: none;
+  }
+  .iconBtn[data-tooltip]::before,
+  .iconBtn[data-tooltip]::after,
+  .mobileMenuBtn[data-tooltip]::before,
+  .mobileMenuBtn[data-tooltip]::after {
+    display: none !important;
   }
 }
 

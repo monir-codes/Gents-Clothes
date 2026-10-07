@@ -1,60 +1,159 @@
-.languageToggle {
-  display: inline-flex;
-  align-items: center;
-  background: rgba(94, 15, 43, 0.05);
-  border: 1px solid var(--color-border, #ebdcd0);
-  border-radius: 20px;
-  padding: 3px;
-  cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  user-select: none;
-  font-family: inherit;
-  gap: 2px;
-}
-
-.languageToggle:hover {
-  background: rgba(94, 15, 43, 0.09);
-  border-color: var(--color-accent, #c9a265);
-}
-
-.langOption {
+/* Minimalist Globe Icon Button */
+.globeIconButton {
+  position: relative;
+  width: 40px;
+  height: 40px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 4px 9px;
-  border-radius: 16px;
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--color-text-secondary, #6c5a60);
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  border-radius: 50%;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
   line-height: 1;
-  letter-spacing: 0.5px;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.langOption.active {
+.globeIconButton:hover {
+  background-color: rgba(94, 15, 43, 0.08);
+  color: var(--color-brand-maroon, #5e0f2b);
+}
+
+.globeSvg {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.globeIconButton:hover .globeSvg {
+  transform: rotate(20deg) scale(1.08);
+}
+
+.langMicroBadge {
+  position: absolute;
+  bottom: 2px;
+  right: 1px;
   background: var(--color-brand-maroon, #5e0f2b);
   color: #ffffff;
-  box-shadow: 0 2px 6px rgba(94, 15, 43, 0.25);
+  font-size: 0.58rem;
+  font-weight: 700;
+  padding: 0.5px 3.5px;
+  border-radius: 4px;
+  line-height: 1.1;
+  border: 1.5px solid #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  letter-spacing: 0.3px;
+  pointer-events: none;
 }
 
-.globeIcon {
-  margin-right: 4px;
-  color: var(--color-accent, #c9a265);
+/* Tooltip on hover */
+.globeIconButton[data-tooltip] {
+  position: relative;
+}
+
+.globeIconButton[data-tooltip]::before {
+  content: '';
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%) translateY(-4px);
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent transparent rgba(26, 20, 22, 0.96) transparent;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1002;
+}
+
+.globeIconButton[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: calc(100% + 14px);
+  left: 50%;
+  transform: translateX(-50%) translateY(-4px);
+  background: rgba(26, 20, 22, 0.96);
+  backdrop-filter: blur(8px);
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 5px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1001;
+  letter-spacing: 0.3px;
+}
+
+.globeIconButton[data-tooltip]:hover::before,
+.globeIconButton[data-tooltip]:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Mobile drawer full width pill format */
+.languageTogglePill {
   display: flex;
-  align-items: center;
+  background: rgba(94, 15, 43, 0.05);
+  border: 1px solid var(--color-border, #ebdcd0);
+  border-radius: 12px;
+  padding: 4px;
+  gap: 6px;
+  user-select: none;
 }
 
-/* Mobile drawer full width variant */
 .fullWidth {
   width: 100%;
-  display: flex;
-  justify-content: space-between;
-  padding: 8px 12px;
-  border-radius: 12px;
 }
 
-.fullWidth .langOption {
+.langPillOption {
   flex: 1;
-  padding: 8px 12px;
-  font-size: 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 14px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--color-text-secondary, #6c5a60);
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  line-height: 1;
+  font-family: inherit;
+}
+
+.langPillOption.active {
+  background: var(--color-brand-maroon, #5e0f2b);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(94, 15, 43, 0.25);
+}
+
+@media (max-width: 1024px) {
+  .globeIconButton[data-tooltip]::before,
+  .globeIconButton[data-tooltip]::after {
+    display: none !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .globeIconButton {
+    width: 38px;
+    height: 38px;
+  }
+}
+
+@media (max-width: 480px) {
+  .globeIconButton {
+    width: 36px;
+    height: 36px;
+  }
 }

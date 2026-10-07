@@ -1,44 +1,54 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import { Globe } from 'lucide-react';
 import useLanguageStore from '../store/useLanguageStore';
 import styles from './LanguageToggle.module.css';
 
-const LanguageToggle = ({ isFullWidth = false, showIcon = true, className = '' }) => {
-  const { language, setLanguage } = useLanguageStore();
+const LanguageToggle = ({ variant = 'icon', isFullWidth = false, className = '' }) => {
+  const { language, toggleLanguage, setLanguage } = useLanguageStore();
 
-  const handleToggle = (lang) => {
-    setLanguage(lang);
-  };
+  const isBn = language === 'bn';
 
+  if (variant === 'icon' && !isFullWidth) {
+    return (
+      <button
+        type="button"
+        className={`${styles.globeIconButton} ${className}`}
+        onClick={toggleLanguage}
+        aria-label={isBn ? "ভাষা পরিবর্তন (বাংলা / English)" : "Switch Language (Bengali / English)"}
+        data-tooltip={isBn ? "ভাষা: বাংলা (Click for English)" : "Language: English (বাংলায় দেখতে ক্লিক করুন)"}
+        title={isBn ? "ভাষা: বাংলা (Click for English)" : "Language: English (বাংলায় দেখতে ক্লিক করুন)"}
+      >
+        <Globe size={20} strokeWidth={1.8} className={styles.globeSvg} />
+        <span className={styles.langMicroBadge}>
+          {isBn ? 'বাং' : 'EN'}
+        </span>
+      </button>
+    );
+  }
+
+  // Mobile Drawer pill format
   return (
     <div 
-      className={`${styles.languageToggle} ${isFullWidth ? styles.fullWidth : ''} ${className}`}
+      className={`${styles.languageTogglePill} ${isFullWidth ? styles.fullWidth : ''} ${className}`}
       role="group"
       aria-label="Language Selector"
     >
-      {showIcon && (
-        <span className={styles.globeIcon} aria-hidden="true">
-          <Globe size={13} strokeWidth={2} />
-        </span>
-      )}
       <button
         type="button"
-        className={`${styles.langOption} ${language === 'bn' ? styles.active : ''}`}
-        onClick={() => handleToggle('bn')}
-        aria-pressed={language === 'bn'}
-        title="বাংলায় দেখুন"
+        className={`${styles.langPillOption} ${isBn ? styles.active : ''}`}
+        onClick={() => setLanguage('bn')}
+        aria-pressed={isBn}
       >
-        বাং
+        <Globe size={14} style={{ marginRight: '6px' }} />
+        বাংলা (বাং)
       </button>
       <button
         type="button"
-        className={`${styles.langOption} ${language === 'en' ? styles.active : ''}`}
-        onClick={() => handleToggle('en')}
-        aria-pressed={language === 'en'}
-        title="Switch to English"
+        className={`${styles.langPillOption} ${!isBn ? styles.active : ''}`}
+        onClick={() => setLanguage('en')}
+        aria-pressed={!isBn}
       >
-        EN
+        English (EN)
       </button>
     </div>
   );
