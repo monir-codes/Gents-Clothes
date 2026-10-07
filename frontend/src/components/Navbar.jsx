@@ -99,56 +99,59 @@ const Navbar = () => {
         </nav>
         
         <div className={styles.navIcons}>
-          
-          <Link to="/wishlist" className={styles.iconWrapper}>
-            <button className={styles.iconBtn} aria-label="Wishlist">
-              <Heart size={22} strokeWidth={1.5} />
-            </button>
+          {/* Wishlist Link */}
+          <Link to="/wishlist" className={styles.iconBtn} aria-label="Wishlist" title="Wishlist">
+            <Heart size={22} strokeWidth={1.75} />
             {wishlistItems.length > 0 && (
               <span className={styles.badge}>{wishlistItems.length}</span>
             )}
           </Link>
           
-          <div className={styles.iconWrapper}>
-            <button className={styles.iconBtn} aria-label="Cart" onClick={toggleCart}>
-              <ShoppingBag size={22} strokeWidth={1.5} />
-            </button>
+          {/* Cart Trigger */}
+          <button className={styles.iconBtn} aria-label="Cart" onClick={toggleCart} title="Cart">
+            <ShoppingBag size={22} strokeWidth={1.75} />
             {cartItems.length > 0 && (
               <span className={styles.badge}>{cartItems.reduce((acc, item) => acc + item.qty, 0)}</span>
             )}
-          </div>
-                    {/* User Icon visible only on Desktop */}
-            <div className={styles.desktopUserIcon}>
-                {user ? (
-                  <>
-                    <button className={styles.iconBtn} aria-label="User" onClick={handleAuth} title="User Menu">
-                      <User size={22} strokeWidth={1.5} />
-                    </button>
-                    {isUserMenuOpen && (
-                      <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        className={styles.userMenu}
-                      >
-                        <Link to="/dashboard" className={styles.userMenuItem} onClick={() => setIsUserMenuOpen(false)}>
-                          Profile
-                        </Link>
-                        <button className={styles.userMenuItem} onClick={() => { logout(); setIsUserMenuOpen(false); navigate('/'); }}>
-                          Logout
-                        </button>
-                      </motion.div>
-                    )}
-                  </>
-                ) : (
-                  <button className={styles.iconBtn} aria-label="Login" onClick={handleAuth} title="Login">
-                    <User size={22} strokeWidth={1.5} />
-                  </button>
-                )}
-            </div>
+          </button>
 
-          <button className={styles.mobileMenuBtn} onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
-            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          {/* User Icon visible only on Desktop */}
+          <div className={styles.desktopUserIcon}>
+            {user ? (
+              <div style={{ position: 'relative' }}>
+                <button className={styles.iconBtn} aria-label="User" onClick={handleAuth} title="User Menu">
+                  <User size={22} strokeWidth={1.75} />
+                </button>
+                {isUserMenuOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className={styles.userMenu}
+                  >
+                    <Link to="/dashboard" className={styles.userMenuItem} onClick={() => setIsUserMenuOpen(false)}>
+                      Profile
+                    </Link>
+                    <button className={styles.userMenuItem} onClick={() => { logout(); setIsUserMenuOpen(false); navigate('/'); }}>
+                      Logout
+                    </button>
+                  </motion.div>
+                )}
+              </div>
+            ) : (
+              <button className={styles.iconBtn} aria-label="Login" onClick={handleAuth} title="Login">
+                <User size={22} strokeWidth={1.75} />
+              </button>
+            )}
+          </div>
+
+          {/* Mobile Hamburger Menu Button */}
+          <button 
+            className={styles.mobileMenuBtn} 
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+          >
+            {isMobileMenuOpen ? <X size={22} strokeWidth={2} /> : <Menu size={22} strokeWidth={2} />}
           </button>
         </div>
       </div>

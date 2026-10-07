@@ -86,49 +86,65 @@
 
 .navIcons {
   display: flex;
-  gap: var(--space-3);
   align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2, 8px);
+  height: 100%;
 }
 
-.iconBtn {
-  font-size: 1.25rem;
-  color: var(--color-text-primary);
-  display: flex;
+.iconBtn,
+.mobileMenuBtn {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  border-radius: 50%;
+  text-decoration: none;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+  line-height: 1;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.iconBtn:hover {
-  color: var(--color-accent);
+.iconBtn:hover,
+.iconBtn:active,
+.mobileMenuBtn:hover,
+.mobileMenuBtn:active {
+  background-color: rgba(94, 15, 43, 0.08);
+  color: var(--color-brand-maroon, #5e0f2b);
 }
 
 .badge {
   position: absolute;
-  top: -5px;
-  right: -8px;
-  background-color: var(--color-accent);
-  color: var(--color-background);
+  top: 2px;
+  right: 2px;
+  background-color: var(--color-brand-maroon, #5e0f2b);
+  color: #ffffff;
   font-size: 0.65rem;
   font-weight: 700;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border-radius: 999px;
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.iconWrapper {
-  position: relative;
+  line-height: 1;
+  pointer-events: none;
+  border: 1.5px solid #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
 .mobileMenuBtn {
   display: none;
-  background: none;
-  border: none;
-  color: var(--color-text-primary);
-  cursor: pointer;
-  padding: 4px;
 }
 
 .mobileMenu {
@@ -235,7 +251,7 @@
     display: none;
   }
   .mobileMenuBtn {
-    display: block;
+    display: inline-flex;
   }
   .desktopUserIcon {
     display: none;
@@ -244,12 +260,12 @@
 
 @media (max-width: 768px) {
   .navContainer {
-    height: 68px;
+    height: 64px;
   }
 
   .logoImg {
-    height: 42px;
-    max-width: 160px;
+    height: 40px;
+    max-width: 155px;
   }
 
   .logo {
@@ -259,25 +275,42 @@
   }
   
   .navIcons {
-    gap: var(--space-2);
+    gap: 6px;
+  }
+
+  .iconBtn,
+  .mobileMenuBtn {
+    width: 38px;
+    height: 38px;
   }
 }
 
 @media (max-width: 480px) {
   .navContainer {
-    height: 60px;
+    height: 58px;
   }
 
   .logoImg {
-    height: 36px;
-    max-width: 135px;
+    height: 34px;
+    max-width: 130px;
   }
 
   .navIcons {
-    gap: 8px;
+    gap: 4px;
   }
 
-  .iconBtn {
-    font-size: 1.15rem;
+  .iconBtn,
+  .mobileMenuBtn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .badge {
+    top: 1px;
+    right: 1px;
+    min-width: 16px;
+    height: 16px;
+    font-size: 0.6rem;
   }
 }
+
