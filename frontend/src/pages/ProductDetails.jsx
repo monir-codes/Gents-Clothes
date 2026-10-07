@@ -116,16 +116,20 @@ const ProductDetails = () => {
   if (loading) return <Loader fullScreen />;
   if (!product) return <div className="container" style={{padding: '50px 0'}}>Product not found</div>;
 
-  const productUrl = `https://ronggoboti.vercel.app${getProductUrl(product)}`;
+  const productUrl = `https://www.ronggoboti.shop${getProductUrl(product)}`;
   
-  const productImages = [product.image, product.hoverImage].filter(Boolean);
+  const productImages = Array.from(new Set([
+    product.image, 
+    product.hoverImage, 
+    ...(Array.isArray(product.images) ? product.images : [])
+  ])).filter(Boolean);
 
   const productSchema = {
     "@context": "https://schema.org/",
     "@type": "Product",
     "name": product.name,
     "image": productImages.length > 0 ? productImages : [product.image],
-    "description": product.description || `Buy ${product.name} from রঙবতী (Ronggoboti). Premium women's fashion in Bangladesh.`,
+    "description": product.description || `Buy ${product.name} from রঙবতী (Ronggoboti.shop). Premium women's fashion in Bangladesh.`,
     "sku": product.sku || product._id,
     "brand": {
       "@type": "Brand",
@@ -167,13 +171,13 @@ const ProductDetails = () => {
         "@type": "ListItem",
         "position": 1,
         "name": "Home",
-        "item": "https://ronggoboti.vercel.app"
+        "item": "https://www.ronggoboti.shop"
       },
       {
         "@type": "ListItem",
         "position": 2,
         "name": product.category || "Shop",
-        "item": product.category ? `https://ronggoboti.vercel.app/shop?category=${encodeURIComponent(product.category)}` : "https://ronggoboti.vercel.app/shop"
+        "item": product.category ? `https://www.ronggoboti.shop/shop?category=${encodeURIComponent(product.category)}` : "https://www.ronggoboti.shop/shop"
       },
       {
         "@type": "ListItem",

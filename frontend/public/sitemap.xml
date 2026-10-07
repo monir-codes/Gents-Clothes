@@ -2,105 +2,157 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
-    <loc>https://ronggoboti.vercel.app</loc>
-    <lastmod>2026-10-05</lastmod>
+    <loc>https://www.ronggoboti.shop</loc>
+    <lastmod>2026-10-07</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://ronggoboti.vercel.app/shop</loc>
-    <lastmod>2026-10-05</lastmod>
+    <loc>https://www.ronggoboti.shop/shop</loc>
+    <lastmod>2026-10-07</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.95</priority>
+  </url>
+  <url>
+    <loc>https://www.ronggoboti.shop/collections</loc>
+    <lastmod>2026-10-07</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://ronggoboti.vercel.app/collections</loc>
-    <lastmod>2026-10-05</lastmod>
+    <loc>https://www.ronggoboti.shop/sale</loc>
+    <lastmod>2026-10-07</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://ronggoboti.vercel.app/shop?category=Sarees</loc>
-    <lastmod>2026-10-05</lastmod>
+    <loc>https://www.ronggoboti.shop/new-arrivals</loc>
+    <lastmod>2026-10-07</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://www.ronggoboti.shop/shop?category=Sarees</loc>
+    <lastmod>2026-10-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://ronggoboti.vercel.app/shop?category=Salwar+Kameez</loc>
-    <lastmod>2026-10-05</lastmod>
+    <loc>https://www.ronggoboti.shop/shop?category=Salwar+Kameez</loc>
+    <lastmod>2026-10-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://ronggoboti.vercel.app/shop?category=Kurtis</loc>
-    <lastmod>2026-10-05</lastmod>
+    <loc>https://www.ronggoboti.shop/shop?category=Kurtis</loc>
+    <lastmod>2026-10-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://ronggoboti.vercel.app/shop?category=Lehengas</loc>
-    <lastmod>2026-10-05</lastmod>
+    <loc>https://www.ronggoboti.shop/shop?category=Lehengas</loc>
+    <lastmod>2026-10-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://ronggoboti.vercel.app/shop?category=Modest+Wear</loc>
-    <lastmod>2026-10-05</lastmod>
+    <loc>https://www.ronggoboti.shop/shop?category=Modest+Wear</loc>
+    <lastmod>2026-10-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://www.ronggoboti.shop/shop?category=Co-ord+Sets</loc>
+    <lastmod>2026-10-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://www.ronggoboti.shop/shop?category=Three+Piece</loc>
+    <lastmod>2026-10-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://www.ronggoboti.shop/shop?category=Gown</loc>
+    <lastmod>2026-10-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://ronggoboti.vercel.app/shop?category=Co-ord+Sets</loc>
-    <lastmod>2026-10-05</lastmod>
+    <loc>https://www.ronggoboti.shop/shop?category=Jewellery</loc>
+    <lastmod>2026-10-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://ronggoboti.vercel.app/about</loc>
-    <lastmod>2026-10-05</lastmod>
+    <loc>https://www.ronggoboti.shop/about</loc>
+    <lastmod>2026-10-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://ronggoboti.vercel.app/contact</loc>
-    <lastmod>2026-10-05</lastmod>
+    <loc>https://www.ronggoboti.shop/contact</loc>
+    <lastmod>2026-10-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://ronggoboti.vercel.app/faq</loc>
-    <lastmod>2026-10-05</lastmod>
+    <loc>https://www.ronggoboti.shop/faq</loc>
+    <lastmod>2026-10-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://ronggoboti.vercel.app/shipping</loc>
-    <lastmod>2026-10-05</lastmod>
+    <loc>https://www.ronggoboti.shop/shipping</loc>
+    <lastmod>2026-10-07</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
+    <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://ronggoboti.vercel.app/returns</loc>
-    <lastmod>2026-10-05</lastmod>
+    <loc>https://www.ronggoboti.shop/returns</loc>
+    <lastmod>2026-10-07</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
+    <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://ronggoboti.vercel.app/size-guide</loc>
-    <lastmod>2026-10-05</lastmod>
+    <loc>https://www.ronggoboti.shop/size-guide</loc>
+    <lastmod>2026-10-07</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
+    <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://ronggoboti.vercel.app/privacy</loc>
-    <lastmod>2026-10-05</lastmod>
+    <loc>https://www.ronggoboti.shop/privacy</loc>
+    <lastmod>2026-10-07</lastmod>
     <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
+    <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://ronggoboti.vercel.app/terms</loc>
-    <lastmod>2026-10-05</lastmod>
+    <loc>https://www.ronggoboti.shop/terms</loc>
+    <lastmod>2026-10-07</lastmod>
     <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://www.ronggoboti.shop/product/kashmiri-katan-saree-with-blouse-piece</loc>
+    <lastmod>2026-10-06</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://i.ibb.co/qLKbWmm4/1791055917-L-3.jpg</image:loc>
+      <image:title><![CDATA[Kashmiri Katan Saree with Blouse Piece]]></image:title>
+      <image:caption><![CDATA[Drape yourself in the timeless elegance of our Kashmiri Katan Saree, a masterpiece woven with the finest silk threads. This exquisite creation showcas]]></image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.ronggoboti.shop/product/afsan-print-sharee-with-blouse-piece</loc>
+    <lastmod>2026-10-06</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://i.ibb.co/Q11BS8m/1791006543-L-1.jpg</image:loc>
+      <image:title><![CDATA[Afsan Print Sharee with Blouse Piece]]></image:title>
+      <image:caption><![CDATA[Drape yourself in the ethereal beauty of the Afsan Print Sharee, a masterpiece where traditional artistry meets contemporary elegance. Each intricate ]]></image:caption>
+    </image:image>
   </url>
 </urlset>

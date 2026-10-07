@@ -30,7 +30,7 @@ const extractJsonObject = (rawText) => {
 
 // Helper to call Gemini with model fallbacks
 const callGemini = async (prompt, apiKey) => {
-  const models = ['gemini-2.5-flash', 'gemini-flash-latest', 'gemini-2.5-pro'];
+  const models = ['gemini-1.5-flash', 'gemini-2.0-flash', 'gemini-1.5-pro', 'gemini-flash-latest'];
   let lastError = null;
 
   for (const model of models) {
@@ -45,7 +45,7 @@ const callGemini = async (prompt, apiKey) => {
             parts: [{ text: prompt }]
           }],
           generationConfig: {
-            temperature: 0.2,
+            temperature: 0.25,
             topP: 0.95
           }
         })
@@ -86,63 +86,84 @@ router.post('/generate', async (req, res) => {
     let prompt = '';
     
     if (type === 'description') {
-      prompt = `Act as an expert luxury fashion copywriter for "রঙবতী" (Ronggoboti) - a premium South Asian fashion brand. 
-I will provide you with a product name, specifications, or messy raw notes. 
-Your task is to write a captivating, elegant, and persuasive 2-4 sentence product description in English.
-Highlight the fabric quality, artistry (e.g. zari, embroidery, handloom), drape, occasion suitability (festive, wedding, party, casual luxury), and styling appeal.
-The tone MUST be sophisticated, luxury-oriented, and enticing. Do NOT include markdown asterisks or bullet points; return clean flowing prose.
+      prompt = `Act as an expert luxury fashion copywriter and textile specialist for "রঙবতী" (Ronggoboti) - Bangladesh's premier women's fashion and ethnic couture house.
+I will provide you with a product name, specifications, or messy raw supplier notes.
+Write an informative, highly detailed, and enticing luxury product description (2 short paragraphs).
+
+Guidelines:
+1. Paragraph 1 (Aesthetics & Craftsmanship): Describe the exact fabric texture, weave (e.g. Katan, Jamdani, Pure Muslin, Georgette, Organza, Lawn Cotton), intricate embroidery/zari motifs, and color brilliance.
+2. Paragraph 2 (Details & Occasion): Mention garment drape, comfort, matching pieces (e.g. Blouse piece, Chiffon/Silk Dupatta), suitable occasions (Weddings, Eid, Festive, Parties, Formal, Casual Elegance), and styling advice.
+Do NOT write vague, generic fluff. Base details on the specific garment type and textile mentioned. Do NOT wrap in markdown asterisks.
 
 Input: "${context}"`;
 
     } else if (type === 'product_details') {
-      prompt = `You are a Senior Product Specialist and Fashion Copywriter for "রঙবতী" (Ronggoboti) - a luxury South Asian women's and ethnic apparel brand.
-Given the product name or notes: "${context}", generate a complete luxury product profile in JSON format ONLY.
+      prompt = `You are a Senior Fashion Product Specialist for "রঙবতী" (Ronggoboti) - an elite women's fashion brand in Bangladesh.
+Given the product name or notes: "${context}", generate a comprehensive, highly accurate luxury product profile in valid JSON format ONLY.
+
+Categories must be one of:
+- "Sarees"
+- "Jamdani Sarees"
+- "Katan & Silk Sarees"
+- "Cotton & Handloom Sarees"
+- "Salwar Kameez & Three Piece"
+- "Unstitched Three Piece"
+- "Readymade Suits & Boutique Sets"
+- "Kurtis & Tunics"
+- "Lehengas & Bridal Wear"
+- "Gowns & Anarkali"
+- "Modest Wear & Abaya"
+- "Borka & Hijab Collection"
+- "Co-ord Sets"
+- "Western Wear & Tops"
+- "Shawls & Winter Wear"
+- "Jewellery & Accessories"
 
 Return a valid JSON object with these EXACT keys:
 {
-  "description": "A captivating, elegant 2-3 sentence luxury product description focusing on craftsmanship and beauty.",
-  "category": "Sarees" | "Salwar Kameez" | "Kurtis & Tunics" | "Lehengas & Gowns" | "Western Wear" | "Modest Wear" | "Co-ord Sets" | "Jewelry & Accessories",
-  "sizes": "Appropriate sizing (e.g. for Sarees: '12 Haat with Blouse Piece'; for 3-Piece: 'Unstitched (Free Size)' or '36, 38, 40, 42, 44'; for Kurti: '36, 38, 40, 42, 44'; for Abaya: '52, 54, 56'; for Western: 'S, M, L, XL')",
-  "material": "e.g. Pure Katan Silk / 84 Count Cotton / Dubai Cherry / Pure Muslin / Heavy Georgette",
-  "gsm": "e.g. 84 Count / 140 GSM / Lightweight / Heavy / N/A",
-  "washInstruction": "e.g. Dry clean recommended / Gentle cold hand wash"
+  "description": "An informative, elegant 2-paragraph luxury description highlighting fabric weave, artistry, drape, and occasion suitability.",
+  "category": "Pick the most accurate category from the list above",
+  "sizes": "Accurate sizing for the garment (e.g. for Sarees: '12 Haat with Unstitched Blouse Piece'; for Unstitched 3-Piece: 'Unstitched (Free Size)'; for Stitched/Kurti: '36, 38, 40, 42, 44'; for Abaya: '52, 54, 56'; for Co-ords: 'S, M, L, XL')",
+  "material": "Specific luxury fabric name (e.g. 'Pure Katan Silk with Zari', '84 Count Pure Combed Cotton', 'Premium Dubai Cherry Georgette', 'Dhakai Muslin', 'Organza with Resham Thread', 'Pure Viscose Silk')",
+  "gsm": "Fabric count/density (e.g. '84 Count Weave', '140 GSM Lightweight', 'Heavy Bridal Weave', 'N/A')",
+  "washInstruction": "Appropriate garment care (e.g. 'Dry clean only to protect zari luster', 'Gentle cold hand wash with mild detergent, dry in shade')"
 }
 
 Do NOT wrap in markdown backticks or commentary. Return pure JSON only.`;
 
     } else if (type === 'seo') {
-      prompt = `Act as an eCommerce SEO specialist for fashion brand "রঙবতী" (Ronggoboti).
-Generate 10-15 high-converting, popular SEO keywords and an irresistible meta description (under 160 characters) for: "${context}".
+      prompt = `Act as an eCommerce SEO specialist for fashion brand "রঙবতী" (Ronggoboti - https://www.ronggoboti.shop).
+Generate 10-15 high-converting, popular SEO keywords (mix of English and Bengali high-intent terms) and an irresistible meta description (under 160 characters) for: "${context}".
 Format the response clearly as:
 Keywords: [comma-separated keywords]
 
 Meta Description: [compelling meta description]`;
 
     } else if (type === 'smart_extract') {
-      prompt = `You are an elite AI Data-Entry specialist for "রঙবতী" (Ronggoboti) - a high-end fashion and lifestyle brand in Bangladesh specializing in Sarees, Salwar Kameez / Three-Pieces, Kurtis, Lehengas, Modest Wear / Abayas, Co-ords, and Western Wear.
+      prompt = `You are an elite AI Data-Entry specialist for "রঙবতী" (Ronggoboti - https://www.ronggoboti.shop) - a premier luxury women's fashion and lifestyle brand in Bangladesh.
 
 The user will provide messy, unorganized raw product text (could be in Bengali, English, Banglish, WhatsApp message, Facebook live sale post, invoice note, with emojis, prices, fabric notes, etc.).
 
 Carefully parse all details and extract them into a clean, valid JSON object with the following fields:
 
 {
-  "name": "Clean, polished luxury product title in English or Bengali as appropriate (e.g. 'Royal Blue Zari Work Pure Katan Silk Saree', 'Embroidered Digital Print Lawn 3-Piece Salwar Kameez', 'Dubai Cherry Premium Abaya with Hijab')",
-  "price": Numeric value only for current price (e.g. 3500). Remove ৳, Tk, /- symbols,
+  "name": "Clean, polished luxury product title in English or Bengali (e.g. 'Royal Crimson Zari Embroidered Pure Katan Saree', 'Luxury Embroidered Lawn 3-Piece Salwar Kameez', 'Dubai Cherry Premium Front-Open Abaya with Matching Hijab')",
+  "price": Numeric value only for current selling price (e.g. 3500). Remove ৳, Tk, /- symbols,
   "oldPrice": Numeric value only if previous/regular/discount price is mentioned (e.g. 4200), else null,
-  "category": "Sarees" | "Salwar Kameez" | "Kurtis & Tunics" | "Lehengas & Gowns" | "Western Wear" | "Modest Wear" | "Co-ord Sets" | "Jewelry & Accessories",
-  "sizes": "Garment-intelligent sizes:
-            - For Sarees: Extract saree length & blouse piece info (e.g. '12 Haat with Blouse Piece', '12 Haat (Free Size)', '14 Haat with Unstitched Blouse Piece') - NEVER default to S/M/L for Sarees!
-            - For Unstitched / 3-Piece / 2-Piece: 'Unstitched (Free Size)' or fabric length details.
+  "category": "Sarees" | "Jamdani Sarees" | "Katan & Silk Sarees" | "Cotton & Handloom Sarees" | "Salwar Kameez & Three Piece" | "Unstitched Three Piece" | "Readymade Suits & Boutique Sets" | "Kurtis & Tunics" | "Lehengas & Bridal Wear" | "Gowns & Anarkali" | "Modest Wear & Abaya" | "Borka & Hijab Collection" | "Co-ord Sets" | "Western Wear & Tops" | "Shawls & Winter Wear" | "Jewellery & Accessories",
+  "sizes": "Garment-intelligent sizing:
+            - For Sarees: Extract saree length & blouse piece info (e.g. '12 Haat with Unstitched Blouse Piece', '12 Haat (Free Size)', '14 Haat with Blouse Piece') - NEVER default to S/M/L for Sarees!
+            - For Unstitched Three Piece / Dress Material: 'Unstitched (Free Size)' or fabric length details (e.g. 'Kamiz 3 yds, Salwar 2.5 yds, Dupatta 2.5 yds').
             - For Readymade Salwar Kameez / Kurtis / Gowns: '36, 38, 40, 42, 44' or 'S, M, L, XL, XXL'.
             - For Abayas / Modest Wear: '52, 54, 56' or '52, 54, 56, 58'.
             - For Western / Co-ords: 'S, M, L, XL' or 'Free Size'.
             - For Jewelry: 'Free Size' or 'Adjustable'.",
-  "colors": "Comma-separated clean color names in English (e.g. 'Maroon, Antique Gold, Royal Blue')",
-  "description": "A rich, persuasive 2-3 sentence luxury product description highlighting elegance, fabric feel, and craftsmanship.",
-  "material": "Primary fabric/fabric blend (e.g. 'Pure Katan Silk', '84 Count Pure Cotton', 'Dubai Cherry Georgette', 'Pure Muslin', 'Organza with Zari', 'Linen')",
-  "gsm": "Fabric count/density/GSM if mentioned (e.g. '84 Count', '140 GSM', 'Heavy Weight', 'Lightweight', 'N/A')",
-  "washInstruction": "Garment care instructions (e.g. 'Dry clean recommended', 'Gentle hand wash in cold water, do not bleach', 'Machine wash cold delicate')",
-  "sku": "Existing SKU if mentioned, or auto-generate a sleek SKU like RGB-SAR-01, RGB-SK-02, RGB-KUR-03"
+  "colors": "Comma-separated clean color names in English (e.g. 'Crimson Maroon, Antique Gold, Forest Green')",
+  "description": "An informative, rich, and articulate 2-paragraph luxury description detailing the fabric weave, embroidery/craftsmanship, matching pieces, comfort, drape, and occasion styling advice.",
+  "material": "Primary fabric/fabric blend (e.g. 'Pure Katan Silk', '84 Count Pure Cotton', 'Dubai Cherry Georgette', 'Pure Muslin', 'Organza with Zari', 'Linen Blend')",
+  "gsm": "Fabric count/density/GSM if mentioned (e.g. '84 Count', '140 GSM', 'Heavy Bridal Weave', 'Lightweight', 'N/A')",
+  "washInstruction": "Garment care instructions (e.g. 'Dry clean recommended to preserve zari sheen', 'Gentle hand wash in cold water, do not bleach', 'Dry clean only')",
+  "sku": "Existing SKU if mentioned, or auto-generate a sleek SKU like RGB-SAR-101, RGB-3P-202, RGB-KUR-303, RGB-ABY-404"
 }
 
 Do NOT wrap the JSON in backticks or markdown fences. Output strictly the JSON object.

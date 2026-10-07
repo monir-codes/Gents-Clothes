@@ -9,25 +9,30 @@ router.get('/', async (req, res) => {
     // Core static & category pages
     const staticPages = [
       { path: '', priority: '1.0', changefreq: 'daily' },
-      { path: '/shop', priority: '0.9', changefreq: 'daily' },
+      { path: '/shop', priority: '0.95', changefreq: 'daily' },
       { path: '/collections', priority: '0.9', changefreq: 'daily' },
+      { path: '/sale', priority: '0.9', changefreq: 'daily' },
+      { path: '/new-arrivals', priority: '0.9', changefreq: 'daily' },
       { path: '/shop?category=Sarees', priority: '0.85', changefreq: 'weekly' },
       { path: '/shop?category=Salwar+Kameez', priority: '0.85', changefreq: 'weekly' },
       { path: '/shop?category=Kurtis', priority: '0.85', changefreq: 'weekly' },
       { path: '/shop?category=Lehengas', priority: '0.85', changefreq: 'weekly' },
-      { path: '/shop?category=Modest+Wear', priority: '0.8', changefreq: 'weekly' },
-      { path: '/shop?category=Co-ord+Sets', priority: '0.8', changefreq: 'weekly' },
+      { path: '/shop?category=Modest+Wear', priority: '0.85', changefreq: 'weekly' },
+      { path: '/shop?category=Co-ord+Sets', priority: '0.85', changefreq: 'weekly' },
+      { path: '/shop?category=Three+Piece', priority: '0.85', changefreq: 'weekly' },
+      { path: '/shop?category=Gown', priority: '0.8', changefreq: 'weekly' },
+      { path: '/shop?category=Jewellery', priority: '0.8', changefreq: 'weekly' },
       { path: '/about', priority: '0.7', changefreq: 'monthly' },
       { path: '/contact', priority: '0.7', changefreq: 'monthly' },
       { path: '/faq', priority: '0.7', changefreq: 'monthly' },
-      { path: '/shipping', priority: '0.5', changefreq: 'monthly' },
-      { path: '/returns', priority: '0.5', changefreq: 'monthly' },
-      { path: '/size-guide', priority: '0.5', changefreq: 'monthly' },
-      { path: '/privacy', priority: '0.3', changefreq: 'yearly' },
-      { path: '/terms', priority: '0.3', changefreq: 'yearly' },
+      { path: '/shipping', priority: '0.6', changefreq: 'monthly' },
+      { path: '/returns', priority: '0.6', changefreq: 'monthly' },
+      { path: '/size-guide', priority: '0.6', changefreq: 'monthly' },
+      { path: '/privacy', priority: '0.4', changefreq: 'yearly' },
+      { path: '/terms', priority: '0.4', changefreq: 'yearly' },
     ];
 
-    const baseUrl = 'https://ronggoboti.vercel.app';
+    const baseUrl = 'https://www.ronggoboti.shop';
     const today = new Date().toISOString().split('T')[0];
 
     let sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n`;

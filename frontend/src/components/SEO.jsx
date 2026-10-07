@@ -1,12 +1,12 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
 
-const DEFAULT_KEYWORDS = "রঙবতী, Ronggoboti, ronggoboti bd, rongoboti, ronggoboti fashion, ronggoboti clothing, রঙবতী ফ্যাশন, buy saree online bd, premium womens clothing bd, best saree brand in bangladesh, salwar kameez online, stylish kurti collection, womens fashion bangladesh, exclusive lehenga dhaka, ladies boutique bd, online shopping for women in bangladesh, মেয়েদের পোশাক, শাড়ি কালেকশন, সালোয়ার কামিজ, কুর্তি ডিজাইন, থ্রি পিস, কাতান শাড়ি, জামদানি শাড়ি, সুতি শাড়ি, সিল্ক শাড়ি, ঈদ কালেকশন, eid dress collection bd, modest wear abaya bd, bridal lehenga bangladesh, party wear for women bd, designer kurtis bd, three piece collection bangladesh";
+const DEFAULT_KEYWORDS = "রঙবতী, Ronggoboti, ronggoboti.shop, www.ronggoboti.shop, rongoboti, ronggoboti fashion, ronggoboti clothing, রঙবতী ফ্যাশন, রঙবতী ডট শপ, ronggoboti bd, buy saree online bd, premium womens clothing bd, best saree brand in bangladesh, salwar kameez online, stylish kurti collection, womens fashion bangladesh, exclusive lehenga dhaka, ladies boutique bd, online shopping for women in bangladesh, three piece collection bangladesh, readymade three piece bd, designer kurtis bd, modest wear abaya bd, bridal lehenga bangladesh, party wear for women bd, co ord sets women bd, মেয়েদের পোশাক, শাড়ি কালেকশন, সালোয়ার কামিজ, কুর্তি ডিজাইন, থ্রি পিস কালেকশন, কাতান শাড়ি, জামদানি শাড়ি, সুতি শাড়ি, সিল্ক শাড়ি, বেনারসী শাড়ি, অরগাঞ্জা শাড়ি, জর্জেট শাড়ি, ঢাকাই জামদানি, লেহেঙ্গা ডিজাইন, ব্রাইডাল লেহেঙ্গা, ঈদ কালেকশন, eid dress collection bd, cash on delivery clothing bd, best clothing brand in bangladesh, luxury womens wear dhaka";
 
-const DEFAULT_DESCRIPTION = "রঙবতী (Ronggoboti) - বাংলাদেশের শীর্ষস্থানীয় এক্সক্লুসিভ উইমেন ফ্যাশন ব্র্যান্ড। প্রিমিয়াম শাড়ি (Sarees), সালোয়ার কামিজ (Salwar Kameez), ডিজাইনার কুর্তি (Kurtis), লেহেঙ্গা ও মডেস্ট ওয়েয়ার অনলাইন কিনুন সেরা মূল্যে। Fast delivery across Bangladesh.";
+const DEFAULT_DESCRIPTION = "রঙবতী (Ronggoboti.shop) - বাংলাদেশের শীর্ষস্থানীয় এক্সক্লুসিভ উইমেন ফ্যাশন ব্র্যান্ড। প্রিমিয়াম শাড়ি (Sarees), সালোয়ার কামিজ (Salwar Kameez), ডিজাইনার কুর্তি (Kurtis), থ্রি পিস ও লেহেঙ্গা অনলাইন কিনুন সেরা মূল্যে। Fast cash on delivery across Bangladesh.";
 
-const BASE_URL = 'https://ronggoboti.vercel.app';
-const DEFAULT_IMAGE = 'https://ronggoboti.vercel.app/images/hero-banner.jpg';
+const BASE_URL = 'https://www.ronggoboti.shop';
+const DEFAULT_IMAGE = 'https://www.ronggoboti.shop/images/hero-banner.jpg';
 
 const SEO = ({ 
   title, 

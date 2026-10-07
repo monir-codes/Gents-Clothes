@@ -19,6 +19,7 @@ const productSchema = new mongoose.Schema({
   name: { type: String, required: true },
   image: { type: String, required: true },
   hoverImage: { type: String }, // For hover effect
+  images: [{ type: String }], // Array for multiple gallery images
   brand: { type: String, required: true },
   category: { type: String, required: true }, // e.g. T-Shirts, Polo, Panjabi
   collectionType: { type: String }, // e.g. Summer Collection, Premium Collection

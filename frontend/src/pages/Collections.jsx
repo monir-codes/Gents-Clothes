@@ -10,7 +10,7 @@ const Collections = () => {
     "@type": "CollectionPage",
     "name": "Exclusive Women's Fashion Collections - রঙবতী | Ronggoboti",
     "description": "Explore exclusive festive, bridal, Jamdani, silk, and contemporary women's fashion collections from রঙবতী (Ronggoboti) in Bangladesh.",
-    "url": "https://ronggoboti.vercel.app/collections"
+    "url": "https://www.ronggoboti.shop/collections"
   };
 
   return (
@@ -18,7 +18,7 @@ const Collections = () => {
       <SEO 
         title="Exclusive Women's Fashion Collections - শাড়ি, থ্রি পিস, কুর্তি" 
         description="Explore exclusive festive, bridal, Dhakai Jamdani, pure silk, and modern designer collections from রঙবতী (Ronggoboti) in Bangladesh." 
-        canonical="https://ronggoboti.vercel.app/collections"
+        canonical="https://www.ronggoboti.shop/collections"
         schemaMarkup={collectionsSchema}
       />
       

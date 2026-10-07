@@ -6,32 +6,37 @@ const API_URLS = [
   'https://gents-clothes-server.vercel.app/api/products',
   'https://ronggoboti-server.vercel.app/api/products'
 ];
-const BASE_URL = 'https://ronggoboti.vercel.app';
+const BASE_URL = 'https://www.ronggoboti.shop';
 
 async function generateSitemap() {
-  console.log('Generating high-performance SEO sitemap...');
+  console.log('Generating high-performance SEO sitemap for ' + BASE_URL + '...');
   try {
     const today = new Date().toISOString().split('T')[0];
 
-    // Core static & category routes
+    // Core static & category routes with SEO priority
     const staticPages = [
       { route: '', priority: '1.0', changefreq: 'daily' },
-      { route: '/shop', priority: '0.9', changefreq: 'daily' },
+      { route: '/shop', priority: '0.95', changefreq: 'daily' },
       { route: '/collections', priority: '0.9', changefreq: 'daily' },
+      { route: '/sale', priority: '0.9', changefreq: 'daily' },
+      { route: '/new-arrivals', priority: '0.9', changefreq: 'daily' },
       { route: '/shop?category=Sarees', priority: '0.85', changefreq: 'weekly' },
       { route: '/shop?category=Salwar+Kameez', priority: '0.85', changefreq: 'weekly' },
       { route: '/shop?category=Kurtis', priority: '0.85', changefreq: 'weekly' },
       { route: '/shop?category=Lehengas', priority: '0.85', changefreq: 'weekly' },
-      { route: '/shop?category=Modest+Wear', priority: '0.8', changefreq: 'weekly' },
-      { route: '/shop?category=Co-ord+Sets', priority: '0.8', changefreq: 'weekly' },
+      { route: '/shop?category=Modest+Wear', priority: '0.85', changefreq: 'weekly' },
+      { route: '/shop?category=Co-ord+Sets', priority: '0.85', changefreq: 'weekly' },
+      { route: '/shop?category=Three+Piece', priority: '0.85', changefreq: 'weekly' },
+      { route: '/shop?category=Gown', priority: '0.8', changefreq: 'weekly' },
+      { route: '/shop?category=Jewellery', priority: '0.8', changefreq: 'weekly' },
       { route: '/about', priority: '0.7', changefreq: 'monthly' },
       { route: '/contact', priority: '0.7', changefreq: 'monthly' },
       { route: '/faq', priority: '0.7', changefreq: 'monthly' },
-      { route: '/shipping', priority: '0.5', changefreq: 'monthly' },
-      { route: '/returns', priority: '0.5', changefreq: 'monthly' },
-      { route: '/size-guide', priority: '0.5', changefreq: 'monthly' },
-      { route: '/privacy', priority: '0.3', changefreq: 'yearly' },
-      { route: '/terms', priority: '0.3', changefreq: 'yearly' }
+      { route: '/shipping', priority: '0.6', changefreq: 'monthly' },
+      { route: '/returns', priority: '0.6', changefreq: 'monthly' },
+      { route: '/size-guide', priority: '0.6', changefreq: 'monthly' },
+      { route: '/privacy', priority: '0.4', changefreq: 'yearly' },
+      { route: '/terms', priority: '0.4', changefreq: 'yearly' }
     ];
 
     let sitemap = `<?xml version="1.0" encoding="UTF-8"?>

@@ -83,7 +83,7 @@ const getProductById = async (req, res) => {
 const createProduct = async (req, res) => {
   try {
     const {
-      name, price, oldPrice, image, hoverImage, brand, category,
+      name, price, oldPrice, image, hoverImage, images, brand, category,
       countInStock, numReviews, description, colors, sizes, fabricDetails, sku
     } = req.body;
 
@@ -102,6 +102,10 @@ const createProduct = async (req, res) => {
       ? sizes.filter(Boolean) 
       : (typeof sizes === 'string' ? sizes.split(',').map(s => s.trim()).filter(Boolean) : []);
 
+    const safeImages = Array.isArray(images) 
+      ? images.map(img => (typeof img === 'string' ? img.trim() : '')).filter(Boolean)
+      : (typeof images === 'string' ? images.split(',').map(img => img.trim()).filter(Boolean) : []);
+
     const safeFabricDetails = typeof fabricDetails === 'object' && fabricDetails !== null ? {
       material: fabricDetails.material || '',
       gsm: fabricDetails.gsm || '',
@@ -116,12 +120,16 @@ const createProduct = async (req, res) => {
     const catCode = catName.substring(0, 3).toUpperCase().replace(/[^A-Z]/g, 'PRD');
     const autoSku = `RGB-${catCode}-${Math.floor(1000 + Math.random() * 9000)}`;
 
+    const primaryImg = image && image.trim() ? image.trim() : (safeImages[0] || fallbackImage);
+    const secondaryImg = hoverImage && hoverImage.trim() ? hoverImage.trim() : (safeImages[1] || '');
+
     const product = new Product({
       name: name.trim(),
       price: Number(price) >= 0 ? Number(price) : 0,
       oldPrice: oldPrice && Number(oldPrice) > 0 ? Number(oldPrice) : null,
-      image: image && image.trim() ? image.trim() : fallbackImage,
-      hoverImage: hoverImage && hoverImage.trim() ? hoverImage.trim() : '',
+      image: primaryImg,
+      hoverImage: secondaryImg,
+      images: safeImages,
       brand: brand || 'রঙবতী',
       category: catName,
       countInStock: Number(countInStock) >= 0 ? Number(countInStock) : 0,
@@ -152,6 +160,7 @@ const updateProduct = async (req, res) => {
     description,
     image,
     hoverImage,
+    images,
     brand,
     category,
     countInStock,
@@ -171,6 +180,11 @@ const updateProduct = async (req, res) => {
       if (description !== undefined) product.description = description.trim();
       if (image) product.image = image.trim();
       if (hoverImage !== undefined) product.hoverImage = hoverImage.trim();
+      if (images !== undefined) {
+        product.images = Array.isArray(images) 
+          ? images.map(img => (typeof img === 'string' ? img.trim() : '')).filter(Boolean)
+          : (typeof images === 'string' ? images.split(',').map(img => img.trim()).filter(Boolean) : []);
+      }
       if (brand) product.brand = brand;
       if (category) product.category = category;
       if (countInStock !== undefined) product.countInStock = Number(countInStock) >= 0 ? Number(countInStock) : 0;

@@ -117,11 +117,11 @@ const Shop = ({ hideHeader }) => {
     "@type": "CollectionPage",
     "name": seoTitle,
     "description": seoDescription,
-    "url": typeof window !== 'undefined' ? window.location.href : "https://ronggoboti.vercel.app/shop",
+    "url": typeof window !== 'undefined' ? window.location.href : "https://www.ronggoboti.shop/shop",
     "isPartOf": {
       "@type": "WebSite",
       "name": "রঙবতী | Ronggoboti",
-      "url": "https://ronggoboti.vercel.app"
+      "url": "https://www.ronggoboti.shop"
     }
   };
 
