@@ -114,7 +114,7 @@ const updateSettings = async (req, res) => {
 
     // List of allowed fields to update
     const allowedFields = [
-      'announcementText', 'announcementList', 'whatsappNumber', 'heroTitle', 'heroSubtitle', 'heroImage', 'heroVideo', 'heroSlideshow',
+      'announcementText', 'announcementList', 'whatsappNumber', 'socialLinks', 'heroTitle', 'heroSubtitle', 'heroImage', 'heroVideo', 'heroSlideshow',
       'marqueeText', 'featuredCategories', 'featuredCollections', 'limitedEdition',
       'shopTheLook', 'premiumCollection', 'features', 'brandStory',
       'featuredVideoSection', 'reviews', 'instagramImages', 'newsletter', 'staticPages', 'paymentSettings',
@@ -124,6 +124,9 @@ const updateSettings = async (req, res) => {
     allowedFields.forEach(field => {
       if (req.body[field] !== undefined) {
         settings[field] = req.body[field];
+        if (typeof req.body[field] === 'object' && req.body[field] !== null) {
+          settings.markModified(field);
+        }
       }
     });
 
