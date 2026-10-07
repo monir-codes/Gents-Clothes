@@ -7,12 +7,15 @@ import {
 } from 'lucide-react';
 import useCartStore from '../store/useCartStore';
 import useAuthStore from '../store/useAuthStore';
+import useLanguageStore from '../store/useLanguageStore';
 import styles from './Checkout.module.css';
 import Swal from 'sweetalert2';
 
 const Checkout = () => {
   const { cartItems, clearCart } = useCartStore();
   const { user } = useAuthStore();
+  const { t, language } = useLanguageStore();
+  const isBn = language === 'bn';
   const navigate = useNavigate();
 
   const bdDivisions = {
@@ -302,35 +305,37 @@ const Checkout = () => {
   return (
     <div className={`container ${styles.checkoutContainer}`}>
       <div className={styles.formSection}>
-        <h2 className={styles.sectionTitle}>Shipping Address</h2>
+        <h2 className={styles.sectionTitle}>
+          {isBn ? 'ডেলিভারি ঠিকানা' : 'Shipping Address'}
+        </h2>
         <form onSubmit={handlePlaceOrder}>
           <div className={styles.formGroup}>
-            <label className={styles.label}>Full Name</label>
-            <input required type="text" className={styles.input} value={address.fullName} onChange={e => setAddress({...address, fullName: e.target.value})} />
+            <label className={styles.label}>{isBn ? 'সম্পূর্ণ নাম' : 'Full Name'}</label>
+            <input required type="text" className={styles.input} value={address.fullName} onChange={e => setAddress({...address, fullName: e.target.value})} placeholder={isBn ? 'আপনার নাম লিখুন' : 'Enter your full name'} />
           </div>
           <div className={styles.formGroup}>
-            <label className={styles.label}>Phone Number</label>
+            <label className={styles.label}>{isBn ? 'মোবাইল নম্বর' : 'Phone Number'}</label>
             <input required type="tel" className={styles.input} value={address.phone} onChange={e => setAddress({...address, phone: e.target.value})} placeholder="017XXXXXXXX" />
           </div>
           <div className={styles.formGroup}>
-            <label className={styles.label}>Street Address</label>
-            <input required type="text" className={styles.input} value={address.street} onChange={e => setAddress({...address, street: e.target.value})} placeholder="House, Road, Area details" />
+            <label className={styles.label}>{isBn ? 'বিস্তারিত ঠিকানা' : 'Street Address'}</label>
+            <input required type="text" className={styles.input} value={address.street} onChange={e => setAddress({...address, street: e.target.value})} placeholder={isBn ? 'বাসা/হোল্ডিং, রোড, এলাকা' : 'House, Road, Area details'} />
           </div>
           
           <div className={styles.row}>
             <div className={styles.formGroup}>
-              <label className={styles.label}>Region (Division)</label>
+              <label className={styles.label}>{isBn ? 'বিভাগ' : 'Region (Division)'}</label>
               <select required className={styles.input} value={address.region} onChange={handleRegionChange}>
-                <option value="">Select Region</option>
+                <option value="">{isBn ? 'বিভাগ নির্বাচন করুন' : 'Select Region'}</option>
                 {Object.keys(bdDivisions).map(region => (
                   <option key={region} value={region}>{region}</option>
                 ))}
               </select>
             </div>
             <div className={styles.formGroup}>
-              <label className={styles.label}>District</label>
+              <label className={styles.label}>{isBn ? 'জেলা' : 'District'}</label>
               <select required className={styles.input} value={address.district} onChange={handleDistrictChange} disabled={!address.region}>
-                <option value="">Select District</option>
+                <option value="">{isBn ? 'জেলা নির্বাচন করুন' : 'Select District'}</option>
                 {currentDistricts.map(district => (
                   <option key={district} value={district}>{district}</option>
                 ))}
@@ -339,12 +344,14 @@ const Checkout = () => {
           </div>
 
           <div className={styles.formGroup}>
-            <label className={styles.label}>City/Thana</label>
-            <input required type="text" className={styles.input} value={address.city} onChange={e => setAddress({...address, city: e.target.value})} placeholder="e.g. Dhanmondi, Mirpur, Uttara, etc." />
+            <label className={styles.label}>{isBn ? 'শহর / থানা' : 'City/Thana'}</label>
+            <input required type="text" className={styles.input} value={address.city} onChange={e => setAddress({...address, city: e.target.value})} placeholder={isBn ? 'যেমন: ধানমন্ডি, মিরপুর, উত্তরা' : 'e.g. Dhanmondi, Mirpur, Uttara'} />
           </div>
 
           {/* Delivery Charges Section */}
-          <h2 className={styles.sectionTitle} style={{ marginTop: '30px' }}>Delivery Charge & Zone</h2>
+          <h2 className={styles.sectionTitle} style={{ marginTop: '30px' }}>
+            {isBn ? 'ডেলিভারি চার্জ ও এরিয়া' : 'Delivery Charge & Zone'}
+          </h2>
           <div className={styles.deliveryZoneGroup}>
             {deliveryZones.map(zone => {
               const isSelected = selectedZone === zone.id;
@@ -364,13 +371,15 @@ const Checkout = () => {
                       className={styles.zoneRadio}
                     />
                     <div>
-                      <div className={styles.zoneTitle}>{zone.name}</div>
-                      <div className={styles.zoneSub}>{zone.nameEn} • ডেলিভারি সময়: {zone.deliveryTime}</div>
+                      <div className={styles.zoneTitle}>{isBn ? zone.name : zone.nameEn}</div>
+                      <div className={styles.zoneSub}>
+                        {isBn ? `ডেলিভারি সময়: ${zone.deliveryTime}` : `Delivery Time: ${zone.deliveryTime}`}
+                      </div>
                     </div>
                   </div>
                   <div className={styles.zonePrice}>
                     {freeShippingThreshold > 0 && itemsPrice >= freeShippingThreshold ? (
-                      <span style={{ color: '#16a34a', fontSize: '0.95rem' }}>FREE</span>
+                      <span style={{ color: '#16a34a', fontSize: '0.95rem' }}>{isBn ? 'ফ্রি' : 'FREE'}</span>
                     ) : (
                       `৳${zone.charge}`
                     )}
@@ -381,7 +390,9 @@ const Checkout = () => {
           </div>
 
           {/* Payment Methods Section */}
-          <h2 className={styles.sectionTitle} style={{ marginTop: '30px' }}>Payment Method</h2>
+          <h2 className={styles.sectionTitle} style={{ marginTop: '30px' }}>
+            {isBn ? 'পেমেন্ট পদ্ধতি' : 'Payment Method'}
+          </h2>
           <div className={styles.paymentMethod}>
             
             {/* Cash On Delivery Card */}
@@ -399,9 +410,13 @@ const Checkout = () => {
                   className={styles.zoneRadio}
                 />
                 <div>
-                  <div style={{ fontWeight: 700, fontSize: '1rem' }}>Cash on Delivery (ক্যাশ অন ডেলিভারি)</div>
+                  <div style={{ fontWeight: 700, fontSize: '1rem' }}>
+                    {isBn ? 'ক্যাশ অন ডেলিভারি (Cash on Delivery)' : 'Cash on Delivery (COD)'}
+                  </div>
                   <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginTop: '2px' }}>
-                    পণ্য হাতে পেয়ে সর্বমোট <strong>৳{totalPrice}</strong> পরিশোধ করুন।
+                    {isBn 
+                      ? <>পণ্য হাতে পেয়ে সর্বমোট <strong>৳{totalPrice}</strong> পরিশোধ করুন।</> 
+                      : <>Pay in cash when your order is delivered (Total: <strong>৳{totalPrice}</strong>).</>}
                   </div>
                 </div>
               </div>
@@ -424,13 +439,13 @@ const Checkout = () => {
                   />
                   <div>
                     <div style={{ fontWeight: 700, fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      Advance Payment (অগ্রিম পেমেন্ট)
+                      {isBn ? 'অগ্রিম মোবাইল পেমেন্ট (Advance Payment)' : 'Advance Payment (bKash / Nagad)'}
                       <span style={{ fontSize: '0.75rem', background: '#dcfce7', color: '#166534', padding: '2px 8px', borderRadius: '4px', fontWeight: 600 }}>
-                        Fast Processing
+                        {isBn ? 'দ্রুত প্রসেসিং' : 'Fast Processing'}
                       </span>
                     </div>
                     <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginTop: '2px' }}>
-                      bKash, Nagad, Rocket ইত্যাদির মাধ্যমে অগ্রিম পরিশোধ করুন।
+                      {isBn ? 'bKash, Nagad ইত্যাদির মাধ্যমে অগ্রিম পরিশোধ করুন।' : 'Pay in advance securely via bKash, Nagad, etc.'}
                     </div>
                   </div>
                 </div>
@@ -439,7 +454,7 @@ const Checkout = () => {
                 {paymentType === 'ADVANCE' && (
                   <div style={{ marginTop: '16px', borderTop: '1px solid var(--color-border)', paddingTop: '14px' }} onClick={(e) => e.stopPropagation()}>
                     <div style={{ fontSize: '0.85rem', fontWeight: 600, marginBottom: '8px' }}>
-                      Select Payment Method:
+                      {isBn ? 'পেমেন্ট মাধ্যম বেছে নিন:' : 'Select Payment Method:'}
                     </div>
 
                     {/* Method Selection Badges */}
@@ -477,7 +492,7 @@ const Checkout = () => {
                             {currentAdvanceMethod.name} ({currentAdvanceMethod.type || 'Personal'}):
                           </span>
                           <span style={{ fontSize: '0.8rem', color: '#16a34a', fontWeight: 600 }}>
-                            অগ্রিম প্রদেয়: ৳{shippingPrice > 0 ? shippingPrice : totalPrice} {shippingPrice > 0 ? '(ডেলিভারি চার্জ)' : ''}
+                            {isBn ? `অগ্রিম প্রদেয়: ৳${shippingPrice > 0 ? shippingPrice : totalPrice}` : `Advance payable: ৳${shippingPrice > 0 ? shippingPrice : totalPrice}`}
                           </span>
                         </div>
 
@@ -489,7 +504,7 @@ const Checkout = () => {
                             onClick={() => handleCopyNumber(currentAdvanceMethod.number)}
                           >
                             {copiedNumber ? <Check size={14} color="#16a34a" /> : <Copy size={14} />}
-                            {copiedNumber ? 'Copied!' : 'Copy Number'}
+                            {copiedNumber ? (isBn ? 'কপি হয়েছে!' : 'Copied!') : (isBn ? 'নাম্বার কপি করুন' : 'Copy Number')}
                           </button>
                         </div>
 
@@ -503,7 +518,7 @@ const Checkout = () => {
                         <div className={styles.paymentInputsRow}>
                           <div>
                             <label className={styles.label} style={{ fontSize: '0.8rem' }}>
-                              আপনার ফোন / একাউন্ট নাম্বার <span style={{ color: '#ef4444' }}>*</span>
+                              {isBn ? 'আপনার ফোন / একাউন্ট নাম্বার' : 'Sender Phone / Account Number'} <span style={{ color: '#ef4444' }}>*</span>
                             </label>
                             <input 
                               type="tel" 
@@ -540,14 +555,16 @@ const Checkout = () => {
           </div>
 
           <button type="submit" className={styles.placeOrderBtn}>
-            Place Order (৳{totalPrice})
+            {isBn ? `অর্ডার নিশ্চিত করুন (৳${totalPrice})` : `Confirm Order (৳${totalPrice})`}
           </button>
         </form>
       </div>
 
       {/* Order Summary Column */}
       <div className={styles.orderSummary}>
-        <h2 className={styles.sectionTitle}>Order Summary</h2>
+        <h2 className={styles.sectionTitle}>
+          {isBn ? 'অর্ডারের বিবরণ' : 'Order Summary'}
+        </h2>
         <div style={{ marginBottom: '20px', maxHeight: '280px', overflowY: 'auto' }}>
           {cartItems.map((item, index) => (
             <div key={index} style={{ display: 'flex', gap: '14px', marginBottom: '14px', alignItems: 'center' }}>
@@ -558,7 +575,7 @@ const Checkout = () => {
                   {item.color && `${item.color} `}{item.size && `| ${item.size}`}
                 </div>
                 <div style={{ fontSize: '0.85rem', fontWeight: 500 }}>
-                  Qty: {item.qty} x ৳{item.price}
+                  {isBn ? 'পরিমাণ:' : 'Qty:'} {item.qty} x ৳{item.price}
                 </div>
               </div>
             </div>
@@ -568,7 +585,7 @@ const Checkout = () => {
         {/* Coupon Code Section */}
         <div className={styles.couponSection}>
           <label className={styles.couponLabel}>
-            <Tag size={16} /> Have a Coupon Code?
+            <Tag size={16} /> {isBn ? 'কুপন কোড আছে?' : 'Have a Coupon Code?'}
           </label>
           
           {appliedCoupon ? (
@@ -584,7 +601,7 @@ const Checkout = () => {
                 type="button" 
                 onClick={handleRemoveCoupon} 
                 className={styles.removeCouponBtn}
-                title="Remove Coupon"
+                title={isBn ? "কুপন বাতিল করুন" : "Remove Coupon"}
               >
                 <X size={16} />
               </button>
@@ -593,7 +610,7 @@ const Checkout = () => {
             <form onSubmit={handleApplyCoupon} className={styles.couponForm}>
               <input 
                 type="text" 
-                placeholder="Enter Coupon Code" 
+                placeholder={isBn ? "কুপন কোড লিখুন" : "Enter Coupon Code"} 
                 value={couponInput}
                 onChange={(e) => {
                   setCouponInput(e.target.value.toUpperCase());
@@ -607,7 +624,7 @@ const Checkout = () => {
                 className={styles.applyCouponBtn}
                 disabled={couponLoading || !couponInput.trim()}
               >
-                {couponLoading ? 'Applying...' : 'Apply'}
+                {couponLoading ? (isBn ? 'যাচাই...' : 'Applying...') : (isBn ? 'প্রয়োগ' : 'Apply')}
               </button>
             </form>
           )}
@@ -622,30 +639,30 @@ const Checkout = () => {
 
         {/* Pricing Breakdown */}
         <div className={styles.summaryItem}>
-          <span>Subtotal</span>
+          <span>{isBn ? 'সাবটোটাল' : 'Subtotal'}</span>
           <span>৳{itemsPrice}</span>
         </div>
 
         {appliedCoupon && (
           <div className={`${styles.summaryItem} ${styles.discountItem}`}>
-            <span>Discount ({appliedCoupon.discountPercentage}%)</span>
+            <span>{isBn ? `ছাড় (${appliedCoupon.discountPercentage}%)` : `Discount (${appliedCoupon.discountPercentage}%)`}</span>
             <span style={{ color: '#16a34a', fontWeight: 600 }}>-৳{discountAmount}</span>
           </div>
         )}
 
         <div className={styles.summaryItem}>
-          <span>Shipping ({activeZone.name})</span>
-          <span>{shippingPrice === 0 ? <span style={{ color: '#16a34a', fontWeight: 600 }}>Free</span> : `৳${shippingPrice}`}</span>
+          <span>{isBn ? `ডেলিভারি চার্জ (${activeZone.name})` : `Shipping (${activeZone.nameEn})`}</span>
+          <span>{shippingPrice === 0 ? <span style={{ color: '#16a34a', fontWeight: 600 }}>{isBn ? 'ফ্রি' : 'Free'}</span> : `৳${shippingPrice}`}</span>
         </div>
 
         <div className={styles.totalRow}>
-          <span>Total</span>
+          <span>{isBn ? 'সর্বমোট' : 'Total'}</span>
           <span style={{ color: 'var(--color-brand-maroon, #5e0f2b)' }}>৳{totalPrice}</span>
         </div>
 
         <div style={{ marginTop: '16px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>
           <ShieldCheck size={16} color="#16a34a" />
-          <span>Guaranteed safe and secure checkout</span>
+          <span>{isBn ? '১০০% নিরাপদ ও সুরক্ষিত চেকআউট' : 'Guaranteed safe and secure checkout'}</span>
         </div>
       </div>
     </div>

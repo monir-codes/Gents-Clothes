@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import axios from 'axios';
+import useLanguageStore from '../store/useLanguageStore';
 import styles from './Footer.module.css';
 
 const formatExternalUrl = (url) => {
@@ -15,11 +16,14 @@ const formatExternalUrl = (url) => {
 };
 
 const Footer = () => {
+  const { t, language } = useLanguageStore();
   const [socialLinks, setSocialLinks] = useState({
     facebook: '#', instagram: '#', tiktok: '#', youtube: '#'
   });
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState({ loading: false, message: '', error: false });
+
+  const isBn = language === 'bn';
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -44,14 +48,14 @@ const Footer = () => {
       const { data } = await axios.post('/api/settings/newsletter/subscribe', { email: email.trim() });
       setStatus({ 
         loading: false, 
-        message: data.message || 'ধন্যবাদ! আপনি সফলভাবে রঙবতী নিউজলেটারে যুক্ত হয়েছেন।', 
+        message: data.message || (isBn ? 'ধন্যবাদ! আপনি সফলভাবে রঙবতী নিউজলেটারে যুক্ত হয়েছেন।' : 'Thank you! You have successfully subscribed to Ronggoboti newsletter.'), 
         error: false 
       });
       setEmail('');
     } catch (error) {
       setStatus({
         loading: false,
-        message: error.response?.data?.message || 'সাবস্ক্রাইব করতে ব্যর্থ হয়েছে। পরে আবার চেষ্টা করুন।',
+        message: error.response?.data?.message || (isBn ? 'সাবস্ক্রাইব করতে ব্যর্থ হয়েছে। পরে আবার চেষ্টা করুন।' : 'Subscription failed. Please try again later.'),
         error: true
       });
     }
@@ -61,7 +65,7 @@ const Footer = () => {
     <footer className={styles.footer}>
       <div className={`container ${styles.footerContent}`}>
         <div className={styles.footerSection}>
-          <Link to="/" className={styles.footerLogoLink} aria-label="রঙবতী Home">
+          <Link to="/" className={styles.footerLogoLink} aria-label={isBn ? "রঙবতী হোম" : "Ronggoboti Home"}>
             <img 
               src="/images/ronggoboti-logo.png" 
               alt="রঙবতী" 
@@ -76,7 +80,9 @@ const Footer = () => {
             <h2 className={styles.brand} style={{ display: 'none' }}>রঙবতী</h2>
           </Link>
           <p className={styles.description}>
-            Redefining luxury fashion in Bangladesh. Premium fabrics, flawless tailoring, and timeless designs for the modern woman.
+            {isBn 
+              ? 'বাংলাদেশের শীর্ষস্থানীয় প্রিমিয়াম উইমেন ফ্যাশন হাউস। ঐতিহ্যবাহী ঢাকাই শাড়ি, এক্সক্লুসিভ থ্রি পিস ও ডিজাইনার কুর্তির বিশ্বস্ত ব্র্যান্ড।'
+              : 'Redefining luxury fashion in Bangladesh. Premium fabrics, flawless tailoring, and timeless designs for the modern woman.'}
           </p>
           <div className={styles.socialLinks}>
             {socialLinks.facebook && (
@@ -103,35 +109,39 @@ const Footer = () => {
         </div>
 
         <div className={styles.footerSection}>
-          <h3 className={styles.sectionTitle}>Shop</h3>
+          <h3 className={styles.sectionTitle}>{t('footer.shopCol', 'Shop')}</h3>
           <ul className={styles.linkList}>
-            <li className={styles.linkItem}><Link to="/shop?category=New+Arrivals">New Arrivals</Link></li>
-            <li className={styles.linkItem}><Link to="/shop?category=Premium">Premium Collection</Link></li>
-            <li className={styles.linkItem}><Link to="/shop?category=Sarees">Sarees</Link></li>
-            <li className={styles.linkItem}><Link to="/shop?category=Salwar+Kameez">Salwar Kameez</Link></li>
-            <li className={styles.linkItem}><Link to="/shop?category=Kurtis">Kurtis</Link></li>
-            <li className={styles.linkItem}><Link to="/shop?category=Sale">Sale</Link></li>
+            <li className={styles.linkItem}><Link to="/shop?category=New+Arrivals">{isBn ? 'নতুন কালেকশন' : 'New Arrivals'}</Link></li>
+            <li className={styles.linkItem}><Link to="/shop?category=Premium">{isBn ? 'প্রিমিয়াম কালেকশন' : 'Premium Collection'}</Link></li>
+            <li className={styles.linkItem}><Link to="/shop?category=Sarees">{isBn ? 'শাড়ি কালেকশন' : 'Sarees'}</Link></li>
+            <li className={styles.linkItem}><Link to="/shop?category=Salwar+Kameez">{isBn ? 'সালোয়ার কামিজ' : 'Salwar Kameez'}</Link></li>
+            <li className={styles.linkItem}><Link to="/shop?category=Kurtis">{isBn ? 'ডিজাইনার কুর্তি' : 'Kurtis'}</Link></li>
+            <li className={styles.linkItem}><Link to="/shop?category=Sale">{isBn ? 'স্পেশাল অফার' : 'Sale'}</Link></li>
           </ul>
         </div>
 
         <div className={styles.footerSection}>
-          <h3 className={styles.sectionTitle}>Support</h3>
+          <h3 className={styles.sectionTitle}>{t('footer.supportCol', 'Support')}</h3>
           <ul className={styles.linkList}>
-            <li className={styles.linkItem}><Link to="/faq">FAQ</Link></li>
-            <li className={styles.linkItem}><Link to="/shipping">Shipping Policy</Link></li>
-            <li className={styles.linkItem}><Link to="/returns">Return & Exchange</Link></li>
-            <li className={styles.linkItem}><Link to="/size-guide">Size Guide</Link></li>
-            <li className={styles.linkItem}><Link to="/contact">Contact Us</Link></li>
+            <li className={styles.linkItem}><Link to="/faq">{isBn ? 'সাধারণ জিজ্ঞাসা (FAQ)' : 'FAQ'}</Link></li>
+            <li className={styles.linkItem}><Link to="/shipping">{isBn ? 'ডেলিভারি পলিসি' : 'Shipping Policy'}</Link></li>
+            <li className={styles.linkItem}><Link to="/returns">{isBn ? 'রিটার্ন ও এক্সচেঞ্জ' : 'Return & Exchange'}</Link></li>
+            <li className={styles.linkItem}><Link to="/size-guide">{isBn ? 'সাইজ নির্দেশিকা' : 'Size Guide'}</Link></li>
+            <li className={styles.linkItem}><Link to="/contact">{isBn ? 'যোগাযোগ করুন' : 'Contact Us'}</Link></li>
           </ul>
         </div>
 
         <div className={styles.footerSection}>
-          <h3 className={styles.sectionTitle}>Newsletter</h3>
-          <p className={styles.description}>Subscribe to get exclusive collections, special offers, and early-bird deals.</p>
+          <h3 className={styles.sectionTitle}>{t('footer.newsletterCol', 'Newsletter')}</h3>
+          <p className={styles.description}>
+            {isBn 
+              ? 'নতুন কালেকশন ও স্পেশাল ছাড় সবার আগে পেতে আপনার ইমেইল দিয়ে সাবস্ক্রাইব করুন।'
+              : 'Subscribe to get exclusive collections, special offers, and early-bird deals.'}
+          </p>
           <form className={styles.newsletterForm} onSubmit={handleNewsletterSubmit}>
             <input 
               type="email" 
-              placeholder="Enter your email" 
+              placeholder={isBn ? 'আপনার ইমেইল অ্যাড্রেস...' : 'Enter your email...'} 
               className={styles.newsletterInput} 
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -160,7 +170,7 @@ const Footer = () => {
       <div className={styles.seoKeywordsWrapper}>
         <div className={`container ${styles.seoKeywordsSection}`}>
           <div className={styles.seoKeywordsTitle}>
-            <span>Popular Searches at রঙবতী (Ronggoboti)</span>
+            <span>{t('footer.popularSearches', 'Popular Searches at রঙবতী (Ronggoboti)')}</span>
           </div>
           <div className={styles.seoKeywordsList}>
             <Link to="/shop?category=Sarees">শাড়ি কালেকশন (Sarees BD)</Link>
@@ -188,10 +198,10 @@ const Footer = () => {
 
       <div className={styles.bottomBar}>
         <div className={`container ${styles.bottomBarInner}`}>
-          <p>&copy; {new Date().getFullYear()} রঙবতী (Ronggoboti). All Rights Reserved.</p>
+          <p>&copy; {new Date().getFullYear()} {t('footer.copyright', 'রঙবতী (Ronggoboti). All Rights Reserved.')}</p>
           <div className={styles.legalLinks}>
-            <Link to="/privacy">Privacy Policy</Link>
-            <Link to="/terms">Terms of Service</Link>
+            <Link to="/privacy">{t('footer.privacyPolicy', 'Privacy Policy')}</Link>
+            <Link to="/terms">{t('footer.termsOfService', 'Terms of Service')}</Link>
           </div>
         </div>
       </div>

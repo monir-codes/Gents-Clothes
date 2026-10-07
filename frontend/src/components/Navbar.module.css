@@ -92,6 +92,12 @@
   height: 100%;
 }
 
+.navLangWrapper {
+  display: flex;
+  align-items: center;
+  margin-right: 2px;
+}
+
 .iconBtn,
 .mobileMenuBtn {
   position: relative;

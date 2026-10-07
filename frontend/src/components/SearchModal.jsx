@@ -1,16 +1,19 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Search as SearchIcon, Sparkles } from 'lucide-react';
+import { X, Search as SearchIcon, Sparkles, TrendingUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import useLanguageStore from '../store/useLanguageStore';
 import styles from './SearchModal.module.css';
 
 const SearchModal = ({ isOpen, onClose }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
+  const { t, language } = useLanguageStore();
 
-  const handleSearch = () => {
-    if (searchTerm.trim()) {
-      navigate(`/shop?search=${encodeURIComponent(searchTerm.trim())}`);
+  const handleSearch = (term) => {
+    const query = term || searchTerm;
+    if (query && query.trim()) {
+      navigate(`/shop?search=${encodeURIComponent(query.trim())}`);
       onClose();
     }
   };
@@ -20,6 +23,26 @@ const SearchModal = ({ isOpen, onClose }) => {
       handleSearch();
     }
   };
+
+  const popularTags = language === 'bn' ? [
+    'ঢাকাই জামদানি শাড়ি',
+    'মিরপুর কাতান শাড়ি',
+    'সিল্ক শাড়ি',
+    'পাকিস্তানি লন ৩-পিস',
+    'ডিজাইনার কুর্তি',
+    'দুবাই চেরি আবায়া',
+    'ব্রাইডাল লেহেঙ্গা',
+    'সুতি ২-পিস'
+  ] : [
+    'Dhakai Jamdani Saree',
+    'Katan Silk Saree',
+    'Pure Silk Saree',
+    'Pakistani Lawn 3-Piece',
+    'Designer Kurtis',
+    'Dubai Cherry Abaya',
+    'Bridal Lehenga',
+    'Cotton Two-Piece'
+  ];
 
   return (
     <AnimatePresence>
@@ -44,33 +67,36 @@ const SearchModal = ({ isOpen, onClose }) => {
                 <SearchIcon size={20} color="var(--color-text-secondary)" />
                 <input 
                   type="text" 
-                  placeholder="Search products, categories..." 
+                  placeholder={t('search.placeholder', 'Search products, categories...')}
                   autoFocus 
                   className={styles.input}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   onKeyDown={handleKeyDown}
                 />
-                <button className={styles.aiBtn} onClick={handleSearch}>
-                  <Sparkles size={16} /> Search
+                <button className={styles.aiBtn} onClick={() => handleSearch()}>
+                  <Sparkles size={16} /> {t('search.searchBtn', 'Search')}
                 </button>
               </div>
-              <button className={styles.closeBtn} onClick={onClose}><X size={24} /></button>
+              <button className={styles.closeBtn} onClick={onClose} aria-label="Close search"><X size={24} /></button>
             </div>
             
             <div className={styles.suggestions}>
-              <h3>Popular Searches</h3>
-              <div className={styles.tags}>
-                <span className={styles.tag}>Jamdani Sarees</span>
-                <span className={styles.tag}>Silk Salwar Kameez</span>
-                <span className={styles.tag}>Designer Kurtis</span>
-                <span className={styles.tag}>Party Wear</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+                <TrendingUp size={18} color="var(--color-accent, #c9a265)" />
+                <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}>{t('search.popularSearches', 'Popular Searches')}</h3>
               </div>
-              
-              <h3 style={{ marginTop: '24px' }}>AI Recommended for You</h3>
-              <div style={{ display: 'flex', gap: '16px', marginTop: '12px' }}>
-                <div style={{ width: '80px', height: '100px', background: 'var(--color-surface)', borderRadius: '4px' }}></div>
-                <div style={{ width: '80px', height: '100px', background: 'var(--color-surface)', borderRadius: '4px' }}></div>
+              <div className={styles.tags}>
+                {popularTags.map((tag, idx) => (
+                  <span 
+                    key={idx} 
+                    className={styles.tag}
+                    onClick={() => handleSearch(tag)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    {tag}
+                  </span>
+                ))}
               </div>
             </div>
           </motion.div>
@@ -81,3 +107,4 @@ const SearchModal = ({ isOpen, onClose }) => {
 };
 
 export default SearchModal;
+

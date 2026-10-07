@@ -1,6 +1,40 @@
 const Product = require('../models/Product');
 
-// @desc    Fetch all products (with pagination & sorting)
+const BILINGUAL_SEARCH_MAP = {
+  'শাড়ি': ['saree', 'sari', 'shari', 'sharee', 'jamdani', 'katan'],
+  'জামদানি': ['jamdani', 'dhakai jamdani'],
+  'কাতান': ['katan', 'katan silk'],
+  'বেনারসি': ['benarasi', 'banarasi'],
+  'সিল্ক': ['silk', 'pure silk', 'half silk', 'soft silk'],
+  'সুতি': ['cotton', 'pure cotton', 'handloom', 'tant'],
+  'তাঁত': ['tant', 'handloom'],
+  'জর্জেট': ['georgette'],
+  'অরগাঞ্জা': ['organza'],
+  'মসলিন': ['muslin'],
+  'বাটিক': ['batik'],
+  'থ্রি পিস': ['three piece', '3 piece', 'salwar kameez', 'lawn'],
+  '৩ পিস': ['three piece', '3 piece', 'salwar kameez'],
+  '৩-পিস': ['three piece', '3 piece', 'salwar kameez'],
+  'টু পিস': ['two piece', '2 piece', 'kurti pant'],
+  '২ পিস': ['two piece', '2 piece', 'kurti pant'],
+  '২-পিস': ['two piece', '2 piece', 'kurti pant'],
+  'সালোয়ার কামিজ': ['salwar kameez', 'three piece'],
+  'পাকিস্তানি লন': ['pakistani lawn', 'lawn'],
+  'কুর্তি': ['kurti', 'kurtis', 'tunic'],
+  'টিউনিক': ['tunic', 'top'],
+  'টপস': ['tops', 'western tops'],
+  'লেহেঙ্গা': ['lehenga', 'lehengas'],
+  'ব্রাইডাল': ['bridal', 'wedding'],
+  'গাউন': ['gown', 'gowns', 'maxi'],
+  'আবায়া': ['abaya', 'abayas', 'cherry abaya', 'dubai'],
+  'বোরকা': ['borka', 'burqa', 'abaya', 'modest'],
+  'হিজাব': ['hijab', 'hijabs', 'khimar'],
+  'কর্ড সেট': ['co-ord', 'coord', 'two piece'],
+  'প্লাজো': ['palazzo', 'pants'],
+  'শাল': ['shawl', 'shawls', 'kashmiri']
+};
+
+// @desc    Fetch all products (with pagination, sorting & bilingual search)
 // @route   GET /api/products
 // @access  Public
 const getProducts = async (req, res) => {
@@ -11,9 +45,39 @@ const getProducts = async (req, res) => {
     // Filter Query
     const query = {};
 
+    // Bilingual Search Filter (Keyword / Search)
+    const searchTerm = req.query.search || req.query.keyword;
+    if (searchTerm && searchTerm.trim()) {
+      const cleanTerm = searchTerm.trim().toLowerCase();
+      const termsSet = new Set([cleanTerm]);
+
+      // Expand with synonyms
+      Object.entries(BILINGUAL_SEARCH_MAP).forEach(([key, synonyms]) => {
+        if (cleanTerm.includes(key.toLowerCase()) || key.toLowerCase().includes(cleanTerm)) {
+          synonyms.forEach(s => termsSet.add(s.toLowerCase()));
+        }
+        synonyms.forEach(syn => {
+          if (cleanTerm.includes(syn.toLowerCase()) || syn.toLowerCase().includes(cleanTerm)) {
+            termsSet.add(key.toLowerCase());
+          }
+        });
+      });
+
+      const searchRegexList = Array.from(termsSet).map(term => new RegExp(term, 'i'));
+
+      query.$or = [
+        { name: { $in: searchRegexList } },
+        { description: { $in: searchRegexList } },
+        { category: { $in: searchRegexList } },
+        { brand: { $in: searchRegexList } },
+        { 'fabricDetails.fabric': { $in: searchRegexList } }
+      ];
+    }
+
     // Category Filter
     if (req.query.category) {
-      query.category = { $in: req.query.category.split(',') };
+      const catList = req.query.category.split(',').map(c => new RegExp(`^${c.trim()}$`, 'i'));
+      query.category = { $in: catList };
     }
 
     // Size Filter

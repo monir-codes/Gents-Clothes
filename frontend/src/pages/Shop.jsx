@@ -1,16 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import axios from 'axios';
-import { Sparkles, SlidersHorizontal } from 'lucide-react';
+import { Sparkles, SlidersHorizontal, Search as SearchIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ProductCard from '../components/ProductCard';
 import SEO from '../components/SEO';
 import Loader from '../components/Loader';
+import useLanguageStore from '../store/useLanguageStore';
 import styles from './Shop.module.css';
+
+const CATEGORY_OPTIONS = [
+  { key: 'Sarees', bn: 'শাড়ি কালেকশন', en: 'Sarees' },
+  { key: 'Salwar Kameez', bn: 'সালোয়ার কামিজ ও ৩-পিস', en: 'Salwar Kameez' },
+  { key: 'Two Piece', bn: '২-পিস ড্রেস', en: 'Two Piece Suits' },
+  { key: 'Kurtis', bn: 'ডিজাইনার কুর্তি ও টিউনিক', en: 'Kurtis & Tunics' },
+  { key: 'Lehengas', bn: 'লেহেঙ্গা ও গাউন', en: 'Lehengas & Gowns' },
+  { key: 'Modest Wear', bn: 'মডেস্ট ওয়্যার ও আবায়া', en: 'Modest Wear & Abaya' },
+  { key: 'Co-ord Sets', bn: 'লেডিস কর্ড সেট', en: 'Co-ord Sets' }
+];
 
 const Shop = ({ hideHeader }) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { t, language, getSearchSynonyms } = useLanguageStore();
   
   // Filter States
   const [selectedCategories, setSelectedCategories] = useState([]);
@@ -27,6 +39,18 @@ const Shop = ({ hideHeader }) => {
   
   const queryParams = new URLSearchParams(location.search);
   const isAiRecommended = queryParams.get('style') === 'ai-recommended';
+  const urlSearch = queryParams.get('search');
+  const urlCategory = queryParams.get('category');
+
+  // Sync with URL parameters
+  useEffect(() => {
+    if (urlSearch !== null) {
+      setSearchTerm(urlSearch);
+    }
+    if (urlCategory) {
+      setSelectedCategories([urlCategory]);
+    }
+  }, [location.search]);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -35,7 +59,10 @@ const Shop = ({ hideHeader }) => {
         let query = `/api/products?page=${page}&limit=12`;
         
         if (selectedCategories.length > 0) {
-          query += `&category=${selectedCategories.join(',')}`;
+          query += `&category=${encodeURIComponent(selectedCategories.join(','))}`;
+        }
+        if (searchTerm && searchTerm.trim()) {
+          query += `&search=${encodeURIComponent(searchTerm.trim())}`;
         }
         if (selectedSizes.length > 0) {
           query += `&sizes=${selectedSizes.join(',')}`;
@@ -51,9 +78,9 @@ const Shop = ({ hideHeader }) => {
           query += `&minPrice=5000`;
         }
 
-        if (sortOption === 'Price: Low to High') {
+        if (sortOption === 'Price: Low to High' || sortOption === 'মূল্য: কম থেকে বেশি') {
           query += `&sort=priceAsc`;
-        } else if (sortOption === 'Price: High to Low') {
+        } else if (sortOption === 'Price: High to Low' || sortOption === 'মূল্য: বেশি থেকে কম') {
           query += `&sort=priceDesc`;
         }
 
@@ -70,7 +97,7 @@ const Shop = ({ hideHeader }) => {
     };
 
     fetchProducts();
-  }, [page, selectedCategories, selectedSizes, priceRange, sortOption]);
+  }, [page, selectedCategories, searchTerm, selectedSizes, priceRange, sortOption]);
 
   const handleCategoryChange = (category) => {
     setSelectedCategories(prev => 
@@ -98,15 +125,14 @@ const Shop = ({ hideHeader }) => {
 
   const displayedProducts = isAiRecommended
     ? (Array.isArray(products) ? products.sort(() => 0.5 - Math.random()).slice(0, 6) : [])
-    : (Array.isArray(products) ? products.filter(p => p.name && p.name.toLowerCase().includes(searchTerm.toLowerCase())) : []);
+    : (Array.isArray(products) ? products : []);
   const filteredProducts = displayedProducts;
 
-  const categoryFromQuery = queryParams.get('category');
-  const currentCategoryName = selectedCategories.length === 1 ? selectedCategories[0] : categoryFromQuery;
+  const currentCategoryName = selectedCategories.length === 1 ? selectedCategories[0] : urlCategory;
 
   const seoTitle = currentCategoryName 
-    ? `${currentCategoryName} Collection - Buy Online in Bangladesh` 
-    : "Shop Women's Fashion Collection - শাড়ি, থ্রি পিস, কুর্তি";
+    ? `${currentCategoryName} Collection - Buy Online in Bangladesh | রঙবতী` 
+    : "Shop Women's Fashion Collection - শাড়ি, থ্রি পিস, কুর্তি | রঙবতী";
 
   const seoDescription = currentCategoryName
     ? `Explore exclusive ${currentCategoryName} collection at রঙবতী (Ronggoboti). Premium quality, exquisite design, and fast home delivery all over Bangladesh.`
@@ -150,37 +176,37 @@ const Shop = ({ hideHeader }) => {
             transition={{ duration: 0.6 }}
           >
           <div className={styles.mobileFilterHeader}>
-            <h3 style={{ fontSize: '1.2rem', fontWeight: 600 }}>Filters</h3>
-            <button onClick={() => setIsMobileFilterOpen(false)} style={{ fontSize: '1.5rem' }}>&times;</button>
+            <h3 style={{ fontSize: '1.2rem', fontWeight: 600 }}>{t('shop.filterBy', 'Filters')}</h3>
+            <button onClick={() => setIsMobileFilterOpen(false)} style={{ fontSize: '1.5rem', background: 'none', border: 'none', cursor: 'pointer' }}>&times;</button>
           </div>
           <div className={styles.filterGroup}>
-            <h3 className={styles.filterTitle}>Categories</h3>
+            <h3 className={styles.filterTitle}>{t('shop.categories', 'Categories')}</h3>
             <div className={styles.filterList}>
-              {['Sarees', 'Salwar Kameez', 'Kurtis & Tunics', 'Lehengas', 'Western Wear', 'Modest Wear', 'Co-ord Sets'].map(cat => (
-                <label key={cat} className={styles.filterLabel}>
+              {CATEGORY_OPTIONS.map(cat => (
+                <label key={cat.key} className={styles.filterLabel}>
                   <input 
                     type="checkbox" 
-                    checked={selectedCategories.includes(cat)}
-                    onChange={() => handleCategoryChange(cat)}
-                  /> {cat}
+                    checked={selectedCategories.includes(cat.key)}
+                    onChange={() => handleCategoryChange(cat.key)}
+                  /> {language === 'bn' ? cat.bn : cat.en}
                 </label>
               ))}
             </div>
           </div>
 
         <div className={styles.filterGroup}>
-          <h3 className={styles.filterTitle}>Price</h3>
+          <h3 className={styles.filterTitle}>{t('shop.price', 'Price')}</h3>
           <div className={styles.filterList}>
-            <label className={styles.filterLabel}><input type="radio" name="price" checked={priceRange === ''} onChange={() => handlePriceChange('')} /> All Prices</label>
-            <label className={styles.filterLabel}><input type="radio" name="price" checked={priceRange === 'under1000'} onChange={() => handlePriceChange('under1000')} /> Under ৳1000</label>
-            <label className={styles.filterLabel}><input type="radio" name="price" checked={priceRange === '1000-2000'} onChange={() => handlePriceChange('1000-2000')} /> ৳1000 - ৳2000</label>
-            <label className={styles.filterLabel}><input type="radio" name="price" checked={priceRange === '2000-5000'} onChange={() => handlePriceChange('2000-5000')} /> ৳2000 - ৳5000</label>
-            <label className={styles.filterLabel}><input type="radio" name="price" checked={priceRange === 'over5000'} onChange={() => handlePriceChange('over5000')} /> Over ৳5000</label>
+            <label className={styles.filterLabel}><input type="radio" name="price" checked={priceRange === ''} onChange={() => handlePriceChange('')} /> {t('shop.allPrices', 'All Prices')}</label>
+            <label className={styles.filterLabel}><input type="radio" name="price" checked={priceRange === 'under1000'} onChange={() => handlePriceChange('under1000')} /> {t('shop.under1000', 'Under ৳1,000')}</label>
+            <label className={styles.filterLabel}><input type="radio" name="price" checked={priceRange === '1000-2000'} onChange={() => handlePriceChange('1000-2000')} /> {t('shop.range1000to2000', '৳1,000 - ৳2,000')}</label>
+            <label className={styles.filterLabel}><input type="radio" name="price" checked={priceRange === '2000-5000'} onChange={() => handlePriceChange('2000-5000')} /> {t('shop.range2000to5000', '৳2,000 - ৳5,000')}</label>
+            <label className={styles.filterLabel}><input type="radio" name="price" checked={priceRange === 'over5000'} onChange={() => handlePriceChange('over5000')} /> {t('shop.over5000', 'Over ৳5,000')}</label>
           </div>
         </div>
 
         <div className={styles.filterGroup}>
-          <h3 className={styles.filterTitle}>Size</h3>
+          <h3 className={styles.filterTitle}>{t('shop.size', 'Size')}</h3>
           <div className={styles.filterList}>
             {['S', 'M', 'L', 'XL', 'XXL'].map(size => (
               <label key={size} className={styles.filterLabel}>
@@ -217,25 +243,37 @@ const Shop = ({ hideHeader }) => {
                 </div>
               ) : (
                 <div>
-                  <h1 className={styles.title}>All Products</h1>
-                  <p className={styles.resultCount}>{filteredProducts.length} Results</p>
+                  <h1 className={styles.title}>
+                    {searchTerm ? `${t('search.resultsFor', 'Search:')} "${searchTerm}"` : t('shop.allProducts', 'All Products')}
+                  </h1>
+                  <p className={styles.resultCount}>{totalProducts} {language === 'bn' ? 'টি পোশাক পাওয়া গেছে' : 'Items Found'}</p>
                 </div>
               )}
             </div>
 
             <div className={styles.toolbarActions}>
-              <input type="text" placeholder="Search products..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className={styles.searchInput} />
+              <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                <SearchIcon size={16} style={{ position: 'absolute', left: '12px', color: 'var(--color-text-secondary)' }} />
+                <input 
+                  type="text" 
+                  placeholder={t('search.placeholder', 'Search products...')} 
+                  value={searchTerm} 
+                  onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }} 
+                  className={styles.searchInput} 
+                  style={{ paddingLeft: '34px' }}
+                />
+              </div>
               <button 
                 className={styles.mobileFilterBtn} 
                 onClick={() => setIsMobileFilterOpen(true)}
               >
-                <SlidersHorizontal size={16} /> Filters
+                <SlidersHorizontal size={16} /> {t('shop.filterBy', 'Filters')}
               </button>
               <select className={styles.sortSelect} value={sortOption} onChange={handleSortChange}>
-                <option>Featured</option>
-                <option>New Arrivals</option>
-                <option>Price: Low to High</option>
-                <option>Price: High to Low</option>
+                <option value="Featured">{t('shop.sortFeatured', 'Featured')}</option>
+                <option value="New Arrivals">{t('shop.sortNewest', 'Newest Arrivals')}</option>
+                <option value="Price: Low to High">{t('shop.sortPriceLowHigh', 'Price: Low to High')}</option>
+                <option value="Price: High to Low">{t('shop.sortPriceHighLow', 'Price: High to Low')}</option>
               </select>
             </div>
           </motion.div>
@@ -263,25 +301,28 @@ const Shop = ({ hideHeader }) => {
                 <button 
                   onClick={() => setPage(p => Math.max(1, p - 1))}
                   disabled={page === 1}
-                  style={{ padding: '8px 16px', background: page === 1 ? 'var(--color-border)' : 'var(--color-text-primary)', color: page === 1 ? 'var(--color-text-secondary)' : '#fff', borderRadius: '4px' }}
+                  style={{ padding: '8px 16px', background: page === 1 ? 'var(--color-border)' : 'var(--color-text-primary)', color: page === 1 ? 'var(--color-text-secondary)' : '#fff', borderRadius: '4px', cursor: page === 1 ? 'not-allowed' : 'pointer' }}
                 >
-                  Prev
+                  {language === 'bn' ? 'পূর্ববর্তী' : 'Prev'}
                 </button>
                 <span style={{ display: 'flex', alignItems: 'center', fontWeight: 600 }}>
-                  Page {page} of {totalPages}
+                  {language === 'bn' ? `পৃষ্ঠা ${page} এর ${totalPages}` : `Page ${page} of ${totalPages}`}
                 </span>
                 <button 
                   onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                   disabled={page === totalPages}
-                  style={{ padding: '8px 16px', background: page === totalPages ? 'var(--color-border)' : 'var(--color-text-primary)', color: page === totalPages ? 'var(--color-text-secondary)' : '#fff', borderRadius: '4px' }}
+                  style={{ padding: '8px 16px', background: page === totalPages ? 'var(--color-border)' : 'var(--color-text-primary)', color: page === totalPages ? 'var(--color-text-secondary)' : '#fff', borderRadius: '4px', cursor: page === totalPages ? 'not-allowed' : 'pointer' }}
                 >
-                  Next
+                  {language === 'bn' ? 'পরবর্তী' : 'Next'}
                 </button>
               </div>
             )}
           </>
         ) : (
-          <p>No products found matching your criteria.</p>
+          <div style={{ textAlign: 'center', padding: '60px 20px', background: '#fff', borderRadius: '12px', border: '1px solid var(--color-border, #ebdcd0)', marginTop: '20px' }}>
+            <h3 style={{ color: 'var(--color-brand-maroon, #5e0f2b)', marginBottom: '8px' }}>{t('shop.noProductsFound', 'No products found')}</h3>
+            <p style={{ color: 'var(--color-text-secondary)' }}>{t('shop.tryDifferentFilter', 'Try adjusting your filters or search keywords.')}</p>
+          </div>
         )}
       </main>
     </div>
@@ -290,3 +331,4 @@ const Shop = ({ hideHeader }) => {
 };
 
 export default Shop;
+

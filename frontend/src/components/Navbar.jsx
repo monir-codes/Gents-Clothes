@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Heart, ShoppingBag, User, Menu, X, LogOut } from 'lucide-react';
+import { Heart, ShoppingBag, User, Menu, X, LogOut, Search } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import useCartStore from '../store/useCartStore';
 import useWishlistStore from '../store/useWishlistStore';
 import useAuthStore from '../store/useAuthStore';
+import useLanguageStore from '../store/useLanguageStore';
+import LanguageToggle from './LanguageToggle';
 import axios from 'axios';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
@@ -17,6 +19,7 @@ const Navbar = () => {
   const { cartItems, toggleCart } = useCartStore();
   const { wishlistItems } = useWishlistStore();
   const { user, logout } = useAuthStore();
+  const { t } = useLanguageStore();
   const navigate = useNavigate();
   const location = useLocation();
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -44,7 +47,6 @@ const Navbar = () => {
 
   const handleAuth = async () => {
     if (user) {
-      // Toggle user menu dropdown
       setIsUserMenuOpen(!isUserMenuOpen);
     } else {
       navigate('/login');
@@ -91,25 +93,30 @@ const Navbar = () => {
         </Link>
         
         <nav className={styles.navLinks}>
-          <Link to="/shop" className={styles.navLink}>Shop</Link>
-          <Link to="/collections" className={styles.navLink}>Collections</Link>
-          <Link to="/new-arrival" className={styles.navLink}>New Arrival</Link>
-          <Link to="/sale" className={styles.navLink}>Sale</Link>
-          <Link to="/about" className={styles.navLink}>About</Link>
+          <Link to="/shop" className={styles.navLink}>{t('nav.shop', 'Shop')}</Link>
+          <Link to="/collections" className={styles.navLink}>{t('nav.collections', 'Collections')}</Link>
+          <Link to="/new-arrival" className={styles.navLink}>{t('nav.newArrivals', 'New Arrival')}</Link>
+          <Link to="/sale" className={styles.navLink}>{t('nav.sale', 'Sale')}</Link>
+          <Link to="/about" className={styles.navLink}>{t('nav.about', 'About')}</Link>
         </nav>
         
         <div className={styles.navIcons}>
+          {/* Language Toggle */}
+          <div className={styles.navLangWrapper}>
+            <LanguageToggle />
+          </div>
+
           {/* Wishlist Link */}
-          <Link to="/wishlist" className={styles.iconBtn} aria-label="Wishlist" title="Wishlist">
-            <Heart size={22} strokeWidth={1.75} />
+          <Link to="/wishlist" className={styles.iconBtn} aria-label={t('nav.wishlist', 'Wishlist')} title={t('nav.wishlist', 'Wishlist')}>
+            <Heart size={21} strokeWidth={1.75} />
             {wishlistItems.length > 0 && (
               <span className={styles.badge}>{wishlistItems.length}</span>
             )}
           </Link>
           
           {/* Cart Trigger */}
-          <button className={styles.iconBtn} aria-label="Cart" onClick={toggleCart} title="Cart">
-            <ShoppingBag size={22} strokeWidth={1.75} />
+          <button className={styles.iconBtn} aria-label={t('nav.cart', 'Cart')} onClick={toggleCart} title={t('nav.cart', 'Cart')}>
+            <ShoppingBag size={21} strokeWidth={1.75} />
             {cartItems.length > 0 && (
               <span className={styles.badge}>{cartItems.reduce((acc, item) => acc + item.qty, 0)}</span>
             )}
@@ -119,8 +126,8 @@ const Navbar = () => {
           <div className={styles.desktopUserIcon}>
             {user ? (
               <div style={{ position: 'relative' }}>
-                <button className={styles.iconBtn} aria-label="User" onClick={handleAuth} title="User Menu">
-                  <User size={22} strokeWidth={1.75} />
+                <button className={styles.iconBtn} aria-label={t('nav.profile', 'User')} onClick={handleAuth} title={t('nav.profile', 'User Menu')}>
+                  <User size={21} strokeWidth={1.75} />
                 </button>
                 {isUserMenuOpen && (
                   <motion.div
@@ -130,17 +137,17 @@ const Navbar = () => {
                     className={styles.userMenu}
                   >
                     <Link to="/dashboard" className={styles.userMenuItem} onClick={() => setIsUserMenuOpen(false)}>
-                      Profile
+                      {t('nav.profile', 'Profile')}
                     </Link>
                     <button className={styles.userMenuItem} onClick={() => { logout(); setIsUserMenuOpen(false); navigate('/'); }}>
-                      Logout
+                      {t('nav.logout', 'Logout')}
                     </button>
                   </motion.div>
                 )}
               </div>
             ) : (
-              <button className={styles.iconBtn} aria-label="Login" onClick={handleAuth} title="Login">
-                <User size={22} strokeWidth={1.75} />
+              <button className={styles.iconBtn} aria-label={t('nav.login', 'Login')} onClick={handleAuth} title={t('nav.login', 'Login')}>
+                <User size={21} strokeWidth={1.75} />
               </button>
             )}
           </div>
@@ -169,30 +176,38 @@ const Navbar = () => {
             <div className={styles.mobileAuthBox}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <User size={24} />
-                <span>{user ? user.name || 'User' : 'Guest'}</span>
+                <span>{user ? user.name || t('nav.welcome', 'User') : t('nav.guest', 'Guest')}</span>
               </div>
               
               {!user ? (
                 <button className={styles.mobileAuthBtn} onClick={() => { setIsMobileMenuOpen(false); navigate('/login'); }}>
-                  Login
+                  {t('nav.login', 'Login')}
                 </button>
               ) : (
                 <div style={{ display: 'flex', gap: '10px' }}>
                   <button className={styles.mobileAuthBtn} onClick={() => { setIsMobileMenuOpen(false); navigate('/dashboard'); }} style={{ background: 'var(--color-text-primary)', color: 'white' }}>
-                    Profile
+                    {t('nav.profile', 'Profile')}
                   </button>
                   <button className={styles.mobileAuthBtn} onClick={() => { setIsMobileMenuOpen(false); logout(); navigate('/'); }} style={{ background: 'var(--color-error)', color: 'white' }}>
-                    Logout
+                    {t('nav.logout', 'Logout')}
                   </button>
                 </div>
               )}
             </div>
 
-            <Link to="/shop" className={styles.mobileNavLink} onClick={() => setIsMobileMenuOpen(false)}>Shop</Link>
-            <Link to="/collections" className={styles.mobileNavLink} onClick={() => setIsMobileMenuOpen(false)}>Collections</Link>
-            <Link to="/new-arrival" className={styles.mobileNavLink} onClick={() => setIsMobileMenuOpen(false)}>New Arrival</Link>
-            <Link to="/sale" className={styles.mobileNavLink} onClick={() => setIsMobileMenuOpen(false)}>Sale</Link>
-            <Link to="/about" className={styles.mobileNavLink} onClick={() => setIsMobileMenuOpen(false)}>About</Link>
+            {/* Mobile Language Switcher Box */}
+            <div style={{ padding: '8px 0', borderBottom: '1px solid var(--color-border)' }}>
+              <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginBottom: '8px', fontWeight: 600 }}>
+                Language / ভাষা:
+              </div>
+              <LanguageToggle isFullWidth={true} />
+            </div>
+
+            <Link to="/shop" className={styles.mobileNavLink} onClick={() => setIsMobileMenuOpen(false)}>{t('nav.shop', 'Shop')}</Link>
+            <Link to="/collections" className={styles.mobileNavLink} onClick={() => setIsMobileMenuOpen(false)}>{t('nav.collections', 'Collections')}</Link>
+            <Link to="/new-arrival" className={styles.mobileNavLink} onClick={() => setIsMobileMenuOpen(false)}>{t('nav.newArrivals', 'New Arrival')}</Link>
+            <Link to="/sale" className={styles.mobileNavLink} onClick={() => setIsMobileMenuOpen(false)}>{t('nav.sale', 'Sale')}</Link>
+            <Link to="/about" className={styles.mobileNavLink} onClick={() => setIsMobileMenuOpen(false)}>{t('nav.about', 'About')}</Link>
           </motion.div>
         )}
       </AnimatePresence>
@@ -201,3 +216,4 @@ const Navbar = () => {
 };
 
 export default Navbar;
+

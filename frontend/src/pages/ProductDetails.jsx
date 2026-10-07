@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import useCartStore from '../store/useCartStore';
 import useWishlistStore from '../store/useWishlistStore';
 import useAuthStore from '../store/useAuthStore';
+import useLanguageStore from '../store/useLanguageStore';
 import Loader from '../components/Loader';
 import SEO from '../components/SEO';
 import ProductCard from '../components/ProductCard';
@@ -251,7 +252,9 @@ const ProductDetails = () => {
           <div className={styles.optionsContainer}>
             {product.colors && product.colors.length > 0 && (
               <div className={styles.optionGroup}>
-                <span className={styles.optionLabel}>Color: <strong>{selectedColor}</strong></span>
+                <span className={styles.optionLabel}>
+                  {t('product.selectColor', 'Color')}: <strong>{selectedColor}</strong>
+                </span>
                 <div className={styles.colorSelector}>
                   {product.colors.map(color => (
                     <button 
@@ -260,7 +263,6 @@ const ProductDetails = () => {
                       onClick={() => setSelectedColor(color)}
                       title={color}
                     >
-                      {/* Using text for demo, usually this is a hex code bg */}
                       {color.charAt(0)}
                     </button>
                   ))}
@@ -271,12 +273,14 @@ const ProductDetails = () => {
             {product.sizes && product.sizes.length > 0 && (
               <div className={styles.optionGroup}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span className={styles.optionLabel}>Size: <strong>{selectedSize}</strong></span>
+                  <span className={styles.optionLabel}>
+                    {t('product.selectSize', 'Size')}: <strong>{selectedSize}</strong>
+                  </span>
                   <Link 
                     to="/size-guide"
                     style={{ fontSize: '0.85rem', color: 'var(--color-accent)', textDecoration: 'underline', fontWeight: 500 }}
                   >
-                    Size Guide
+                    {language === 'bn' ? 'সাইজ নির্দেশিকা' : 'Size Guide'}
                   </Link>
                 </div>
                 <div className={styles.sizeSelector}>
@@ -297,9 +301,9 @@ const ProductDetails = () => {
           {/* Actions */}
           <div className={styles.actionContainer}>
             <div className={styles.qtyBox}>
-              <button onClick={() => setQty(Math.max(1, qty - 1))}>-</button>
-              <input type="number" value={qty} readOnly />
-              <button onClick={() => setQty(Math.min(product.countInStock, qty + 1))}>+</button>
+              <button onClick={() => setQty(Math.max(1, qty - 1))} aria-label="Decrease quantity">-</button>
+              <input type="number" value={qty} readOnly aria-label="Quantity" />
+              <button onClick={() => setQty(Math.min(product.countInStock, qty + 1))} aria-label="Increase quantity">+</button>
             </div>
             
             <motion.button 
@@ -309,12 +313,14 @@ const ProductDetails = () => {
               disabled={product.countInStock === 0}
               style={{ opacity: product.countInStock === 0 ? 0.5 : 1, cursor: product.countInStock === 0 ? 'not-allowed' : 'pointer' }}
             >
-              <ShoppingBag size={20} /> {product.countInStock > 0 ? 'Add to Cart' : 'Out of Stock'}
+              <ShoppingBag size={20} /> 
+              {product.countInStock > 0 ? t('product.addToCart', 'Add to Cart') : t('product.outOfStock', 'Out of Stock')}
             </motion.button>
             
             <button 
               className={styles.wishlistBtn}
               onClick={() => toggleWishlist(product)}
+              aria-label={language === 'bn' ? 'উইশলিস্টে রাখুন' : 'Wishlist'}
               style={{ color: isInWishlist(product._id) ? 'var(--color-error)' : 'var(--color-text-primary)' }}
             >
               <Heart size={20} fill={isInWishlist(product._id) ? 'var(--color-error)' : 'none'} />
@@ -324,15 +330,15 @@ const ProductDetails = () => {
           <div className={styles.trustBadges}>
             <div className={styles.trustItem}>
               <Truck size={20} />
-              <span>Fast Delivery</span>
+              <span>{t('features.fastDelivery', 'Fast Delivery')}</span>
             </div>
             <div className={styles.trustItem}>
               <RefreshCcw size={20} />
-              <span>Easy Returns</span>
+              <span>{t('product.easyReturns', 'Easy Returns')}</span>
             </div>
             <div className={styles.trustItem}>
               <ShieldCheck size={20} />
-              <span>Secure Payment</span>
+              <span>{t('features.cod', 'Cash on Delivery')}</span>
             </div>
           </div>
         </motion.div>
@@ -351,19 +357,19 @@ const ProductDetails = () => {
             className={`${styles.tabHeader} ${activeTab === 'description' ? styles.activeTab : ''}`}
             onClick={() => setActiveTab('description')}
           >
-            Description
+            {language === 'bn' ? 'বিবরণ' : 'Description'}
           </button>
           <button 
             className={`${styles.tabHeader} ${activeTab === 'details' ? styles.activeTab : ''}`}
             onClick={() => setActiveTab('details')}
           >
-            Fabric Details
+            {language === 'bn' ? 'ফ্যাব্রিক বিবরণ' : 'Fabric Details'}
           </button>
           <button 
             className={`${styles.tabHeader} ${activeTab === 'reviews' ? styles.activeTab : ''}`}
             onClick={() => setActiveTab('reviews')}
           >
-            Reviews ({product.numReviews})
+            {language === 'bn' ? `রিভিউ (${product.numReviews})` : `Reviews (${product.numReviews})`}
           </button>
         </div>
         
@@ -373,15 +379,17 @@ const ProductDetails = () => {
           )}
           {activeTab === 'details' && product.fabricDetails && (
             <ul style={{ paddingLeft: '20px' }}>
-              <li><strong>Material:</strong> {product.fabricDetails.material}</li>
-              <li><strong>GSM:</strong> {product.fabricDetails.gsm}</li>
-              <li><strong>Wash Instruction:</strong> {product.fabricDetails.washInstruction}</li>
+              <li><strong>{language === 'bn' ? 'ম্যাটেরিয়াল:' : 'Material:'}</strong> {product.fabricDetails.material || 'Premium Fabric'}</li>
+              {product.fabricDetails.gsm && <li><strong>GSM:</strong> {product.fabricDetails.gsm}</li>}
+              {product.fabricDetails.washInstruction && <li><strong>{language === 'bn' ? 'ধোয়ার নির্দেশিকা:' : 'Wash Instruction:'}</strong> {product.fabricDetails.washInstruction}</li>}
             </ul>
           )}
           {activeTab === 'reviews' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
               <div>
-                <h3 style={{ fontSize: '1.2rem', marginBottom: '15px' }}>Customer Reviews</h3>
+                <h3 style={{ fontSize: '1.2rem', marginBottom: '15px' }}>
+                  {language === 'bn' ? 'গ্রাহকদের মতামত' : 'Customer Reviews'}
+                </h3>
                 {product.reviews && product.reviews.filter(r => r.isApproved).length > 0 ? (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                     {product.reviews.filter(r => r.isApproved).map(review => (
@@ -395,7 +403,7 @@ const ProductDetails = () => {
                         <p style={{ margin: 0 }}>{review.comment}</p>
                         {review.adminReply && (
                           <div style={{ marginTop: '15px', padding: '10px', background: 'var(--color-surface)', borderLeft: '3px solid var(--color-accent)' }}>
-                            <strong>Admin Reply:</strong>
+                            <strong>{language === 'bn' ? 'অ্যাডমিন রিপ্লাই:' : 'Admin Reply:'}</strong>
                             <p style={{ margin: 0, marginTop: '5px', fontSize: '0.9rem' }}>{review.adminReply}</p>
                           </div>
                         )}
@@ -403,37 +411,40 @@ const ProductDetails = () => {
                     ))}
                   </div>
                 ) : (
-                  <p>No reviews yet.</p>
+                  <p>{language === 'bn' ? 'এখনও কোনো রিভিউ নেই।' : 'No reviews yet.'}</p>
                 )}
               </div>
 
               <div style={{ padding: '20px', background: 'var(--color-surface)', borderRadius: '8px' }}>
-                <h3 style={{ fontSize: '1.2rem', marginBottom: '15px' }}>Write a Review</h3>
+                <h3 style={{ fontSize: '1.2rem', marginBottom: '15px' }}>
+                  {language === 'bn' ? 'রিভিউ লিখুন' : 'Write a Review'}
+                </h3>
                 {!user ? (
-                  <p>Please <Link to={`/login?redirect=${getProductUrl(product)}?tab=reviews`} style={{ color: 'var(--color-accent)', textDecoration: 'underline' }}>log in</Link> to write a review.</p>
+                  <p>{language === 'bn' ? 'রিভিউ দিতে অনুগ্রহ করে ' : 'Please '}<Link to={`/login?redirect=${getProductUrl(product)}?tab=reviews`} style={{ color: 'var(--color-accent)', textDecoration: 'underline' }}>{language === 'bn' ? 'লগইন করুন' : 'log in'}</Link>{language === 'bn' ? '।' : ' to write a review.'}</p>
                 ) : (
                   <form onSubmit={submitReview} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                     <div>
-                      <label style={{ display: 'block', marginBottom: '5px' }}>Rating</label>
-                      <select value={rating} onChange={(e) => setRating(e.target.value)} style={{ padding: '10px', borderRadius: '4px', border: '1px solid var(--color-border)', width: '100px' }}>
-                        <option value="5">5 - Excellent</option>
-                        <option value="4">4 - Very Good</option>
-                        <option value="3">3 - Good</option>
-                        <option value="2">2 - Fair</option>
-                        <option value="1">1 - Poor</option>
+                      <label style={{ display: 'block', marginBottom: '5px' }}>{language === 'bn' ? 'রেটিং' : 'Rating'}</label>
+                      <select value={rating} onChange={(e) => setRating(e.target.value)} style={{ padding: '10px', borderRadius: '4px', border: '1px solid var(--color-border)', width: '120px' }}>
+                        <option value="5">{language === 'bn' ? '৫ - চমৎকার' : '5 - Excellent'}</option>
+                        <option value="4">{language === 'bn' ? '৪ - খুব ভালো' : '4 - Very Good'}</option>
+                        <option value="3">{language === 'bn' ? '৩ - ভালো' : '3 - Good'}</option>
+                        <option value="2">{language === 'bn' ? '২ - চলনসই' : '2 - Fair'}</option>
+                        <option value="1">{language === 'bn' ? '১ - সন্তোষজনক নয়' : '1 - Poor'}</option>
                       </select>
                     </div>
                     <div>
-                      <label style={{ display: 'block', marginBottom: '5px' }}>Comment</label>
+                      <label style={{ display: 'block', marginBottom: '5px' }}>{language === 'bn' ? 'আপনার মন্তব্য' : 'Comment'}</label>
                       <textarea 
                         value={comment} 
                         onChange={(e) => setComment(e.target.value)}
                         required
+                        placeholder={language === 'bn' ? 'পোশাকটির কোয়ালিটি ও ফিটিং সম্পর্কে আপনার অভিজ্ঞতা লিখুন...' : 'Write your experience with this product...'}
                         style={{ padding: '10px', borderRadius: '4px', border: '1px solid var(--color-border)', width: '100%', minHeight: '100px', resize: 'vertical' }}
                       />
                     </div>
                     <button type="submit" disabled={reviewSubmitLoading} style={{ padding: '10px 20px', background: 'var(--color-text-primary)', color: 'white', borderRadius: '4px', cursor: reviewSubmitLoading ? 'not-allowed' : 'pointer', width: 'fit-content' }}>
-                      {reviewSubmitLoading ? 'Submitting...' : 'Submit Review'}
+                      {reviewSubmitLoading ? (language === 'bn' ? 'জমা হচ্ছে...' : 'Submitting...') : (language === 'bn' ? 'রিভিউ জমা দিন' : 'Submit Review')}
                     </button>
                     {reviewMessage && <p style={{ color: reviewMessage.includes('failed') ? 'var(--color-error)' : 'var(--color-success)', marginTop: '10px' }}>{reviewMessage}</p>}
                   </form>
@@ -453,7 +464,9 @@ const ProductDetails = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <h2 style={{ fontSize: '2rem', fontWeight: 600, textAlign: 'center', marginBottom: 'var(--space-4)' }}>You May Also Like</h2>
+          <h2 style={{ fontSize: '2rem', fontWeight: 600, textAlign: 'center', marginBottom: 'var(--space-4)' }}>
+            {language === 'bn' ? 'আপনার পছন্দের আরও কালেকশন' : 'You May Also Like'}
+          </h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: 'var(--space-3)' }}>
             {relatedProducts.map(p => (
               <ProductCard key={p._id} product={p} />

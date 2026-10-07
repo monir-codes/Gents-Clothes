@@ -4,12 +4,14 @@ import { Heart, ShoppingBag } from 'lucide-react';
 import { motion } from 'framer-motion';
 import useCartStore from '../store/useCartStore';
 import useWishlistStore from '../store/useWishlistStore';
+import useLanguageStore from '../store/useLanguageStore';
 import { getProductUrl } from '../utils/slugify';
 import styles from './ProductCard.module.css';
 
 const ProductCard = ({ product }) => {
   const { addToCart } = useCartStore();
   const { toggleWishlist, isInWishlist } = useWishlistStore();
+  const { language } = useLanguageStore();
   const isWishlisted = isInWishlist(product._id);
 
   const handleQuickAdd = (e) => {
@@ -31,6 +33,8 @@ const ProductCard = ({ product }) => {
     show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
   };
 
+  const isBn = language === 'bn';
+
   return (
     <motion.div 
       className={styles.card}
@@ -46,22 +50,30 @@ const ProductCard = ({ product }) => {
           
           {/* Badges */}
           {product.oldPrice && (
-            <div className={styles.discountBadge}>Sale</div>
+            <div className={styles.discountBadge}>
+              {isBn ? 'অফার' : 'Sale'}
+            </div>
           )}
           {product.countInStock < 5 && product.countInStock > 0 && (
-            <div className={styles.stockBadge}>Only {product.countInStock} Left</div>
+            <div className={styles.stockBadge}>
+              {isBn ? `মাত্র ${product.countInStock}টি বাকি` : `Only ${product.countInStock} Left`}
+            </div>
           )}
         </Link>
         
         <div className={styles.actions}>
           <button 
             className={styles.actionBtn} 
-            aria-label="Add to Wishlist" 
+            aria-label={isBn ? "উইশলিস্টে রাখুন" : "Add to Wishlist"} 
             onClick={(e) => { e.preventDefault(); toggleWishlist(product); }}
           >
             <Heart size={20} fill={isWishlisted ? "var(--color-text-primary)" : "none"} color={isWishlisted ? "var(--color-text-primary)" : "currentColor"} />
           </button>
-          <button className={styles.actionBtn} aria-label="Quick Add" onClick={handleQuickAdd}>
+          <button 
+            className={styles.actionBtn} 
+            aria-label={isBn ? "কার্টে যোগ করুন" : "Quick Add"} 
+            onClick={handleQuickAdd}
+          >
             <ShoppingBag size={20} />
           </button>
         </div>

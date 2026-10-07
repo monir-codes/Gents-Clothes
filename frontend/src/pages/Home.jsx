@@ -14,6 +14,7 @@ import ProductCard from '../components/ProductCard';
 import TestimonialsSlider from '../components/TestimonialsSlider';
 import SEO from '../components/SEO';
 import Loader from '../components/Loader';
+import useLanguageStore from '../store/useLanguageStore';
 import styles from './Home.module.css';
 
 // Function to find and filter the lowest price / budget-friendly products
@@ -26,6 +27,9 @@ const getMostAffordableProducts = (productList, limit = 4) => {
 };
 
 const Home = () => {
+  const { t, language } = useLanguageStore();
+  const isBn = language === 'bn';
+
   const [settings, setSettings] = useState({
     heroVideo: null,
     heroSlideshow: [],
@@ -96,14 +100,14 @@ const Home = () => {
       const { data } = await axios.post('/api/settings/newsletter/subscribe', { email: newsletterEmail.trim() });
       setNewsletterStatus({ 
         loading: false, 
-        message: data.message || 'ধন্যবাদ! আপনি সফলভাবে রঙবতী নিউজলেটারে যুক্ত হয়েছেন।', 
+        message: data.message || (isBn ? 'ধন্যবাদ! আপনি সফলভাবে রঙবতী নিউজলেটারে যুক্ত হয়েছেন।' : 'Thank you! You have successfully subscribed.'), 
         error: false 
       });
       setNewsletterEmail('');
     } catch (error) {
       setNewsletterStatus({
         loading: false,
-        message: error.response?.data?.message || 'সাবস্ক্রাইব করতে ব্যর্থ হয়েছে।',
+        message: error.response?.data?.message || (isBn ? 'সাবস্ক্রাইব করতে ব্যর্থ হয়েছে।' : 'Failed to subscribe.'),
         error: true
       });
     }
@@ -146,13 +150,13 @@ const Home = () => {
   return (
     <div style={{ overflowX: 'hidden' }}>
       <SEO 
-        title="রঙবতী | Ronggoboti - Exclusive Women's Fashion & Designer Clothing BD" 
+        title={isBn ? "রঙবতী | Ronggoboti - এক্সক্লুসিভ উইমেন ফ্যাশন ও ডিজাইনার পোশাক" : "রঙবতী | Ronggoboti - Exclusive Women's Fashion & Designer Clothing BD"} 
         description="রঙবতী (Ronggoboti) - বাংলাদেশের শীর্ষস্থানীয় প্রিমিয়াম ওমেন ফ্যাশন ব্র্যান্ড। এক্সক্লুসিভ শাড়ি (Sarees), সালোয়ার কামিজ (Salwar Kameez), ডিজাইনার কুর্তি (Kurtis), লেহেঙ্গা ও মডেস্ট ওয়েয়ার অনলাইন কিনুন সেরা দামে। Fast delivery across Bangladesh." 
         canonical="https://ronggoboti.vercel.app"
         schemaMarkup={homeSchema}
       />
 
-      {/* Fixed Hero Section (No parallax scroll displacement) */}
+      {/* Fixed Hero Section */}
       <section className={styles.hero}>
         {settings.heroVideo ? (
           <video 
@@ -208,10 +212,10 @@ const Home = () => {
           >
             <div className={styles.ctaContainer}>
               <Link to="/shop">
-                <button className={styles.btnPrimary}>Shop Now</button>
+                <button className={styles.btnPrimary}>{t('home.shopNow', 'Shop Now')}</button>
               </Link>
               <Link to="/collections">
-                <button className={styles.btnOutline}>Explore Collections</button>
+                <button className={styles.btnOutline}>{t('home.exploreBtn', 'Explore Collections')}</button>
               </Link>
             </div>
           </motion.div>
@@ -238,7 +242,7 @@ const Home = () => {
             viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 0.5 }}
           >
-            Featured Categories
+            {t('home.categoriesTitle', 'Featured Categories')}
           </motion.h2>
           <motion.div 
             initial={{ opacity: 0 }}
@@ -278,13 +282,15 @@ const Home = () => {
           className={styles.sectionHeader}
         >
           <div className={styles.sectionHeaderTitleGroup}>
-            <h2 className={styles.sectionTitleLeft}>New Arrivals</h2>
+            <h2 className={styles.sectionTitleLeft}>
+              {isBn ? 'নতুন কালেকশন' : 'New Arrivals'}
+            </h2>
             <p className={styles.sectionSubtitle}>
-              Freshly handcrafted additions to our signature collections.
+              {isBn ? 'ঐতিহ্য ও আধুনিকতার মিশেলে নিখুঁত কারুকার্যের নতুন পোশাক।' : 'Freshly handcrafted additions to our signature collections.'}
             </p>
           </div>
           <Link to="/new-arrival" className={styles.viewAllLink}>
-            View All &rarr;
+            {isBn ? 'সব দেখুন →' : 'View All →'}
           </Link>
         </motion.div>
         <div className={styles.productGrid}>
@@ -312,7 +318,7 @@ const Home = () => {
             viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 0.5 }}
           >
-            Curated Collections
+            {t('home.featuredTitle', 'Curated Collections')}
           </motion.h2>
           <motion.div
             initial={{ opacity: 0 }}
@@ -336,7 +342,9 @@ const Home = () => {
                     <img src={col.image} alt={col.title} />
                     <div className={styles.collectionContent}>
                       <h3>{col.title}</h3>
-                      <Link to={col.link || '/shop'} style={{ color: '#fff', textDecoration: 'underline' }}>Shop Now</Link>
+                      <Link to={col.link || '/shop'} style={{ color: '#fff', textDecoration: 'underline' }}>
+                        {t('home.shopNow', 'Shop Now')}
+                      </Link>
                     </div>
                   </div>
                 </SwiperSlide>
@@ -400,22 +408,22 @@ const Home = () => {
       >
         <div className="container">
           <h2 className={styles.newsletterTitle}>
-            {settings.newsletter?.title || 'Join the রঙবতী Inner Circle'}
+            {settings.newsletter?.title || t('home.newsletterTitle', 'Join the রঙবতী Inner Circle')}
           </h2>
           <p className={styles.newsletterSubtitle}>
-            {settings.newsletter?.subtitle || 'Subscribe to receive priority access to new saree collections, luxury pret launches, and private offers.'}
+            {settings.newsletter?.subtitle || t('home.newsletterSubtitle', 'Subscribe to receive priority access to new saree collections, luxury pret launches, and private offers.')}
           </p>
           <form className={styles.newsletterInputGroup} onSubmit={handleNewsletterSubmit}>
             <input 
               type="email" 
-              placeholder="Enter your email address" 
+              placeholder={isBn ? "আপনার ইমেইল অ্যাড্রেস লিখুন..." : "Enter your email address"} 
               value={newsletterEmail}
               onChange={(e) => setNewsletterEmail(e.target.value)}
               disabled={newsletterStatus.loading}
               required 
             />
             <button type="submit" disabled={newsletterStatus.loading}>
-              {newsletterStatus.loading ? 'Subscribing...' : 'Subscribe'}
+              {newsletterStatus.loading ? (isBn ? 'সাবস্ক্রাইব হচ্ছে...' : 'Subscribing...') : t('home.subscribeBtn', 'Subscribe')}
             </button>
           </form>
           {newsletterStatus.message && (
