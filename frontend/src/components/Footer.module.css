@@ -191,12 +191,16 @@
   background-color: var(--color-accent);
 }
 
-.seoKeywordsSection {
-  padding: 30px 0 24px 0;
+.seoKeywordsWrapper {
   border-top: 1px solid var(--color-border, #eee);
-  margin-top: 0;
-  margin-bottom: 0;
   width: 100%;
+  background-color: transparent;
+}
+
+.seoKeywordsSection {
+  padding-top: 32px;
+  padding-bottom: 26px;
+  margin: 0 auto;
 }
 
 .seoKeywordsTitle {
@@ -305,7 +309,8 @@
     max-width: 160px;
   }
   .seoKeywordsSection {
-    padding: 22px 0 18px 0;
+    padding-top: 22px;
+    padding-bottom: 20px;
   }
   .seoKeywordsTitle {
     font-size: 0.78rem;
@@ -342,7 +347,8 @@
 
 @media (max-width: 480px) {
   .seoKeywordsSection {
-    padding: 18px 0 16px 0;
+    padding-top: 18px;
+    padding-bottom: 16px;
   }
   .seoKeywordsTitle {
     font-size: 0.75rem;
