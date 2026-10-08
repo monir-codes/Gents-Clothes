@@ -49,6 +49,13 @@ const WOMEN_CATEGORIES = [
   "Jewellery & Accessories"
 ];
 
+// Helper to convert Bengali digits to Western digits
+const convertBnToEnDigits = (str) => {
+  if (!str) return '';
+  const bnToEnMap = { '০': '0', '১': '1', '২': '2', '৩': '3', '৪': '4', '৫': '5', '৬': '6', '৭': '7', '৮': '8', '৯': '9' };
+  return String(str).replace(/[০-৯]/g, d => bnToEnMap[d] || d);
+};
+
 // Helper to safely extract JSON from AI response text
 const extractJsonObject = (rawText) => {
   if (!rawText) return null;
@@ -61,22 +68,55 @@ const extractJsonObject = (rawText) => {
       cleaned = cleaned.substring(startIdx, endIdx + 1);
     }
     
+    // Remove trailing commas before closing braces/brackets
     cleaned = cleaned.replace(/,\s*([}\]])/g, '$1');
 
     return JSON.parse(cleaned);
   } catch (err) {
-    console.error('Failed to parse AI JSON:', err.message);
+    // Fallback: try removing unescaped newlines inside strings
+    try {
+      let sanitized = rawText
+        .replace(/```(?:json)?/gi, '')
+        .replace(/```/g, '')
+        .trim();
+      const start = sanitized.indexOf('{');
+      const end = sanitized.lastIndexOf('}');
+      if (start !== -1 && end !== -1) {
+        sanitized = sanitized.substring(start, end + 1);
+        sanitized = sanitized.replace(/\r?\n/g, ' ');
+        return JSON.parse(sanitized);
+      }
+    } catch (e2) {
+      console.error('Failed to parse AI JSON:', err.message, e2.message);
+    }
     return null;
   }
 };
 
-// Helper to call Gemini with model fallbacks
-const callGemini = async (prompt, apiKey) => {
-  const models = ['gemini-1.5-flash', 'gemini-2.0-flash', 'gemini-1.5-pro', 'gemini-flash-latest'];
+// Helper to call Gemini with active modern model fallbacks
+const callGemini = async (prompt, apiKey, isJson = false) => {
+  const models = [
+    'gemini-2.5-flash',
+    'gemini-3.7-flash',
+    'gemini-3.5-flash',
+    'gemini-2.5-flash-lite',
+    'gemini-2.5-pro',
+    'gemini-flash-lite-latest'
+  ];
+  
   let lastError = null;
 
   for (const model of models) {
     try {
+      const generationConfig = {
+        temperature: 0.2,
+        topP: 0.95
+      };
+
+      if (isJson) {
+        generationConfig.responseMimeType = 'application/json';
+      }
+
       const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
         method: 'POST',
         headers: {
@@ -86,10 +126,7 @@ const callGemini = async (prompt, apiKey) => {
           contents: [{
             parts: [{ text: prompt }]
           }],
-          generationConfig: {
-            temperature: 0.25,
-            topP: 0.95
-          }
+          generationConfig
         })
       });
 
@@ -126,47 +163,49 @@ router.post('/generate', async (req, res) => {
     }
 
     let prompt = '';
+    let isJsonMode = false;
     
     if (type === 'smart_extract' || type === 'product_details') {
-      prompt = `You are the Master AI eCommerce Data Specialist for "রঙবতী" (Ronggoboti - https://www.ronggoboti.shop) - Bangladesh's elite luxury women's fashion and couture brand.
+      isJsonMode = true;
+      prompt = `You are the Master AI eCommerce Data Specialist for "রঙবতী" (Ronggoboti - https://www.ronggoboti.shop) - Bangladesh's premier luxury women's fashion and couture brand.
 
-The user will provide messy, raw, unstructured product notes or supplier messages. The input may be in BENGALI (বাংলা), BANGLISH, or ENGLISH (with prices, emojis, garment specs, color names, wash instructions, fabric count, etc.).
+The user will provide unstructured, raw product notes or vendor text. It may be in BENGALI (বাংলা), BANGLISH, or ENGLISH (containing prices, measurements, color names, fabric specs, wash instructions, etc.).
 
-YOUR GOAL:
-Translate and structure ALL details into CLEAN, HIGH-END, PROFESSIONAL ENGLISH across ALL fields of our product database.
+YOUR TASK:
+Extract and translate EVERY detail into CLEAN, PROFESSIONAL, HIGH-END ENGLISH.
 
-CATEGORY SELECTION (Must pick the SINGLE most accurate category from this EXACT list):
+ALLOWED CATEGORIES (Pick the single closest match):
 ${WOMEN_CATEGORIES.map(c => `"${c}"`).join(', ')}
 
-OUTPUT FORMAT:
-Return a valid JSON object ONLY, with these EXACT keys:
+OUTPUT A VALID JSON OBJECT WITH THESE EXACT KEYS:
 {
-  "name": "Luxury English product title (e.g. 'Royal Crimson Red Pure Handloom Dhakai Jamdani Saree', 'Designer Embroidered Lawn 2-Piece Kurti & Dupatta Set', 'Pakistani Luxury Embroidered Chiffon 3-Piece Salwar Kameez', 'Pure Dubai Cherry Silk Front-Open Abaya with Matching Hijab')",
-  "price": Numeric value for selling price (e.g. 3500). Number only without ৳, Tk, /- symbols,
-  "oldPrice": Numeric value for regular/previous price if a discount was mentioned (e.g. 4200), else null,
-  "category": "Pick the most accurate matching category from the list above",
-  "sizes": "Garment-intelligent sizing string in English:
-            - For Sarees: Saree length & blouse piece info (e.g. '12 Haat with Unstitched Blouse Piece', '12 Haat (Free Size)', '14 Haat with Blouse Piece') - NEVER write S/M/L for Sarees!
-            - For Two Piece / 2-Piece: 'Unstitched (Free Size)' or '36, 38, 40, 42' or 'S, M, L, XL'.
-            - For Three Piece / Unstitched Salwar Kameez: 'Unstitched (Free Size)' or 'Kamiz 3 yds, Salwar 2.5 yds, Dupatta 2.5 yds' or '36, 38, 40, 42, 44'.
-            - For Kurtis / Tops: '36, 38, 40, 42, 44' or 'S, M, L, XL, XXL' or 'Free Size'.
-            - For Abayas / Modest Wear: '52, 54, 56' or '52, 54, 56, 58'.
-            - For Lehengas / Gowns: 'Semi-Stitched (Free Size)' or 'Ready-to-Wear (38, 40, 42)'.
-            - For Co-ord Sets: 'S, M, L, XL' or 'Free Size'.
-            - For Bottoms / Pants: 'Free Size (Stretchable)' or '28, 30, 32, 34, 36'.
-            - For Accessories / Jewellery / Shawls: 'Free Size' or 'Adjustable' or 'Standard Size'.",
-  "colors": "Clean comma-separated English color names (e.g. 'Crimson Red, Antique Gold, Emerald Green')",
-  "material": "Specific luxury English textile name (e.g. '84 Count Pure Combed Cotton', 'Pure Katan Silk with Golden Zari', 'Premium Dubai Cherry Georgette', 'Luxury Embroidered Lawn with Pure Chiffon Dupatta', 'Pure Dhakai Muslin', 'Organza Silk with Resham Thread')",
+  "name": "Luxury English product title (e.g. 'Royal Crimson Red Handloom Dhakai Jamdani Saree', 'Designer Embroidered Lawn 2-Piece Kurti Set', 'Pakistani Luxury Embroidered Chiffon 3-Piece Salwar Kameez', 'Pure Dubai Cherry Silk Front-Open Abaya with Matching Hijab')",
+  "price": Numeric selling price as integer or float (e.g. 3500). Digits only without currency symbols,
+  "oldPrice": Numeric previous/regular price for discount badge if mentioned (e.g. 4200), else null,
+  "category": "One of the allowed categories listed above",
+  "sizes": "Garment-appropriate sizing in English:
+            - Sarees: '12 Haat with Unstitched Blouse Piece', '12 Haat (Free Size)', '14 Haat with Blouse Piece' (NEVER use S/M/L for Sarees)
+            - 2-Piece & 3-Piece: 'Unstitched (Free Size)', '36, 38, 40, 42', '38, 40, 42, 44, 46', or 'S, M, L, XL'
+            - Kurtis & Tops: '36, 38, 40, 42, 44' or 'S, M, L, XL, XXL'
+            - Abayas & Modest Wear: '52, 54, 56' or '52, 54, 56, 58'
+            - Lehengas & Gowns: 'Semi-Stitched (Free Size)' or 'Custom Fit (36-44)'
+            - Western/Co-ords: 'S, M, L, XL' or 'Free Size'",
+  "colors": "Clean comma-separated English color names (e.g. 'Crimson Red, Antique Gold, Forest Green')",
+  "material": "Specific English luxury textile name (e.g. '84 Count Pure Combed Cotton', 'Pure Katan Silk with Zari', 'Dubai Cherry Georgette Silk', 'Embroidered Lawn with Chiffon Dupatta')",
   "gsm": "Fabric count/density (e.g. '84 Count Fine Handloom', '140 GSM Lightweight', 'Heavy Festive Weave', 'N/A')",
-  "washInstruction": "Garment care instruction in English (e.g. 'Dry clean recommended to preserve delicate zari work', 'Gentle cold hand wash with mild liquid detergent, dry in shade', 'Dry clean only')",
-  "description": "An informative, elegant, 2-paragraph luxury English product description detailing the fabric weave, embroidery craftsmanship, drape comfort, matching pieces, and ideal styling/occasion advice (Festivals, Weddings, Formal, Casual Chic).",
-  "sku": "Generate a clean SKU code based on category e.g. RGB-JAM-350, RGB-2PC-120, RGB-3PC-450, RGB-SAR-890, RGB-ABY-230"
+  "washInstruction": "Garment care instruction in English (e.g. 'Dry clean recommended', 'Gentle cold hand wash, dry in shade', 'Dry clean only')",
+  "description": "An elegant, engaging 2-paragraph luxury English product description detailing craftsmanship, fabric comfort, matching pieces, and styling/occasion advice.",
+  "sku": "Short clean SKU code (e.g. 'RGB-JAM-101', 'RGB-2PC-202', 'RGB-3PC-303', 'RGB-SAR-404', 'RGB-ABY-505')"
 }
-
-Do NOT wrap the JSON in markdown codeblocks (no \`\`\`json). Output pure JSON only.
 
 Input Text:
 """${context}"""`;
+
+    } else if (type === 'description') {
+      prompt = `Act as an elite luxury fashion copywriter for "রঙবতী" (Ronggoboti - https://www.ronggoboti.shop).
+Write an irresistible, premium 2-paragraph product description in English for the following garment details:
+"${context}"
+Highlight the fabric weave quality, comfort, elegant silhouette, embellishments, matching accessories, and ideal occasions (Eid, Weddings, Parties, Casual Sophistication).`;
 
     } else if (type === 'seo') {
       prompt = `Act as an eCommerce SEO specialist for fashion brand "রঙবতী" (Ronggoboti - https://www.ronggoboti.shop).
@@ -176,12 +215,16 @@ Keywords: [comma-separated keywords]
 
 Meta Description: [compelling meta description]`;
 
+    } else if (type === 'marketing') {
+      prompt = `Act as a senior fashion marketing strategist for "রঙবতী" (Ronggoboti).
+Create a high-converting Facebook/Instagram social media caption with emojis, compelling hooks, promotional hashtags, and a clear Call to Action (Shop Online at https://www.ronggoboti.shop) for: "${context}".`;
+
     } else {
       return res.status(400).json({ message: 'Invalid generation type' });
     }
 
-    const generatedText = await callGemini(prompt, apiKey);
-    const parsedData = extractJsonObject(generatedText);
+    const generatedText = await callGemini(prompt, apiKey, isJsonMode);
+    const parsedData = isJsonMode ? extractJsonObject(generatedText) : null;
     
     res.json({ 
       success: true,
@@ -199,3 +242,4 @@ Meta Description: [compelling meta description]`;
 });
 
 module.exports = router;
+

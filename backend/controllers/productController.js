@@ -186,6 +186,11 @@ const createProduct = async (req, res) => {
 
     const primaryImg = image && image.trim() ? image.trim() : (safeImages[0] || fallbackImage);
     const secondaryImg = hoverImage && hoverImage.trim() ? hoverImage.trim() : (safeImages[1] || '');
+    const allGalleryImages = Array.from(new Set([
+      primaryImg,
+      secondaryImg,
+      ...safeImages
+    ])).filter(Boolean);
 
     const product = new Product({
       name: name.trim(),
@@ -193,7 +198,7 @@ const createProduct = async (req, res) => {
       oldPrice: oldPrice && Number(oldPrice) > 0 ? Number(oldPrice) : null,
       image: primaryImg,
       hoverImage: secondaryImg,
-      images: safeImages,
+      images: allGalleryImages,
       brand: brand || 'রঙবতী',
       category: catName,
       countInStock: Number(countInStock) >= 0 ? Number(countInStock) : 0,
@@ -244,11 +249,13 @@ const updateProduct = async (req, res) => {
       if (description !== undefined) product.description = description.trim();
       if (image) product.image = image.trim();
       if (hoverImage !== undefined) product.hoverImage = hoverImage.trim();
-      if (images !== undefined) {
-        product.images = Array.isArray(images) 
-          ? images.map(img => (typeof img === 'string' ? img.trim() : '')).filter(Boolean)
-          : (typeof images === 'string' ? images.split(',').map(img => img.trim()).filter(Boolean) : []);
-      }
+      
+      const rawImgs = Array.isArray(images) 
+        ? images.map(img => (typeof img === 'string' ? img.trim() : '')).filter(Boolean)
+        : (typeof images === 'string' ? images.split(',').map(img => img.trim()).filter(Boolean) : (product.images || []));
+      const finalMain = (image && image.trim()) || product.image;
+      const finalHover = hoverImage !== undefined ? hoverImage.trim() : product.hoverImage;
+      product.images = Array.from(new Set([finalMain, finalHover, ...rawImgs])).filter(Boolean);
       if (brand) product.brand = brand;
       if (category) product.category = category;
       if (countInStock !== undefined) product.countInStock = Number(countInStock) >= 0 ? Number(countInStock) : 0;

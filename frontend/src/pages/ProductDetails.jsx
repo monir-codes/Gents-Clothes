@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
-import { ShoppingBag, Heart, Star, Truck, RefreshCcw, ShieldCheck, Sparkles } from 'lucide-react';
+import { ShoppingBag, Heart, Star, Truck, RefreshCcw, ShieldCheck, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import useCartStore from '../store/useCartStore';
 import useWishlistStore from '../store/useWishlistStore';
@@ -126,16 +126,38 @@ const ProductDetails = () => {
     fetchProduct();
   }, [id]);
 
+  const productImages = useMemo(() => {
+    if (!product) return [];
+    const imgs = [
+      product.image, 
+      product.hoverImage, 
+      ...(Array.isArray(product.images) ? product.images : [])
+    ];
+    return Array.from(new Set(imgs)).filter(img => typeof img === 'string' && img.trim().length > 0);
+  }, [product]);
+
+  const currentImageIndex = useMemo(() => {
+    const active = displayImage || product?.image;
+    const idx = productImages.indexOf(active);
+    return idx >= 0 ? idx : 0;
+  }, [displayImage, product, productImages]);
+
+  const handlePrevImage = () => {
+    if (productImages.length <= 1) return;
+    const prevIdx = (currentImageIndex - 1 + productImages.length) % productImages.length;
+    setDisplayImage(productImages[prevIdx]);
+  };
+
+  const handleNextImage = () => {
+    if (productImages.length <= 1) return;
+    const nextIdx = (currentImageIndex + 1) % productImages.length;
+    setDisplayImage(productImages[nextIdx]);
+  };
+
   if (loading) return <Loader fullScreen />;
   if (!product) return <div className="container" style={{padding: '50px 0'}}>Product not found</div>;
 
   const productUrl = `https://www.ronggoboti.shop${getProductUrl(product)}`;
-  
-  const productImages = Array.from(new Set([
-    product.image, 
-    product.hoverImage, 
-    ...(Array.isArray(product.images) ? product.images : [])
-  ])).filter(Boolean);
 
   const productSchema = {
     "@context": "https://schema.org/",
@@ -227,14 +249,60 @@ const ProductDetails = () => {
           transition={{ duration: 0.6 }}
         >
           <div className={styles.mainImageContainer}>
-            <img src={displayImage || product.image} alt={`${localizeTitle(product.name)} - Front View`} className={styles.mainImage} />
-          </div>
-          <div className={styles.thumbnailList}>
-            <img src={product.image} alt={`${localizeTitle(product.name)} Thumbnail 1`} className={styles.thumbnail} onClick={() => setDisplayImage(product.image)} style={{ borderColor: displayImage === product.image ? 'var(--color-accent)' : 'transparent' }} />
-            {product.hoverImage && (
-              <img src={product.hoverImage} alt={`${localizeTitle(product.name)} Thumbnail 2`} className={styles.thumbnail} onClick={() => setDisplayImage(product.hoverImage)} style={{ borderColor: displayImage === product.hoverImage ? 'var(--color-accent)' : 'transparent' }} />
+            <img 
+              src={displayImage || product.image} 
+              alt={`${localizeTitle(product.name)} - View ${currentImageIndex + 1}`} 
+              className={styles.mainImage} 
+            />
+            
+            {productImages.length > 1 && (
+              <>
+                <button 
+                  type="button" 
+                  className={`${styles.navBtn} ${styles.prevBtn}`} 
+                  onClick={handlePrevImage} 
+                  aria-label="Previous photo"
+                >
+                  <ChevronLeft size={22} />
+                </button>
+                <button 
+                  type="button" 
+                  className={`${styles.navBtn} ${styles.nextBtn}`} 
+                  onClick={handleNextImage} 
+                  aria-label="Next photo"
+                >
+                  <ChevronRight size={22} />
+                </button>
+                <div className={styles.imageBadge}>
+                  {currentImageIndex + 1} / {productImages.length}
+                </div>
+              </>
             )}
           </div>
+
+          {/* All Gallery Thumbnails */}
+          {productImages.length > 1 && (
+            <div className={styles.thumbnailList}>
+              {productImages.map((imgUrl, index) => {
+                const isActive = (displayImage ? displayImage === imgUrl : index === 0);
+                return (
+                  <button
+                    type="button"
+                    key={index}
+                    className={`${styles.thumbnailBtn} ${isActive ? styles.thumbnailActive : ''}`}
+                    onClick={() => setDisplayImage(imgUrl)}
+                    aria-label={`View photo ${index + 1}`}
+                  >
+                    <img 
+                      src={imgUrl} 
+                      alt={`${localizeTitle(product.name)} Thumbnail ${index + 1}`} 
+                      className={styles.thumbnail} 
+                    />
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </motion.div>
 
         {/* Product Info */}

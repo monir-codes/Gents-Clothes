@@ -324,6 +324,50 @@ const AdminProducts = () => {
     });
   };
 
+  // Helper to convert Bengali digits to English digits
+  const toEnglishDigits = (str) => {
+    if (str === null || str === undefined) return '';
+    const bnToEnMap = { '০': '0', '১': '1', '২': '2', '৩': '3', '৪': '4', '৫': '5', '৬': '6', '৭': '7', '৮': '8', '৯': '9' };
+    return String(str).replace(/[০-৯]/g, d => bnToEnMap[d] || d);
+  };
+
+  // Clean numeric price for HTML number inputs
+  const cleanNumericValue = (val) => {
+    if (val === null || val === undefined || val === '') return '';
+    const withEnDigits = toEnglishDigits(val);
+    const cleaned = withEnDigits.replace(/,/g, '').replace(/[^0-9.]/g, '');
+    const parsed = parseFloat(cleaned);
+    return !isNaN(parsed) && parsed >= 0 ? parsed : '';
+  };
+
+  // Match category intelligently to CATEGORIES list
+  const matchCategory = (catInput) => {
+    if (!catInput || typeof catInput !== 'string') return { category: 'Two Piece Sets', isCustom: false };
+    const trimmed = catInput.trim();
+    
+    // Exact match
+    const exact = CATEGORIES.find(c => c.toLowerCase() === trimmed.toLowerCase());
+    if (exact) return { category: exact, isCustom: false };
+
+    // Substring or keyword matching
+    const lower = trimmed.toLowerCase();
+    if (lower.includes('jamdani')) return { category: 'Jamdani Sarees', isCustom: false };
+    if (lower.includes('katan') || lower.includes('silk saree')) return { category: 'Katan & Silk Sarees', isCustom: false };
+    if (lower.includes('saree') || lower.includes('shari') || lower.includes('sari')) return { category: 'Sarees', isCustom: false };
+    if (lower.includes('two piece') || lower.includes('2 piece') || lower.includes('2-piece')) return { category: 'Two Piece Sets', isCustom: false };
+    if (lower.includes('three piece') || lower.includes('3 piece') || lower.includes('3-piece') || lower.includes('salwar')) return { category: 'Three Piece Salwar Kameez', isCustom: false };
+    if (lower.includes('pakistani')) return { category: 'Pakistani Lawn & Silk Suits', isCustom: false };
+    if (lower.includes('abaya') || lower.includes('borka') || lower.includes('cherry')) return { category: 'Dubai Cherry Abayas', isCustom: false };
+    if (lower.includes('kurti') || lower.includes('kurta')) return { category: 'Single Kurtis', isCustom: false };
+    if (lower.includes('lehenga')) return { category: 'Party Lehengas', isCustom: false };
+    if (lower.includes('gown')) return { category: 'Gowns & Anarkali', isCustom: false };
+    if (lower.includes('co-ord') || lower.includes('coord')) return { category: 'Co-ord Sets', isCustom: false };
+    if (lower.includes('shawl')) return { category: 'Shawls & Pashmina', isCustom: false };
+    
+    // Custom category fallback
+    return { category: trimmed, isCustom: true };
+  };
+
   // Single Master AI Auto-Fill Handler
   const handleMagicFill = async () => {
     if (!magicText.trim()) {
@@ -339,32 +383,45 @@ const AdminProducts = () => {
       const parsedData = data.data || (typeof data.result === 'string' ? JSON.parse(data.result.replace(/```json/gi, '').replace(/```/g, '').trim()) : null);
       
       if (parsedData) {
-        const safeSizes = Array.isArray(parsedData.sizes) 
-          ? parsedData.sizes.join(', ') 
-          : (parsedData.sizes ? String(parsedData.sizes) : formData.sizes);
+        const cleanPrice = cleanNumericValue(parsedData.price);
+        const cleanOldPrice = cleanNumericValue(parsedData.oldPrice);
 
-        const safeColors = Array.isArray(parsedData.colors) 
-          ? parsedData.colors.join(', ') 
-          : (parsedData.colors ? String(parsedData.colors) : formData.colors);
+        const categoryMatch = matchCategory(parsedData.category);
+        setIsCustomCategory(categoryMatch.isCustom);
 
-        const safeMaterial = Array.isArray(parsedData.material) 
-          ? parsedData.material.join(' / ') 
-          : (parsedData.material ? String(parsedData.material) : (formData.fabricDetails?.material || ''));
+        let safeSizes = '';
+        if (Array.isArray(parsedData.sizes)) {
+          safeSizes = parsedData.sizes.map(s => toEnglishDigits(s)).join(', ');
+        } else if (parsedData.sizes) {
+          safeSizes = toEnglishDigits(parsedData.sizes);
+        }
+
+        let safeColors = '';
+        if (Array.isArray(parsedData.colors)) {
+          safeColors = parsedData.colors.join(', ');
+        } else if (parsedData.colors) {
+          safeColors = String(parsedData.colors);
+        }
+
+        const materialVal = parsedData.material || parsedData.fabricDetails?.material || parsedData.fabric || '';
+        const safeMaterial = Array.isArray(materialVal) ? materialVal.join(' / ') : String(materialVal);
+        const safeGsm = parsedData.gsm || parsedData.fabricDetails?.gsm || '';
+        const safeWash = parsedData.washInstruction || parsedData.fabricDetails?.washInstruction || parsedData.washCare || '';
 
         setFormData(prev => ({
           ...prev,
           name: parsedData.name || prev.name,
-          price: parsedData.price !== undefined ? parsedData.price : prev.price,
-          oldPrice: parsedData.oldPrice !== null && parsedData.oldPrice !== undefined ? parsedData.oldPrice : prev.oldPrice,
-          category: parsedData.category || prev.category,
-          sizes: safeSizes,
-          colors: safeColors,
+          price: cleanPrice !== '' ? cleanPrice : prev.price,
+          oldPrice: cleanOldPrice !== '' ? cleanOldPrice : prev.oldPrice,
+          category: categoryMatch.category || prev.category,
+          sizes: safeSizes || prev.sizes,
+          colors: safeColors || prev.colors,
           sku: parsedData.sku || prev.sku,
           description: parsedData.description || prev.description,
           fabricDetails: {
-            material: safeMaterial,
-            gsm: parsedData.gsm || prev.fabricDetails?.gsm || '',
-            washInstruction: parsedData.washInstruction || prev.fabricDetails?.washInstruction || ''
+            material: safeMaterial || prev.fabricDetails?.material || '',
+            gsm: safeGsm || prev.fabricDetails?.gsm || '',
+            washInstruction: safeWash || prev.fabricDetails?.washInstruction || ''
           }
         }));
 
@@ -381,7 +438,7 @@ const AdminProducts = () => {
         Swal.fire('Extraction Error', 'Could not parse response into fields. Please verify your text.', 'error');
       }
     } catch (error) {
-      console.error(error);
+      console.error('Magic Fill Error:', error);
       Swal.fire('Error', error.response?.data?.message || 'Failed to auto-fill product details.', 'error');
     } finally {
       setIsMagicLoading(false);
