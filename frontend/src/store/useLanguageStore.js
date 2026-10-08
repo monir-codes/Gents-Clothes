@@ -58,15 +58,11 @@ const useLanguageStore = create(
         return fallback || path;
       },
 
-      // Price formatter helper: returns "৳২,৫০০" (in bn) or "৳2,500" (in en)
+      // Price formatter helper: returns "৳ 2,500" (Clear, professional, standard eCommerce format)
       formatPrice: (price) => {
-        if (price === undefined || price === null || isNaN(Number(price))) return '৳০';
-        const lang = get().language || 'bn';
+        if (price === undefined || price === null || isNaN(Number(price))) return '৳ 0';
         const formattedEn = Number(price).toLocaleString('en-US');
-        if (lang === 'bn') {
-          return `৳${toBengaliNumerals(formattedEn)}`;
-        }
-        return `৳${formattedEn}`;
+        return `৳ ${formattedEn}`;
       },
 
       // Number formatter helper (e.g. 10 -> ১০ in Bengali)
