@@ -103,8 +103,9 @@
 }
 
 .price {
-  font-size: clamp(1.4rem, 5vw, 1.8rem);
-  font-weight: 600;
+  font-size: clamp(1.45rem, 5vw, 1.85rem);
+  font-weight: 700;
+  color: var(--color-brand-maroon, #5e0f2b);
 }
 
 .oldPrice {
