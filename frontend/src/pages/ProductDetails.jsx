@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { 
   ShoppingBag, Heart, Star, Truck, RefreshCcw, ShieldCheck, 
-  Sparkles, ChevronLeft, ChevronRight, Ruler, Check, Maximize2, X, ZoomIn
+  Sparkles, ChevronLeft, ChevronRight, Ruler, Check, Maximize2, 
+  Minimize2, X, ZoomIn, ZoomOut, RotateCcw, Move, Smartphone
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import useCartStore from '../store/useCartStore';
@@ -35,6 +36,20 @@ const ProductDetails = () => {
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [isHoverZooming, setIsHoverZooming] = useState(false);
   const [zoomOrigin, setZoomOrigin] = useState({ x: 50, y: 50 });
+
+  // Lightbox Zoom & Pan State (Mobile & Desktop)
+  const [lightboxScale, setLightboxScale] = useState(1);
+  const [lightboxPan, setLightboxPan] = useState({ x: 0, y: 0 });
+  const [isLightboxDragging, setIsLightboxDragging] = useState(false);
+
+  // Refs for Touch & Pinch Interactions
+  const thumbnailListRef = useRef(null);
+  const lightboxThumbsRef = useRef(null);
+  const mainTouchRef = useRef(null);
+  const lastTapRef = useRef(0);
+  const lightboxTouchRef = useRef(null);
+  const lightboxPinchRef = useRef(null);
+  const lightboxMouseDragRef = useRef(null);
 
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
@@ -187,6 +202,214 @@ const ProductDetails = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isLightboxOpen, productImages, currentImageIndex]);
 
+  // Auto-scroll active thumbnail into view (both main page and lightbox)
+  useEffect(() => {
+    if (thumbnailListRef.current) {
+      const activeEl = thumbnailListRef.current.querySelector(`.${styles.thumbnailActive}`);
+      if (activeEl) {
+        activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      }
+    }
+    if (lightboxThumbsRef.current) {
+      const activeEl = lightboxThumbsRef.current.querySelector(`.${styles.lightboxThumbActive}`);
+      if (activeEl) {
+        activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      }
+    }
+  }, [currentImageIndex, activeImageSrc, isLightboxOpen]);
+
+  // Reset Lightbox zoom state whenever active image changes or lightbox opens/closes
+  useEffect(() => {
+    setLightboxScale(1);
+    setLightboxPan({ x: 0, y: 0 });
+    setIsLightboxDragging(false);
+  }, [activeImageSrc, isLightboxOpen]);
+
+  // Main Image Touch Gestures (Swipe + Double Tap for Mobile)
+  const handleMainTouchStart = (e) => {
+    const touch = e.touches[0];
+    mainTouchRef.current = {
+      x: touch.clientX,
+      y: touch.clientY,
+      time: Date.now()
+    };
+  };
+
+  const handleMainTouchEnd = (e) => {
+    if (!mainTouchRef.current) return;
+    const touch = e.changedTouches[0];
+    const dx = touch.clientX - mainTouchRef.current.x;
+    const dy = touch.clientY - mainTouchRef.current.y;
+    const dt = Date.now() - mainTouchRef.current.time;
+
+    // Double tap detector for mobile zoom
+    const now = Date.now();
+    if (Math.abs(dx) < 15 && Math.abs(dy) < 15 && now - lastTapRef.current < 320) {
+      setIsLightboxOpen(true);
+      setLightboxScale(2.2);
+      lastTapRef.current = 0;
+      return;
+    }
+    lastTapRef.current = now;
+
+    // Horizontal Swipe Gesture for changing photo
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.3 && dt < 450) {
+      if (dx < 0) {
+        handleNextImage();
+      } else {
+        handlePrevImage();
+      }
+    }
+  };
+
+  // Lightbox Zoom Controls
+  const handleZoomIn = (e) => {
+    e?.stopPropagation();
+    setLightboxScale(prev => Math.min(prev + 0.5, 3.5));
+  };
+
+  const handleZoomOut = (e) => {
+    e?.stopPropagation();
+    setLightboxScale(prev => {
+      const next = Math.max(prev - 0.5, 1);
+      if (next === 1) setLightboxPan({ x: 0, y: 0 });
+      return next;
+    });
+  };
+
+  const handleResetZoom = (e) => {
+    e?.stopPropagation();
+    setLightboxScale(1);
+    setLightboxPan({ x: 0, y: 0 });
+  };
+
+  // Lightbox Double Tap
+  const handleLightboxDoubleTap = (e) => {
+    if (lightboxScale > 1) {
+      setLightboxScale(1);
+      setLightboxPan({ x: 0, y: 0 });
+    } else {
+      setLightboxScale(2.4);
+      // Pan slightly toward tap
+      const rect = e.currentTarget.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0]?.clientX || (rect.left + rect.width / 2) : e.clientX;
+      const clientY = e.touches ? e.touches[0]?.clientY || (rect.top + rect.height / 2) : e.clientY;
+      const ox = (clientX - (rect.left + rect.width / 2)) * 0.6;
+      const oy = (clientY - (rect.top + rect.height / 2)) * 0.6;
+      setLightboxPan({ x: -ox, y: -oy });
+    }
+  };
+
+  // Lightbox Touch Events (Pinch-to-zoom + Pan when zoomed + Swipe to navigate / Swipe down to close)
+  const handleLightboxTouchStart = (e) => {
+    if (e.touches.length === 1) {
+      const touch = e.touches[0];
+      lightboxTouchRef.current = {
+        startX: touch.clientX,
+        startY: touch.clientY,
+        startPanX: lightboxPan.x,
+        startPanY: lightboxPan.y,
+        time: Date.now()
+      };
+    } else if (e.touches.length === 2) {
+      const dist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      lightboxPinchRef.current = { initialDist: dist, initialScale: lightboxScale };
+    }
+  };
+
+  const handleLightboxTouchMove = (e) => {
+    if (e.touches.length === 2 && lightboxPinchRef.current) {
+      e.preventDefault();
+      const dist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      const ratio = dist / lightboxPinchRef.current.initialDist;
+      const newScale = Math.min(Math.max(1, lightboxPinchRef.current.initialScale * ratio), 3.5);
+      setLightboxScale(newScale);
+      if (newScale === 1) setLightboxPan({ x: 0, y: 0 });
+    } else if (e.touches.length === 1 && lightboxTouchRef.current && lightboxScale > 1) {
+      e.preventDefault();
+      const touch = e.touches[0];
+      const dx = touch.clientX - lightboxTouchRef.current.startX;
+      const dy = touch.clientY - lightboxTouchRef.current.startY;
+      setLightboxPan({
+        x: lightboxTouchRef.current.startPanX + dx,
+        y: lightboxTouchRef.current.startPanY + dy
+      });
+    }
+  };
+
+  const handleLightboxTouchEnd = (e) => {
+    if (lightboxTouchRef.current) {
+      const dx = (e.changedTouches[0]?.clientX || 0) - lightboxTouchRef.current.startX;
+      const dy = (e.changedTouches[0]?.clientY || 0) - lightboxTouchRef.current.startY;
+      const dt = Date.now() - lightboxTouchRef.current.time;
+
+      // Double-tap detector in Lightbox
+      const now = Date.now();
+      if (Math.abs(dx) < 15 && Math.abs(dy) < 15 && now - lastTapRef.current < 300) {
+        handleLightboxDoubleTap(e);
+        lastTapRef.current = 0;
+        lightboxTouchRef.current = null;
+        return;
+      }
+      lastTapRef.current = now;
+
+      // Gestures when scale is 1x
+      if (lightboxScale === 1) {
+        // Swipe Down to Dismiss Lightbox
+        if (dy > 80 && Math.abs(dy) > Math.abs(dx) * 1.3 && dt < 400) {
+          setIsLightboxOpen(false);
+          return;
+        }
+
+        // Horizontal Swipe to browse photos
+        if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.3 && dt < 450) {
+          if (dx < 0) {
+            handleNextImage();
+          } else {
+            handlePrevImage();
+          }
+        }
+      }
+    }
+    lightboxTouchRef.current = null;
+    lightboxPinchRef.current = null;
+  };
+
+  // Lightbox Desktop Mouse Drag Pan (when zoomed > 1)
+  const handleLightboxMouseDown = (e) => {
+    if (lightboxScale > 1) {
+      setIsLightboxDragging(true);
+      lightboxMouseDragRef.current = {
+        startX: e.clientX,
+        startY: e.clientY,
+        startPanX: lightboxPan.x,
+        startPanY: lightboxPan.y
+      };
+    }
+  };
+
+  const handleLightboxMouseMove = (e) => {
+    if (isLightboxDragging && lightboxMouseDragRef.current && lightboxScale > 1) {
+      const dx = e.clientX - lightboxMouseDragRef.current.startX;
+      const dy = e.clientY - lightboxMouseDragRef.current.startY;
+      setLightboxPan({
+        x: lightboxMouseDragRef.current.startPanX + dx,
+        y: lightboxMouseDragRef.current.startPanY + dy
+      });
+    }
+  };
+
+  const handleLightboxMouseUp = () => {
+    setIsLightboxDragging(false);
+    lightboxMouseDragRef.current = null;
+  };
+
   const handleImageMouseMove = (e) => {
     const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
     const x = Math.max(0, Math.min(100, ((e.clientX - left) / width) * 100));
@@ -298,6 +521,8 @@ const ProductDetails = () => {
             onClick={() => setIsLightboxOpen(true)}
             onMouseMove={handleImageMouseMove}
             onMouseLeave={handleImageMouseLeave}
+            onTouchStart={handleMainTouchStart}
+            onTouchEnd={handleMainTouchEnd}
             title={language === 'bn' ? 'ক্লিক করে সম্পূর্ণ ছবি বড় করে দেখুন' : 'Click to inspect full photo in high resolution'}
           >
             {/* Ambient subtle underlay */}
@@ -317,7 +542,13 @@ const ProductDetails = () => {
               } : {}}
             />
 
-            {/* Zoom Icon Button */}
+            {/* Mobile Touch & Zoom Hint Badge */}
+            <div className={styles.mobileZoomHint}>
+              <ZoomIn size={14} />
+              <span>{language === 'bn' ? 'জুম করতে ট্যাপ করুন' : 'Tap to Zoom'}</span>
+            </div>
+
+            {/* Zoom Icon Button (Desktop & Mobile) */}
             <button 
               type="button" 
               className={styles.zoomTriggerBtn} 
@@ -353,9 +584,24 @@ const ProductDetails = () => {
             )}
           </div>
 
+          {/* Mobile Pagination Indicator Dots */}
+          {productImages.length > 1 && (
+            <div className={styles.mobileDotsContainer}>
+              {productImages.map((_, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  className={`${styles.mobileDot} ${idx === currentImageIndex ? styles.mobileDotActive : ''}`}
+                  onClick={() => setDisplayImage(productImages[idx])}
+                  aria-label={`Go to slide ${idx + 1}`}
+                />
+              ))}
+            </div>
+          )}
+
           {/* All Gallery Thumbnails */}
           {productImages.length > 1 && (
-            <div className={styles.thumbnailList}>
+            <div className={styles.thumbnailList} ref={thumbnailListRef}>
               {productImages.map((imgUrl, index) => {
                 const isActive = (activeImageSrc === imgUrl);
                 return (
@@ -665,7 +911,7 @@ const ProductDetails = () => {
         defaultCategory={product.category} 
       />
 
-      {/* Fullscreen High-Resolution Lightbox Modal */}
+      {/* Fullscreen High-Resolution Lightbox Modal with Pinch-to-Zoom & Pan */}
       <AnimatePresence>
         {isLightboxOpen && (
           <motion.div
@@ -676,60 +922,140 @@ const ProductDetails = () => {
             className={styles.lightboxOverlay}
             onClick={() => setIsLightboxOpen(false)}
           >
-            <button
-              type="button"
-              className={styles.lightboxCloseBtn}
-              onClick={() => setIsLightboxOpen(false)}
-              aria-label="Close fullscreen view"
-            >
-              <X size={26} />
-            </button>
+            {/* Top Toolbar */}
+            <div className={styles.lightboxHeader} onClick={(e) => e.stopPropagation()}>
+              <div className={styles.lightboxHeaderInfo}>
+                <span className={styles.lightboxTitleText}>{localizeTitle(product.name)}</span>
+                <span className={styles.lightboxCounterBadge}>
+                  {currentImageIndex + 1} / {productImages.length}
+                </span>
+              </div>
 
+              {/* Zoom & Close Toolbar */}
+              <div className={styles.lightboxControls}>
+                <button
+                  type="button"
+                  className={styles.lightboxToolBtn}
+                  onClick={handleZoomOut}
+                  disabled={lightboxScale <= 1}
+                  title="Zoom Out (-)"
+                  aria-label="Zoom out"
+                >
+                  <ZoomOut size={18} />
+                </button>
+                <span className={styles.lightboxZoomLevel}>
+                  {Math.round(lightboxScale * 100)}%
+                </span>
+                <button
+                  type="button"
+                  className={styles.lightboxToolBtn}
+                  onClick={handleZoomIn}
+                  disabled={lightboxScale >= 3.5}
+                  title="Zoom In (+)"
+                  aria-label="Zoom in"
+                >
+                  <ZoomIn size={18} />
+                </button>
+                {lightboxScale > 1 && (
+                  <button
+                    type="button"
+                    className={styles.lightboxToolBtn}
+                    onClick={handleResetZoom}
+                    title="Reset Zoom (1:1)"
+                    aria-label="Reset zoom"
+                  >
+                    <RotateCcw size={16} />
+                  </button>
+                )}
+                <button
+                  type="button"
+                  className={styles.lightboxCloseBtn}
+                  onClick={() => setIsLightboxOpen(false)}
+                  aria-label="Close fullscreen view"
+                >
+                  <X size={22} />
+                </button>
+              </div>
+            </div>
+
+            {/* Main Interactive Stage */}
             <div 
               className={styles.lightboxContent}
               onClick={(e) => e.stopPropagation()}
+              onTouchStart={handleLightboxTouchStart}
+              onTouchMove={handleLightboxTouchMove}
+              onTouchEnd={handleLightboxTouchEnd}
+              onMouseDown={handleLightboxMouseDown}
+              onMouseMove={handleLightboxMouseMove}
+              onMouseUp={handleLightboxMouseUp}
+              onMouseLeave={handleLightboxMouseUp}
             >
-              <img 
-                src={activeImageSrc} 
-                alt={`${localizeTitle(product.name)} - Fullscreen`} 
-                className={styles.lightboxImage} 
-              />
+              <div className={styles.lightboxImageWrapper} onDoubleClick={handleLightboxDoubleTap}>
+                <img 
+                  src={activeImageSrc} 
+                  alt={`${localizeTitle(product.name)} - High Res Fullscreen`} 
+                  className={styles.lightboxImage} 
+                  style={{
+                    transform: `translate(${lightboxPan.x}px, ${lightboxPan.y}px) scale(${lightboxScale})`,
+                    transition: isLightboxDragging ? 'none' : 'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+                    cursor: lightboxScale > 1 ? (isLightboxDragging ? 'grabbing' : 'grab') : 'zoom-in'
+                  }}
+                  draggable={false}
+                />
+              </div>
 
               {productImages.length > 1 && (
                 <>
                   <button 
                     type="button" 
                     className={`${styles.lightboxNavBtn} ${styles.lightboxPrevBtn}`} 
-                    onClick={handlePrevImage} 
+                    onClick={(e) => { e.stopPropagation(); handlePrevImage(); }} 
                     aria-label="Previous photo"
                   >
-                    <ChevronLeft size={30} />
+                    <ChevronLeft size={28} />
                   </button>
                   <button 
                     type="button" 
                     className={`${styles.lightboxNavBtn} ${styles.lightboxNextBtn}`} 
-                    onClick={handleNextImage} 
+                    onClick={(e) => { e.stopPropagation(); handleNextImage(); }} 
                     aria-label="Next photo"
                   >
-                    <ChevronRight size={30} />
+                    <ChevronRight size={28} />
                   </button>
-                  <div className={styles.lightboxCounter}>
-                    {currentImageIndex + 1} / {productImages.length}
-                  </div>
-
-                  <div className={styles.lightboxThumbnails}>
-                    {productImages.map((img, idx) => (
-                      <button
-                        key={idx}
-                        type="button"
-                        className={`${styles.lightboxThumbBtn} ${activeImageSrc === img ? styles.lightboxThumbActive : ''}`}
-                        onClick={() => setDisplayImage(img)}
-                      >
-                        <img src={img} alt={`Thumb ${idx + 1}`} />
-                      </button>
-                    ))}
-                  </div>
                 </>
+              )}
+            </div>
+
+            {/* Bottom Bar: Instructions & Thumbnails */}
+            <div className={styles.lightboxFooter} onClick={(e) => e.stopPropagation()}>
+              <div className={styles.lightboxGestureHint}>
+                {lightboxScale > 1 ? (
+                  <>
+                    <Move size={14} />
+                    <span>{language === 'bn' ? 'ড্র্যাগ করে বিভিন্ন অংশ ঘুরে দেখুন • জুম আউট করতে রিসেট চাপুন' : 'Drag to pan details • Double tap to reset'}</span>
+                  </>
+                ) : (
+                  <>
+                    <Smartphone size={14} />
+                    <span>{language === 'bn' ? 'ডাবল ট্যাপ বা পিঞ্চ করে জুম করুন • সোয়াইপ করে অন্য ছবি দেখুন' : 'Double-tap or pinch to zoom • Swipe left/right to browse'}</span>
+                  </>
+                )}
+              </div>
+
+              {productImages.length > 1 && (
+                <div className={styles.lightboxThumbnails} ref={lightboxThumbsRef}>
+                  {productImages.map((img, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      className={`${styles.lightboxThumbBtn} ${activeImageSrc === img ? styles.lightboxThumbActive : ''}`}
+                      onClick={() => setDisplayImage(img)}
+                      aria-label={`View photo ${idx + 1}`}
+                    >
+                      <img src={img} alt={`Thumb ${idx + 1}`} />
+                    </button>
+                  ))}
+                </div>
               )}
             </div>
           </motion.div>
