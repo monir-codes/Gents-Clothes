@@ -4,10 +4,11 @@ import styles from './Admin.module.css';
 import { 
   Plus, Edit, Trash2, X, Upload, Sparkles, Search, 
   RefreshCw, Link as LinkIcon, Image as ImageIcon,
-  CheckCircle2, ArrowRight, Wand2
+  CheckCircle2, ArrowRight, Wand2, Palette
 } from 'lucide-react';
 import Swal from 'sweetalert2';
 import useAuthStore from '../../store/useAuthStore';
+import { extractColorsFromMultipleImages, extractDominantColorFromImage } from '../../utils/colorDetector';
 
 // ImgBB API Key
 const IMGBB_API_KEY = "affe71bc1ff1277c7d83bc8e9dfe4c3c";
@@ -258,9 +259,26 @@ const AdminProducts = () => {
           };
         });
 
+        // Automatically extract colors from newly uploaded images in background
+        extractColorsFromMultipleImages(uploadedUrls).then(detectedColors => {
+          if (detectedColors && detectedColors.length > 0) {
+            const newNames = detectedColors.map(c => c.name);
+            setFormData(prev => {
+              const currentColors = typeof prev.colors === 'string'
+                ? prev.colors.split(',').map(c => c.trim()).filter(Boolean)
+                : (Array.isArray(prev.colors) ? prev.colors : []);
+              const merged = Array.from(new Set([...currentColors, ...newNames]));
+              return {
+                ...prev,
+                colors: merged.join(', ')
+              };
+            });
+          }
+        });
+
         Swal.fire({ 
           title: 'Images Uploaded!', 
-          text: `Added ${uploadedUrls.length} photos to product gallery.`, 
+          text: `Added ${uploadedUrls.length} photos. Auto-detecting colors...`, 
           icon: 'success', 
           toast: true, 
           position: 'top-end', 
@@ -278,7 +296,7 @@ const AdminProducts = () => {
   };
 
   // Add image URL manually
-  const handleAddImageUrl = () => {
+  const handleAddImageUrl = async () => {
     if (!newImageUrl.trim()) return;
     const url = newImageUrl.trim();
     setFormData(prev => {
@@ -292,7 +310,69 @@ const AdminProducts = () => {
         images: Array.from(new Set([...currentImages, url]))
       };
     });
+
+    // Auto extract color from URL
+    extractDominantColorFromImage(url).then(detected => {
+      if (detected) {
+        setFormData(prev => {
+          const currentColors = typeof prev.colors === 'string'
+            ? prev.colors.split(',').map(c => c.trim()).filter(Boolean)
+            : (Array.isArray(prev.colors) ? prev.colors : []);
+          const merged = Array.from(new Set([...currentColors, detected.name]));
+          return {
+            ...prev,
+            colors: merged.join(', ')
+          };
+        });
+      }
+    });
+
     setNewImageUrl('');
+  };
+
+  // Dedicated Auto-Detect Colors from all Gallery Images
+  const handleAutoDetectColors = async () => {
+    const allGalleryImgs = Array.from(new Set([
+      formData.image,
+      formData.hoverImage,
+      ...(Array.isArray(formData.images) ? formData.images : [])
+    ])).filter(Boolean);
+
+    if (allGalleryImgs.length === 0) {
+      Swal.fire('No Images', 'Please upload or add product photos first.', 'info');
+      return;
+    }
+
+    try {
+      const detected = await extractColorsFromMultipleImages(allGalleryImgs);
+      if (detected && detected.length > 0) {
+        const detectedNames = detected.map(c => c.name);
+        setFormData(prev => {
+          const currentColors = typeof prev.colors === 'string'
+            ? prev.colors.split(',').map(c => c.trim()).filter(Boolean)
+            : (Array.isArray(prev.colors) ? prev.colors : []);
+          const merged = Array.from(new Set([...currentColors, ...detectedNames]));
+          return {
+            ...prev,
+            colors: merged.join(', ')
+          };
+        });
+
+        Swal.fire({
+          title: '🎨 Colors Auto-Detected!',
+          text: `Added colors: ${detectedNames.join(', ')}`,
+          icon: 'success',
+          toast: true,
+          position: 'top-end',
+          showConfirmButton: false,
+          timer: 3000
+        });
+      } else {
+        Swal.fire('Color Detection', 'Could not extract distinct colors. You can type them manually.', 'info');
+      }
+    } catch (err) {
+      console.error('Color scan error:', err);
+    }
   };
 
   // Set specific image as main
@@ -943,40 +1023,64 @@ const AdminProducts = () => {
                     </span>
                   </div>
 
-                  {/* Mode Toggle: Upload vs Direct URL */}
-                  <div style={{ display: 'flex', gap: '6px', background: 'var(--color-surface)', padding: '3px', borderRadius: '6px', border: '1px solid var(--color-border)' }}>
+                  {/* Gallery Actions & Mode Toggle */}
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
                     <button
                       type="button"
-                      onClick={() => setImageInputMode('upload')}
+                      onClick={handleAutoDetectColors}
+                      title="Scan all uploaded photos and automatically extract garment colors"
                       style={{
-                        padding: '4px 10px',
+                        padding: '5px 12px',
                         fontSize: '0.78rem',
-                        border: 'none',
-                        borderRadius: '4px',
-                        background: imageInputMode === 'upload' ? 'var(--color-accent)' : 'transparent',
-                        color: imageInputMode === 'upload' ? '#fff' : 'var(--color-text-primary)',
+                        border: '1px solid rgba(94, 15, 43, 0.3)',
+                        borderRadius: '6px',
+                        background: 'rgba(94, 15, 43, 0.08)',
+                        color: 'var(--color-accent)',
                         cursor: 'pointer',
-                        fontWeight: 600
+                        fontWeight: 600,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '5px'
                       }}
                     >
-                      Upload Files
+                      <Palette size={14} />
+                      <span>Auto-Detect Colors from Photos</span>
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => setImageInputMode('url')}
-                      style={{
-                        padding: '4px 10px',
-                        fontSize: '0.78rem',
-                        border: 'none',
-                        borderRadius: '4px',
-                        background: imageInputMode === 'url' ? 'var(--color-accent)' : 'transparent',
-                        color: imageInputMode === 'url' ? '#fff' : 'var(--color-text-primary)',
-                        cursor: 'pointer',
-                        fontWeight: 600
-                      }}
-                    >
-                      Paste URLs
-                    </button>
+
+                    <div style={{ display: 'flex', gap: '4px', background: 'var(--color-surface)', padding: '3px', borderRadius: '6px', border: '1px solid var(--color-border)' }}>
+                      <button
+                        type="button"
+                        onClick={() => setImageInputMode('upload')}
+                        style={{
+                          padding: '4px 10px',
+                          fontSize: '0.78rem',
+                          border: 'none',
+                          borderRadius: '4px',
+                          background: imageInputMode === 'upload' ? 'var(--color-accent)' : 'transparent',
+                          color: imageInputMode === 'upload' ? '#fff' : 'var(--color-text-primary)',
+                          cursor: 'pointer',
+                          fontWeight: 600
+                        }}
+                      >
+                        Upload Files
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setImageInputMode('url')}
+                        style={{
+                          padding: '4px 10px',
+                          fontSize: '0.78rem',
+                          border: 'none',
+                          borderRadius: '4px',
+                          background: imageInputMode === 'url' ? 'var(--color-accent)' : 'transparent',
+                          color: imageInputMode === 'url' ? '#fff' : 'var(--color-text-primary)',
+                          cursor: 'pointer',
+                          fontWeight: 600
+                        }}
+                      >
+                        Paste URLs
+                      </button>
+                    </div>
                   </div>
                 </div>
 
@@ -1237,9 +1341,17 @@ const AdminProducts = () => {
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '5px', fontWeight: 600 }}>
-                    Colors (comma separated)
-                  </label>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
+                    <label style={{ fontSize: '0.85rem', fontWeight: 600 }}>Colors (comma separated)</label>
+                    <button
+                      type="button"
+                      onClick={handleAutoDetectColors}
+                      style={{ background: 'none', border: 'none', color: 'var(--color-accent)', fontSize: '0.78rem', cursor: 'pointer', textDecoration: 'underline', display: 'flex', alignItems: 'center', gap: '3px' }}
+                      title="Auto detect colors from uploaded images"
+                    >
+                      <Palette size={12} /> Auto-Detect
+                    </button>
+                  </div>
                   <input 
                     type="text" 
                     name="colors" 

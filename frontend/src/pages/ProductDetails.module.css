@@ -214,24 +214,72 @@
 .colorSelector {
   display: flex;
   gap: var(--space-2);
+  flex-wrap: wrap;
+  align-items: center;
 }
 
-.colorBtn {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  border: 2px solid var(--color-border);
+.colorSwatchBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px 6px 8px;
+  background: var(--color-surface, #faf6f1);
+  border: 1.5px solid var(--color-border, #ebdcd0);
+  border-radius: 50px;
   cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  outline: none;
+}
+
+.colorSwatchBtn:hover {
+  border-color: var(--color-accent, #c9a265);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.colorSwatchBtn.activeColorSwatch {
+  border-color: var(--color-brand-maroon, #5e0f2b);
+  background: #ffffff;
+  box-shadow: 0 0 0 1px var(--color-brand-maroon, #5e0f2b), 0 4px 14px rgba(94, 15, 43, 0.15);
+  transform: translateY(-2px);
+}
+
+.colorDot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+}
+
+.colorNameLabel {
+  font-size: 0.86rem;
   font-weight: 600;
-  background-color: var(--color-surface);
   color: var(--color-text-primary);
 }
 
-.colorBtn.activeColor {
-  border-color: var(--color-text-primary);
+.sizeGuideTriggerBtn {
+  background: none;
+  border: none;
+  color: var(--color-accent, #c9a265);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  text-decoration: underline;
+}
+
+.sizeGuideTriggerBtn:hover {
+  background: rgba(201, 162, 101, 0.12);
+  color: var(--color-brand-maroon, #5e0f2b);
 }
 
 .sizeSelector {

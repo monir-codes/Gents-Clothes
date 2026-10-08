@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
-import { ShoppingBag, Heart, Star, Truck, RefreshCcw, ShieldCheck, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ShoppingBag, Heart, Star, Truck, RefreshCcw, ShieldCheck, Sparkles, ChevronLeft, ChevronRight, Ruler, Check } from 'lucide-react';
 import { motion } from 'framer-motion';
 import useCartStore from '../store/useCartStore';
 import useWishlistStore from '../store/useWishlistStore';
@@ -11,6 +11,8 @@ import Loader from '../components/Loader';
 import SEO from '../components/SEO';
 import ProductCard from '../components/ProductCard';
 import RecentlyViewed from '../components/RecentlyViewed';
+import SizeGuideModal from '../components/SizeGuideModal';
+import { getColorHex } from '../utils/colorDetector';
 import { generateProductKeywords } from '../utils/seoHelpers';
 import { getProductUrl } from '../utils/slugify';
 import styles from './ProductDetails.module.css';
@@ -26,6 +28,7 @@ const ProductDetails = () => {
   const [selectedColor, setSelectedColor] = useState('');
   const [selectedSize, setSelectedSize] = useState('');
   const [qty, setQty] = useState(1);
+  const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const initialTab = searchParams.get('tab') || 'description';
@@ -333,35 +336,59 @@ const ProductDetails = () => {
             {product.colors && product.colors.length > 0 && (
               <div className={styles.optionGroup}>
                 <span className={styles.optionLabel}>
-                  {t('product.selectColor', 'Color')}: <strong>{localizeColor(selectedColor)}</strong>
+                  {t('product.selectColor', 'Color')}: <strong style={{ color: 'var(--color-brand-maroon, #5e0f2b)' }}>{localizeColor(selectedColor)}</strong>
                 </span>
                 <div className={styles.colorSelector}>
-                  {product.colors.map(color => (
-                    <button 
-                      key={color}
-                      className={`${styles.colorBtn} ${selectedColor === color ? styles.activeColor : ''}`}
-                      onClick={() => setSelectedColor(color)}
-                      title={localizeColor(color)}
-                    >
-                      {localizeColor(color).charAt(0)}
-                    </button>
-                  ))}
+                  {product.colors.map(color => {
+                    const isSelected = selectedColor === color;
+                    const hexCode = getColorHex(color);
+                    const isLight = hexCode === '#ffffff' || hexCode === '#f8fafc' || hexCode === '#fef08a';
+                    return (
+                      <button 
+                        key={color}
+                        type="button"
+                        className={`${styles.colorSwatchBtn} ${isSelected ? styles.activeColorSwatch : ''}`}
+                        onClick={() => setSelectedColor(color)}
+                        title={localizeColor(color)}
+                        aria-label={localizeColor(color)}
+                      >
+                        <span 
+                          className={styles.colorDot} 
+                          style={{ 
+                            backgroundColor: hexCode, 
+                            border: isLight ? '1px solid #cbd5e1' : 'none' 
+                          }}
+                        >
+                          {isSelected && (
+                            <Check 
+                              size={13} 
+                              color={isLight ? '#0f172a' : '#ffffff'} 
+                              strokeWidth={3} 
+                            />
+                          )}
+                        </span>
+                        <span className={styles.colorNameLabel}>{localizeColor(color)}</span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}
 
             {product.sizes && product.sizes.length > 0 && (
               <div className={styles.optionGroup}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                   <span className={styles.optionLabel}>
-                    {t('product.selectSize', 'Size')}: <strong>{localizeSize(selectedSize)}</strong>
+                    {t('product.selectSize', 'Size')}: <strong style={{ color: 'var(--color-brand-maroon, #5e0f2b)' }}>{localizeSize(selectedSize)}</strong>
                   </span>
-                  <Link 
-                    to="/size-guide"
-                    style={{ fontSize: '0.85rem', color: 'var(--color-accent)', textDecoration: 'underline', fontWeight: 500 }}
+                  <button 
+                    type="button"
+                    onClick={() => setIsSizeGuideOpen(true)}
+                    className={styles.sizeGuideTriggerBtn}
                   >
-                    {language === 'bn' ? 'সাইজ নির্দেশিকা' : 'Size Guide'}
-                  </Link>
+                    <Ruler size={15} />
+                    <span>{language === 'bn' ? 'সাইজ নির্দেশিকা চার্ট' : 'Size Guide & Chart'}</span>
+                  </button>
                 </div>
                 <div className={styles.sizeSelector}>
                   {product.sizes.map(size => (
@@ -560,6 +587,13 @@ const ProductDetails = () => {
 
       {/* Recently Viewed Section */}
       <RecentlyViewed currentProductId={product._id} />
+
+      {/* Interactive Size & Measurement Guide Modal */}
+      <SizeGuideModal 
+        isOpen={isSizeGuideOpen} 
+        onClose={() => setIsSizeGuideOpen(false)} 
+        defaultCategory={product.category} 
+      />
     </div>
     </>
   );

@@ -913,6 +913,61 @@ export const LegalPage = ({ title }) => {
       );
     }
 
+    if (contentKey === 'sizeGuide') {
+      return isBn ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', lineHeight: 1.8 }}>
+          <div>
+            <h3 style={{ color: 'var(--color-brand-maroon)', marginBottom: '8px' }}>১. শাড়ির মাপ ও হাত নির্দেশিকা (Sarees)</h3>
+            <p style={{ margin: '0 0 10px' }}>রঙবতীর প্রতিটি শাড়ি ঐতিহ্যবাহী স্ট্যান্ডার্ড মাপে তৈরি:</p>
+            <ul style={{ paddingLeft: '20px' }}>
+              <li><strong>১২ হাত শাড়ি:</strong> ১৮ ফুট (~৫.৫ মিটার), সাথে ০.৮ মিটার ব্লাউজ পিস। সকল স্বাভাবিক উচ্চতার জন্য পারফেক্ট।</li>
+              <li><strong>১৪ হাত শাড়ি:</strong> ২১ ফুট (~৬.৪ মিটার), বেশি কুঁচি ও ভারী আঁচলের জন্য উপযুক্ত।</li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 style={{ color: 'var(--color-brand-maroon)', marginBottom: '8px' }}>২. সালোয়ার কামিজ ও ২-পিস / ৩-পিস সাইজ চার্ট</h3>
+            <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '10px', fontSize: '0.9rem' }}>
+              <thead>
+                <tr style={{ background: 'var(--color-surface)', borderBottom: '2px solid var(--color-border)' }}>
+                  <th style={{ padding: '8px', textAlign: 'left' }}>সাইজ</th>
+                  <th style={{ padding: '8px', textAlign: 'left' }}>বডি (ইঞ্চি)</th>
+                  <th style={{ padding: '8px', textAlign: 'left' }}>কোমর (ইঞ্চি)</th>
+                  <th style={{ padding: '8px', textAlign: 'left' }}>কামিজ ঝুল</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style={{ borderBottom: '1px solid var(--color-border)' }}><td style={{ padding: '8px' }}>S (৩৬)</td><td style={{ padding: '8px' }}>৩৬"</td><td style={{ padding: '8px' }}>৩২"</td><td style={{ padding: '8px' }}>৪২"</td></tr>
+                <tr style={{ borderBottom: '1px solid var(--color-border)' }}><td style={{ padding: '8px' }}>M (৩৮)</td><td style={{ padding: '8px' }}>৩৮"</td><td style={{ padding: '8px' }}>৩৪"</td><td style={{ padding: '8px' }}>৪৪"</td></tr>
+                <tr style={{ borderBottom: '1px solid var(--color-border)' }}><td style={{ padding: '8px' }}>L (৪০)</td><td style={{ padding: '8px' }}>৪০"</td><td style={{ padding: '8px' }}>৩৬"</td><td style={{ padding: '8px' }}>৪৪"</td></tr>
+                <tr style={{ borderBottom: '1px solid var(--color-border)' }}><td style={{ padding: '8px' }}>XL (৪২)</td><td style={{ padding: '8px' }}>৪২"</td><td style={{ padding: '8px' }}>৩৮"</td><td style={{ padding: '8px' }}>৪৬"</td></tr>
+                <tr><td style={{ padding: '8px' }}>XXL (৪৪)</td><td style={{ padding: '8px' }}>৪৪"</td><td style={{ padding: '8px' }}>৪০"</td><td style={{ padding: '8px' }}>৪৬"</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div>
+            <h3 style={{ color: 'var(--color-brand-maroon)', marginBottom: '8px' }}>৩. দুবাই চেরি আবায়া ও বোরকা সাইজ চার্ট</h3>
+            <p>উচ্চতা অনুযায়ী আবায়ার ঝুল নির্বাচন করুন: <strong>৫২</strong> (উচ্চতা ৫'০"-৫'২"), <strong>৫৪</strong> (৫'৩"-৫'৪"), <strong>৫৬</strong> (৫'৫"-৫'৬"), <strong>৫৮</strong> (৫'৭"+)।</p>
+          </div>
+        </div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', lineHeight: 1.8 }}>
+          <div>
+            <h3 style={{ color: 'var(--color-brand-maroon)', marginBottom: '8px' }}>1. Saree Haat & Measurement Guide</h3>
+            <ul style={{ paddingLeft: '20px' }}>
+              <li><strong>12 Haat Standard:</strong> 18 Feet (~5.5m) with 0.8m Blouse piece included.</li>
+              <li><strong>14 Haat Extra Long:</strong> 21 Feet (~6.4m) with 1m Designer piece.</li>
+            </ul>
+          </div>
+          <div>
+            <h3 style={{ color: 'var(--color-brand-maroon)', marginBottom: '8px' }}>2. Stitched Suits & Kurtis Size Chart</h3>
+            <p>Sizes: <strong>36 (S)</strong>, <strong>38 (M)</strong>, <strong>40 (L)</strong>, <strong>42 (XL)</strong>, <strong>44 (XXL)</strong>, <strong>46 (3XL)</strong>.</p>
+          </div>
+        </div>
+      );
+    }
+
     return <p>{isBn ? 'পলিসির বিস্তারিত তথ্য লোড হচ্ছে...' : 'Loading document details...'}</p>;
   };
 
