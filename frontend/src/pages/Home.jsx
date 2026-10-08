@@ -27,7 +27,7 @@ const getMostAffordableProducts = (productList, limit = 4) => {
 };
 
 const Home = () => {
-  const { t, language } = useLanguageStore();
+  const { t, language, localizeTitle, localizeCategory } = useLanguageStore();
   const isBn = language === 'bn';
 
   const [settings, setSettings] = useState({
@@ -121,9 +121,9 @@ const Home = () => {
       "@type": "ClothingStore",
       "name": "রঙবতী | Ronggoboti",
       "alternateName": ["Ronggoboti", "রঙবতী", "Rongoboti", "Ronggoboti Fashion", "Ronggoboti BD"],
-      "url": "https://ronggoboti.vercel.app",
-      "logo": "https://ronggoboti.vercel.app/images/ronggoboti-logo.png",
-      "image": "https://ronggoboti.vercel.app/images/hero-banner.jpg",
+      "url": "https://www.ronggoboti.shop",
+      "logo": "https://www.ronggoboti.shop/images/ronggoboti-logo.png",
+      "image": "https://www.ronggoboti.shop/images/hero-banner.jpg",
       "description": "রঙবতী (Ronggoboti) - বাংলাদেশের শীর্ষস্থানীয় প্রিমিয়াম ওমেন ফ্যাশন ও লাইফস্টাইল ব্র্যান্ড। শাড়ি, সালোয়ার কামিজ, কুর্তি ও লেহেঙ্গার সেরা অনলাইন শপ।",
       "priceRange": "৳৳",
       "currenciesAccepted": "BDT",
@@ -137,11 +137,11 @@ const Home = () => {
     {
       "@context": "https://schema.org",
       "@type": "WebSite",
-      "url": "https://ronggoboti.vercel.app",
+      "url": "https://www.ronggoboti.shop",
       "name": "রঙবতী | Ronggoboti",
       "potentialAction": {
         "@type": "SearchAction",
-        "target": "https://ronggoboti.vercel.app/shop?search={search_term_string}",
+        "target": "https://www.ronggoboti.shop/shop?search={search_term_string}",
         "query-input": "required name=search_term_string"
       }
     }
@@ -152,7 +152,7 @@ const Home = () => {
       <SEO 
         title={isBn ? "রঙবতী | Ronggoboti - এক্সক্লুসিভ উইমেন ফ্যাশন ও ডিজাইনার পোশাক" : "রঙবতী | Ronggoboti - Exclusive Women's Fashion & Designer Clothing BD"} 
         description="রঙবতী (Ronggoboti) - বাংলাদেশের শীর্ষস্থানীয় প্রিমিয়াম ওমেন ফ্যাশন ব্র্যান্ড। এক্সক্লুসিভ শাড়ি (Sarees), সালোয়ার কামিজ (Salwar Kameez), ডিজাইনার কুর্তি (Kurtis), লেহেঙ্গা ও মডেস্ট ওয়েয়ার অনলাইন কিনুন সেরা দামে। Fast delivery across Bangladesh." 
-        canonical="https://ronggoboti.vercel.app"
+        canonical="https://www.ronggoboti.shop"
         schemaMarkup={homeSchema}
       />
 
@@ -226,8 +226,28 @@ const Home = () => {
       {settings.marqueeText && settings.marqueeText.length > 0 && (
         <div className={styles.marqueeContainer}>
           <div className={styles.marqueeText}>
-            {settings.marqueeText.map((text, i) => <span key={i}>{text}</span>)}
-            {settings.marqueeText.map((text, i) => <span key={`dup-${i}`}>{text}</span>)}
+            {settings.marqueeText.map((text, i) => {
+              let displayText = text;
+              if (isBn) {
+                if (text.includes('PREMIUM QUALITY')) displayText = '১০০% প্রিমিয়াম কোয়ালিটি';
+                else if (text.includes('TIMELESS ELEGANCE')) displayText = 'চিরন্তন আভিজাত্য';
+                else if (text.includes('GRACEFUL SILHOUETTES')) displayText = 'আকর্ষণীয় ফ্যাশন ও স্টাইল';
+                else if (text.includes('LUXURY FABRICS')) displayText = 'অভিজাত খাঁটি ফেব্রিক';
+                else displayText = localizeTitle(text);
+              }
+              return <span key={i}>{displayText}</span>;
+            })}
+            {settings.marqueeText.map((text, i) => {
+              let displayText = text;
+              if (isBn) {
+                if (text.includes('PREMIUM QUALITY')) displayText = '১০০% প্রিমিয়াম কোয়ালিটি';
+                else if (text.includes('TIMELESS ELEGANCE')) displayText = 'চিরন্তন আভিজাত্য';
+                else if (text.includes('GRACEFUL SILHOUETTES')) displayText = 'আকর্ষণীয় ফ্যাশন ও স্টাইল';
+                else if (text.includes('LUXURY FABRICS')) displayText = 'অভিজাত খাঁটি ফেব্রিক';
+                else displayText = localizeTitle(text);
+              }
+              return <span key={`dup-${i}`}>{displayText}</span>;
+            })}
           </div>
         </div>
       )}
@@ -264,7 +284,11 @@ const Home = () => {
             >
               {settings.featuredCategories.map((cat, i) => (
                 <SwiperSlide key={i}>
-                  <CategoryCard title={cat.title} image={cat.image} link={cat.link} />
+                  <CategoryCard 
+                    title={isBn ? localizeCategory(cat.title) : cat.title} 
+                    image={cat.image} 
+                    link={cat.link} 
+                  />
                 </SwiperSlide>
               ))}
             </Swiper>
@@ -341,7 +365,7 @@ const Home = () => {
                   <div className={styles.collectionItem}>
                     <img src={col.image} alt={col.title} />
                     <div className={styles.collectionContent}>
-                      <h3>{col.title}</h3>
+                      <h3>{isBn ? localizeTitle(col.title) : col.title}</h3>
                       <Link to={col.link || '/shop'} style={{ color: '#fff', textDecoration: 'underline' }}>
                         {t('home.shopNow', 'Shop Now')}
                       </Link>
@@ -355,45 +379,62 @@ const Home = () => {
       )}
 
       {/* Shop the Look / Editorial Spotlight */}
-      {settings.shopTheLook && settings.shopTheLook.image && (
-        <section className="container" style={{ padding: 'var(--space-8) var(--space-4)' }}>
-          <div className={styles.shopTheLook}>
-            <motion.div 
-              className={styles.lookImage}
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-            >
-              <img src={settings.shopTheLook.image} alt={settings.shopTheLook.title} style={{ width: '100%', borderRadius: 'var(--radius-lg)' }} />
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-            >
-              <h3 className={styles.lookTitle}>{settings.shopTheLook.title}</h3>
-              <p className={styles.lookSubtitle}>
-                {settings.shopTheLook.subtitle}
-              </p>
-              <div className={styles.productGrid} style={{ gridTemplateColumns: '1fr 1fr' }}>
-                {products.slice(0, 2).map((p, i) => (
-                  <motion.div 
-                    key={p._id+'stl'}
-                    initial={{ opacity: 0, y: 15 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: i * 0.1, duration: 0.4 }}
-                  >
-                    <ProductCard product={p} />
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-          </div>
-        </section>
-      )}
+      {settings.shopTheLook && settings.shopTheLook.image && (() => {
+        let lookTitle = settings.shopTheLook.title || 'The Weekend Edit';
+        let lookSubtitle = settings.shopTheLook.subtitle || '';
+        
+        if (isBn) {
+          if (lookTitle === 'The Weekend Edit' || lookTitle.includes('Weekend')) {
+            lookTitle = 'উইকেন্ড ফ্যাশন স্পটলাইট';
+          } else {
+            lookTitle = localizeTitle(lookTitle);
+          }
+
+          if (!lookSubtitle || lookSubtitle.includes('Curated outfits') || lookSubtitle.includes('weekend getaways')) {
+            lookSubtitle = 'ছুটির দিনে ভ্রমণের জন্য আকর্ষণীয় ও আরামদায়ক পোশাকের বিশেষ কালেকশন।';
+          }
+        }
+        
+        return (
+          <section className="container" style={{ padding: 'var(--space-8) var(--space-4)' }}>
+            <div className={styles.shopTheLook}>
+              <motion.div 
+                className={styles.lookImage}
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+              >
+                <img src={settings.shopTheLook.image} alt={lookTitle} style={{ width: '100%', borderRadius: 'var(--radius-lg)' }} />
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+              >
+                <h3 className={styles.lookTitle}>{lookTitle}</h3>
+                <p className={styles.lookSubtitle}>
+                  {lookSubtitle}
+                </p>
+                <div className={styles.productGrid} style={{ gridTemplateColumns: '1fr 1fr' }}>
+                  {products.slice(0, 2).map((p, i) => (
+                    <motion.div 
+                      key={p._id+'stl'}
+                      initial={{ opacity: 0, y: 15 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: i * 0.1, duration: 0.4 }}
+                    >
+                      <ProductCard product={p} />
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+            </div>
+          </section>
+        );
+      })()}
 
       {/* Customer Testimonials / Social Proof Auto-Slider Section */}
       <TestimonialsSlider />
@@ -408,10 +449,12 @@ const Home = () => {
       >
         <div className="container">
           <h2 className={styles.newsletterTitle}>
-            {settings.newsletter?.title || t('home.newsletterTitle', 'Join the রঙবতী Inner Circle')}
+            {isBn ? 'রঙবতী ক্লাবে যুক্ত হোন' : (settings.newsletter?.title || t('home.newsletterTitle', 'Join the রঙবতী Inner Circle'))}
           </h2>
           <p className={styles.newsletterSubtitle}>
-            {settings.newsletter?.subtitle || t('home.newsletterSubtitle', 'Subscribe to receive priority access to new saree collections, luxury pret launches, and private offers.')}
+            {isBn 
+              ? 'নতুন কালেকশন, স্পেশাল অফার এবং লাক্সারি ফ্যাশন আপডেটের নোটিফিকেশন সবার আগে পেতে সাবস্ক্রাইব করুন।' 
+              : (settings.newsletter?.subtitle || t('home.newsletterSubtitle', 'Subscribe to receive priority access to new saree collections, luxury pret launches, and private offers.'))}
           </p>
           <form className={styles.newsletterInputGroup} onSubmit={handleNewsletterSubmit}>
             <input 

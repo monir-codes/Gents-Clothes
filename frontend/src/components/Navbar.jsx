@@ -61,24 +61,38 @@ const Navbar = () => {
     <>
       <header className={styles.header}>
         <div className={styles.announcementBar}>
-          {announcements.length > 1 ? (
-            <Swiper
-              modules={[Autoplay]}
-              autoplay={{ delay: 3000, disableOnInteraction: false }}
-              loop={true}
-              allowTouchMove={false}
-              speed={800}
-              style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center' }}
-            >
-              {announcements.map((text, idx) => (
-                <SwiperSlide key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                  {text}
-                </SwiperSlide>
-              ))}
-            </Swiper>
-          ) : (
-            announcements[0]
-          )}
+          {(() => {
+            const getLocalizedAnnouncement = (text) => {
+              if (!isBn) return text;
+              if (text.includes('FREE SHIPPING') || text.includes('5000')) {
+                return '৳ ৫০০০ টাকার অর্ডারে সারা বাংলাদেশে ফ্রি ডেলিভারি | প্রিমিয়াম সামার কালেকশন ২০২৬';
+              }
+              if (text.includes('PREMIUM SUMMER COLLECTION')) {
+                return 'প্রিমিয়াম সামার কালেকশন ২০২৬ - এক্সক্লুসিভ উইমেন ফ্যাশন';
+              }
+              return text;
+            };
+
+            if (announcements.length > 1) {
+              return (
+                <Swiper
+                  modules={[Autoplay]}
+                  autoplay={{ delay: 3500, disableOnInteraction: false }}
+                  loop={true}
+                  allowTouchMove={false}
+                  speed={800}
+                  style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center' }}
+                >
+                  {announcements.map((text, idx) => (
+                    <SwiperSlide key={idx} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                      {getLocalizedAnnouncement(text)}
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
+              );
+            }
+            return getLocalizedAnnouncement(announcements[0] || '');
+          })()}
         </div>
         
         <div className={`container ${styles.navContainer}`}>
