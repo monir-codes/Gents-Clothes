@@ -45,6 +45,13 @@
   color: var(--color-error);
 }
 
+.headerCount {
+  font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  font-weight: 600;
+  font-size: 1.15rem;
+  color: var(--color-accent);
+}
+
 .itemsContainer {
   flex: 1;
   overflow-y: auto;
@@ -56,14 +63,14 @@
 
 .cartItem {
   display: flex;
-  gap: var(--space-2);
-  padding-bottom: var(--space-2);
+  gap: var(--space-3);
+  padding-bottom: var(--space-3);
   border-bottom: 1px solid var(--color-border);
 }
 
 .itemImage {
   width: 80px;
-  height: 100px;
+  height: 105px;
   object-fit: cover;
   border-radius: var(--radius-sm);
 }
@@ -77,13 +84,14 @@
 .itemName {
   font-weight: 600;
   font-size: 0.95rem;
+  line-height: 1.35;
   margin-bottom: 4px;
 }
 
 .itemVariants {
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   color: var(--color-text-secondary);
-  margin-bottom: var(--space-1);
+  margin-bottom: var(--space-2);
 }
 
 .priceRow {
@@ -94,22 +102,54 @@
 }
 
 .qtyControl {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
+  background: var(--color-surface, #f9f9f9);
+  overflow: hidden;
 }
 
 .qtyBtn {
-  padding: 4px 8px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: 500;
   color: var(--color-text-primary);
+  transition: background 0.2s;
+}
+
+.qtyBtn:hover {
+  background: rgba(0, 0, 0, 0.05);
 }
 
 .qtyInput {
-  width: 30px;
+  width: 34px;
+  height: 28px;
   text-align: center;
   border: none;
-  font-size: 0.9rem;
+  background: transparent;
+  font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+}
+
+.cartItemPrice {
+  font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
 }
 
 .removeBtn {
@@ -127,9 +167,12 @@
 .subtotalRow {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: var(--space-3);
-  font-size: 1.2rem;
-  font-weight: 600;
+  font-size: 1.15rem;
+  font-weight: 700;
+  font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  font-variant-numeric: tabular-nums;
 }
 
 .checkoutBtn {

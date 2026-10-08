@@ -88,6 +88,14 @@ export const CATEGORY_TRANSLATIONS = {
 };
 
 export const PRODUCT_TRANSLATIONS = {
+  'Kashmiri Katan Saree with Blouse Piece': {
+    name: 'কাশ্মীরি কাতান শাড়ি (ব্লাউজ পিস সহ)',
+    description: 'অভিজাত ও নিখুঁত সিল্ক সুতায় বোনা প্রিমিয়াম কাশ্মীরি কাতান শাড়ি। কাশ্মীরের ঐতিহ্যবাহী নান্দনিক নকশায় সাজানো এই শাড়িটি যেকোনো উৎসব, বিয়ে বা স্পেশাল অকেশনে আপনাকে দেবে এক অনন্য ও রাজকীয় আভিজাত্য। ম্যাচিং ব্লাউজ পিস সহ সম্পূর্ণ ১২ হাত শাড়ি।'
+  },
+  'Afsan Print Sharee with Blouse Piece': {
+    name: 'আফসান প্রিন্ট শাড়ি (ব্লাউজ পিস সহ)',
+    description: 'নান্দনিক ও প্রিমিয়াম ডিজাইনে তৈরি এক্সক্লুসিভ আফসান প্রিন্ট শাড়ি। ঐতিহ্যবাহী কারুকাজ ও আধুনিক ফ্যাশনের অপূর্ব সংমিশ্রণে অত্যন্ত মসৃণ ও আরামদায়ক কাপড়ে তৈরি। উৎসব ও অনুষ্ঠানে স্টাইলিশ লুকের জন্য ম্যাচিং ব্লাউজ পিস সহ ১২ হাত শাড়ি।'
+  },
   'Royal Heritage Jamdani Saree': {
     name: 'রয়েল হেরিটেজ ঢাকাই জামদানি শাড়ি',
     description: 'দক্ষ তাঁতিদের হাতে বোনা খাঁটি ঢাকাই জামদানি শাড়ি। এতে রয়েছে নান্দনিক ফ্লোরাল মোটিফ, উজ্জ্বল মেরুন শেড এবং সোনালী জরির অভিজাত বর্ডার।'
@@ -168,6 +176,8 @@ export const COLOR_TRANSLATIONS = {
 };
 
 export const FABRIC_TRANSLATIONS = {
+  'Pure Katan Silk': 'খাঁটি কাতান সিল্ক',
+  'Premium Silk Blend': 'প্রিমিয়াম সিল্ক ব্লেন্ড',
   '100% Fine Cotton & Gold Zari': '১০০% খাঁটি সুতি ও গোল্ডেন জরি',
   'Pure Viscose Georgette with Silk Dupatta': 'পিওর ভিসকোস জর্জেট সাথে সিল্ক ওড়না',
   'Mulberry Silk Blend': 'মালবেরি সিল্ক ব্লেন্ড',
@@ -181,6 +191,10 @@ export const FABRIC_TRANSLATIONS = {
   'Chiffon': 'পিওর শিফন',
   'Velvet': 'মাইক্রো ভেলভেট',
   'Dubai Cherry': 'দুবাই চেরি জর্জেট',
+  'Heavy': 'হেভি কোয়ালিটি',
+  'Lightweight': 'লাইটওয়েট / হালকা ও আরামদায়ক',
+  'Medium': 'মিডিয়াম কোয়ালিটি',
+  'Dry clean recommended': 'ড্রাই ওয়াশ করার পরামর্শ দেয়া হচ্ছে',
   'Dry clean only': 'শুধুমাত্র ড্রাই ওয়াশ',
   'Gentle dry clean': 'হালকা ড্রাই ক্লিন',
   'Hand wash cold or gentle machine wash': 'ঠান্ডা পানিতে মৃদু ওয়াশ অথবা হ্যান্ড ওয়াশ',
@@ -189,7 +203,10 @@ export const FABRIC_TRANSLATIONS = {
   '120 GSM': '১২০ জিএসএম',
   '140 GSM': '১৪০ জিএসএম',
   '260 GSM': '২৬০ জিএসএম',
-  'Free Size': 'ফ্রি সাইজ'
+  'Free Size': 'ফ্রি সাইজ',
+  '12 Haat with Blouse Piece': '১২ হাত (ব্লাউজ পিস সহ)',
+  '12 Haat (Free Size)': '১২ হাত (ফ্রি সাইজ)',
+  '12 Haat': '১২ হাত'
 };
 
 export const translations = {
@@ -290,7 +307,7 @@ export const translations = {
       fabricDetails: 'ফ্যাব্রিক ও কাপড়ের বিবরণ',
       deliveryInfo: 'ডেলিভারি ও রিটার্ন তথ্য',
       cashOnDeliveryAvailable: 'সারা বাংলাদেশে ক্যাশ অন ডেলিভারি ও পার্সেল চেক সুবিধা',
-      easyReturns: 'পছন্দ না হলে বা ত্রুটি থাকলে শুধু ডেলিভারি চার্জ দিয়ে রিটার্ন',
+      easyReturns: 'সহজ রিটার্ন',
       fastDeliveryTime: 'ঢাকায় ২-৩ দিন, ঢাকার বাইরে ৩-৫ দিনে ডেলিভারি',
       returnNotice: 'পণ্য হাতে পেয়ে চেক করে যদি পছন্দ না হয় বা কোনো সমস্যা থাকে, তবে ডেলিভারিম্যানকে কেবল ডেলিভারি চার্জ পরিশোধ করে সাথে সাথে রিটার্ন করতে পারবেন।',
       sourcingNotice: 'আমরা যাচাইকৃত বিশ্বস্ত সাপ্লায়ারদের কাছ থেকে সেরা মানের পণ্য বাছাই করে রিসেলিং করি।',
@@ -479,7 +496,7 @@ export const translations = {
       fabricDetails: 'Fabric & Material Details',
       deliveryInfo: 'Delivery & Return Information',
       cashOnDeliveryAvailable: 'Nationwide Cash on Delivery with Doorstep Inspection',
-      easyReturns: 'Easy Doorstep Return with Delivery Charge if not satisfied',
+      easyReturns: 'Easy Returns',
       fastDeliveryTime: '2-3 days in Dhaka, 3-5 days outside Dhaka',
       returnNotice: 'Check your parcel upon arrival. If you find any defect or change your mind, return it directly to the delivery agent by only paying the delivery fee.',
       sourcingNotice: 'We carefully curate and quality-check garments sourced directly from verified suppliers.',

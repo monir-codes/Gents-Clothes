@@ -13,7 +13,7 @@ const TrackOrder = () => {
   const [error, setError] = useState('');
   const [orderData, setOrderData] = useState(null);
 
-  const { language, formatPrice, formatNumber, localizeTitle } = useLanguageStore();
+  const { language, formatPrice, formatNumber, localizeTitle, localizeSize } = useLanguageStore();
   const isBn = language === 'bn';
 
   const handleTrack = async (e) => {
@@ -145,7 +145,7 @@ const TrackOrder = () => {
                 </h4>
                 {orderData?.orderItems.map((item, index) => (
                   <div key={index} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', fontSize: '0.9rem' }}>
-                    <span>{formatNumber(item.qty)}x {localizeTitle(item.name)} {item.size ? `(${item.size})` : ''}</span>
+                    <span>{formatNumber(item.qty)}x {localizeTitle(item.name)} {item.size ? `(${localizeSize(item.size)})` : ''}</span>
                     <span>{formatPrice(item.price * item.qty)}</span>
                   </div>
                 ))}

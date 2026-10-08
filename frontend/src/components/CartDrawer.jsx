@@ -8,7 +8,7 @@ import styles from './CartDrawer.module.css';
 
 const CartDrawer = () => {
   const { isCartOpen, toggleCart, cartItems, removeFromCart, updateQty } = useCartStore();
-  const { t, language, formatPrice, formatNumber, localizeTitle, localizeColor } = useLanguageStore();
+  const { t, language, formatPrice, localizeTitle, localizeColor, localizeSize } = useLanguageStore();
   const navigate = useNavigate();
 
   const handleCheckout = () => {
@@ -18,6 +18,7 @@ const CartDrawer = () => {
     }, 300);
   };
 
+  const totalItemCount = cartItems.reduce((acc, item) => acc + item.qty, 0);
   const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.qty, 0);
   const isBn = language === 'bn';
 
@@ -41,7 +42,7 @@ const CartDrawer = () => {
           >
             <div className={styles.header}>
               <h2 className={styles.title}>
-                {t('cart.title', 'Your Shopping Bag')} ({formatNumber(cartItems.length)})
+                {t('cart.title', 'Your Shopping Bag')} <span className={styles.headerCount}>({totalItemCount})</span>
               </h2>
               <button className={styles.closeBtn} onClick={toggleCart} aria-label="Close Cart"><X /></button>
             </div>
@@ -65,7 +66,7 @@ const CartDrawer = () => {
                       <h4 className={styles.itemName}>{localizeTitle(item.name)}</h4>
                       <p className={styles.itemVariants}>
                         {item.color && `${isBn ? 'রং:' : 'Color:'} ${localizeColor(item.color)}`} 
-                        {item.size && ` | ${isBn ? 'সাইজ:' : 'Size:'} ${item.size}`}
+                        {item.size && ` | ${isBn ? 'সাইজ:' : 'Size:'} ${localizeSize(item.size)}`}
                       </p>
                       <div className={styles.priceRow}>
                         <div className={styles.qtyControl}>
@@ -74,14 +75,14 @@ const CartDrawer = () => {
                             onClick={() => updateQty(item.product, item.size, item.color, Math.max(1, item.qty - 1))}
                             aria-label="Decrease quantity"
                           >-</button>
-                          <input type="text" value={formatNumber(item.qty)} readOnly className={styles.qtyInput} />
+                          <input type="text" value={item.qty} readOnly className={styles.qtyInput} />
                           <button 
                             className={styles.qtyBtn}
                             onClick={() => updateQty(item.product, item.size, item.color, item.qty + 1)}
                             aria-label="Increase quantity"
                           >+</button>
                         </div>
-                        <div style={{fontWeight: 600}}>{formatPrice(item.price * item.qty)}</div>
+                        <div className={styles.cartItemPrice}>{formatPrice(item.price * item.qty)}</div>
                       </div>
                       <button 
                         className={styles.removeBtn}

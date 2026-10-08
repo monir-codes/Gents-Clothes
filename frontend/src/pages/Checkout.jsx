@@ -14,7 +14,7 @@ import Swal from 'sweetalert2';
 const Checkout = () => {
   const { cartItems, clearCart } = useCartStore();
   const { user } = useAuthStore();
-  const { t, language, formatPrice, formatNumber, localizeTitle } = useLanguageStore();
+  const { t, language, formatPrice, formatNumber, localizeTitle, localizeColor, localizeSize } = useLanguageStore();
   const isBn = language === 'bn';
   const navigate = useNavigate();
 
@@ -572,7 +572,7 @@ const Checkout = () => {
               <div style={{ flex: 1 }}>
                 <div style={{ fontWeight: 600, fontSize: '0.95rem' }}>{localizeTitle(item.name)}</div>
                 <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>
-                  {item.color && `${item.color} `}{item.size && `| ${item.size}`}
+                  {item.color && `${localizeColor(item.color)} `}{item.size && `| ${localizeSize(item.size)}`}
                 </div>
                 <div style={{ fontSize: '0.85rem', fontWeight: 500 }}>
                   {isBn ? 'পরিমাণ:' : 'Qty:'} {formatNumber(item.qty)} x {formatPrice(item.price)}

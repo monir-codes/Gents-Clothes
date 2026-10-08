@@ -65,14 +65,32 @@ const useLanguageStore = create(
         return `৳ ${formattedEn}`;
       },
 
-      // Number formatter helper (e.g. 10 -> ১০ in Bengali)
+      // Number formatter helper: returns clean, crystal-clear standard numerals (e.g. 1, 2, 3...)
       formatNumber: (num) => {
         if (num === undefined || num === null) return '';
-        const lang = get().language || 'bn';
-        if (lang === 'bn') {
-          return toBengaliNumerals(num);
-        }
         return String(num);
+      },
+
+      // Size localizer helper
+      localizeSize: (size) => {
+        if (!size || typeof size !== 'string') return '';
+        const lang = get().language || 'bn';
+        if (lang === 'en') return size;
+
+        let localized = size;
+        localized = localized
+          .replace(/12 Haat with Blouse Piece/gi, '১২ হাত (ব্লাউজ পিস সহ)')
+          .replace(/12 Haat \(Free Size\)/gi, '১২ হাত (ফ্রি সাইজ)')
+          .replace(/12 Haat/gi, '১২ হাত')
+          .replace(/14 Haat/gi, '১৪ হাত')
+          .replace(/Free Size/gi, 'ফ্রি সাইজ')
+          .replace(/with Blouse Piece/gi, '(ব্লাউজ পিস সহ)')
+          .replace(/Semi-Stitched/gi, 'সেমি-স্টিচড')
+          .replace(/Unstitched/gi, 'আনস্টিচড')
+          .replace(/Stitched/gi, 'স্টিচড')
+          .replace(/Ready to Wear/gi, 'রেডি টু ওয়্যার');
+
+        return localized;
       },
 
       // Category localizer
@@ -99,6 +117,9 @@ const useLanguageStore = create(
         // 2. Multi-word phrase translation
         let localized = title;
         const replacements = [
+          [/Kashmiri Katan Saree with Blouse Piece/gi, 'কাশ্মীরি কাতান শাড়ি (ব্লাউজ পিস সহ)'],
+          [/Afsan Print Sharee with Blouse Piece/gi, 'আফসান প্রিন্ট শাড়ি (ব্লাউজ পিস সহ)'],
+          [/Afsan Print Saree with Blouse Piece/gi, 'আফসান প্রিন্ট শাড়ি (ব্লাউজ পিস সহ)'],
           [/Royal Heritage Jamdani Saree/gi, 'রয়েল হেরিটেজ ঢাকাই জামদানি শাড়ি'],
           [/Embroidered Georgette Salwar Kameez/gi, 'এমব্রয়ডারি জর্জেট সালোয়ার কামিজ (৩-পিস)'],
           [/Contemporary Silk Kurti & Co-ord Set/gi, 'কনটেম্পরারি সিল্ক কুর্তি ও কর্ড সেট'],
@@ -230,8 +251,14 @@ const useLanguageStore = create(
           return PRODUCT_TRANSLATIONS[title.trim()].description;
         }
 
-        // 2. Check phrase matches
+        // 2. Check phrase matches for live & seeded catalog items
         let text = description;
+        if (text.includes('Kashmiri Katan Saree') || text.includes('serene beauty of Kashmir')) {
+          return 'অভিজাত ও নিখুঁত সিল্ক সুতায় বোনা প্রিমিয়াম কাশ্মীরি কাতান শাড়ি। কাশ্মীরের ঐতিহ্যবাহী নান্দনিক নকশায় সাজানো এই শাড়িটি যেকোনো উৎসব, বিয়ে বা স্পেশাল অকেশনে আপনাকে দেবে এক অনন্য ও রাজকীয় আভিজাত্য। ম্যাচিং ব্লাউজ পিস সহ সম্পূর্ণ ১২ হাত শাড়ি।';
+        }
+        if (text.includes('Afsan Print Sharee') || text.includes('ethereal beauty of the Afsan Print')) {
+          return 'নান্দনিক ও প্রিমিয়াম ডিজাইনে তৈরি এক্সক্লুসিভ আফসান প্রিন্ট শাড়ি। ঐতিহ্যবাহী কারুকাজ ও আধুনিক ফ্যাশনের অপূর্ব সংমিশ্রণে অত্যন্ত মসৃণ ও আরামদায়ক কাপড়ে তৈরি। উৎসব ও অনুষ্ঠানে স্টাইলিশ লুকের জন্য ম্যাচিং ব্লাউজ পিস সহ ১২ হাত শাড়ি।';
+        }
         if (text.includes('Masterfully handwoven Dhakai Jamdani')) {
           return 'দক্ষ তাঁতিদের হাতে বোনা খাঁটি ঢাকাই জামদানি শাড়ি। এতে রয়েছে নান্দনিক ফ্লোরাল মোটিফ, উজ্জ্বল মেরুন শেড এবং সোনালী জরির অভিজাত বর্ডার।';
         }
@@ -247,6 +274,11 @@ const useLanguageStore = create(
 
         // 3. Heuristic dictionary replacement for generic product descriptions
         const descReplacements = [
+          [/Drape yourself in the timeless elegance of our/gi, 'নিজেকে সাজিয়ে নিন আমাদের অনন্য ও অভিজাত'],
+          [/Drape yourself in the ethereal beauty of the/gi, 'নিজেকে সাজিয়ে নিন নজরকাড়া সৌন্দর্যের'],
+          [/a masterpiece woven with the finest silk threads/gi, 'নিখুঁত সিল্ক সুতায় বোনা এক অনন্য মাস্টারপিস'],
+          [/This exquisite creation showcases intricate patterns/gi, 'এই নান্দনিক সৃষ্টিতে ফুটে উঠেছে সূক্ষ্ম কারুকাজ'],
+          [/promising a regal allure and unparalleled sophistication for every special occasion/gi, 'যা যেকোনো বিশেষ অনুষ্ঠানে আপনাকে দেবে রাজকীয় ও আকর্ষণীয় আভিজাত্য'],
           [/Masterfully handwoven/gi, 'দক্ষ কারিগরদের নিপুণ হাতে বোনা'],
           [/handwoven/gi, 'হাতে বোনা'],
           [/intricate floral motifs/gi, 'সূক্ষ্ম ফ্লোরাল মোটিফ ও নকশা'],
@@ -266,6 +298,8 @@ const useLanguageStore = create(
           [/hand-embroidered borders/gi, 'হাতে কারুকাজ করা এমব্রয়ডারি বর্ডার'],
           [/perfect accessory/gi, 'নিখুঁত অনুষঙ্গ'],
           [/celebratory look/gi, 'উৎসবের জমকালো সাজ'],
+          [/with a matching blouse piece/gi, 'ম্যাচিং ব্লাউজ পিস সহ'],
+          [/complete with a matching blouse piece/gi, 'ম্যাচিং ব্লাউজ পিস সহ সম্পূর্ণ'],
           [/Dry clean recommended/gi, 'ড্রাই ওয়াশ প্রযোজ্য'],
           [/Dry clean only/gi, 'শুধুমাত্র ড্রাই ওয়াশ'],
           [/Gentle dry clean/gi, 'হালকা ড্রাই ক্লিন'],
@@ -299,8 +333,9 @@ const useLanguageStore = create(
           mat = FABRIC_TRANSLATIONS[mat.trim()];
         } else {
           mat = mat
-            .replace(/Pure Katan Silk/gi, 'পিওর কাতান সিল্ক')
-            .replace(/Pure Silk/gi, 'পিওর সিল্ক')
+            .replace(/Pure Katan Silk/gi, 'খাঁটি কাতান সিল্ক')
+            .replace(/Premium Silk Blend/gi, 'প্রিমিয়াম সিল্ক ব্লেন্ড')
+            .replace(/Pure Silk/gi, 'খাঁটি সিল্ক')
             .replace(/Pure Cotton/gi, 'খাঁটি সুতি')
             .replace(/Pure/gi, 'পিওর')
             .replace(/Katan/gi, 'কাতান')
@@ -316,9 +351,11 @@ const useLanguageStore = create(
         }
 
         let gsm = fabricDetails.gsm || '';
-        if (gsm && gsm.trim()) {
+        if (FABRIC_TRANSLATIONS[gsm.trim()]) {
+          gsm = FABRIC_TRANSLATIONS[gsm.trim()];
+        } else if (gsm && gsm.trim()) {
           const numOnly = gsm.replace(/[^0-9]/g, '');
-          gsm = numOnly ? `${toBengaliNumerals(numOnly)} জিএসএম` : (FABRIC_TRANSLATIONS[gsm.trim()] || gsm);
+          gsm = numOnly ? `${numOnly} জিএসএম` : gsm;
         } else {
           gsm = '';
         }
@@ -328,7 +365,7 @@ const useLanguageStore = create(
           wash = FABRIC_TRANSLATIONS[wash.trim()];
         } else {
           wash = wash
-            .replace(/Dry clean recommended/gi, 'ড্রাই ওয়াশ প্রযোজ্য')
+            .replace(/Dry clean recommended/gi, 'ড্রাই ওয়াশ করার পরামর্শ দেয়া হচ্ছে')
             .replace(/Dry clean only/gi, 'শুধুমাত্র ড্রাই ওয়াশ')
             .replace(/Gentle dry clean/gi, 'হালকা ড্রাই ক্লিন')
             .replace(/Hand wash cold/gi, 'ঠান্ডা পানিতে হাত ধোয়া')
