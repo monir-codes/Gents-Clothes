@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
-import { ShoppingBag, Heart, Star, Truck, RefreshCcw, ShieldCheck, Sparkles, ChevronLeft, ChevronRight, Ruler, Check } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { 
+  ShoppingBag, Heart, Star, Truck, RefreshCcw, ShieldCheck, 
+  Sparkles, ChevronLeft, ChevronRight, Ruler, Check, Maximize2, X, ZoomIn
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import useCartStore from '../store/useCartStore';
 import useWishlistStore from '../store/useWishlistStore';
 import useAuthStore from '../store/useAuthStore';
@@ -29,6 +32,10 @@ const ProductDetails = () => {
   const [selectedSize, setSelectedSize] = useState('');
   const [qty, setQty] = useState(1);
   const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [isHoverZooming, setIsHoverZooming] = useState(false);
+  const [zoomOrigin, setZoomOrigin] = useState({ x: 50, y: 50 });
+
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const initialTab = searchParams.get('tab') || 'description';
@@ -139,11 +146,13 @@ const ProductDetails = () => {
     return Array.from(new Set(imgs)).filter(img => typeof img === 'string' && img.trim().length > 0);
   }, [product]);
 
+  const activeImageSrc = displayImage || product?.image || (productImages.length > 0 ? productImages[0] : '');
+
   const currentImageIndex = useMemo(() => {
-    const active = displayImage || product?.image;
+    const active = activeImageSrc;
     const idx = productImages.indexOf(active);
     return idx >= 0 ? idx : 0;
-  }, [displayImage, product, productImages]);
+  }, [activeImageSrc, productImages]);
 
   const handlePrevImage = () => {
     if (productImages.length <= 1) return;
@@ -155,6 +164,39 @@ const ProductDetails = () => {
     if (productImages.length <= 1) return;
     const nextIdx = (currentImageIndex + 1) % productImages.length;
     setDisplayImage(productImages[nextIdx]);
+  };
+
+  useEffect(() => {
+    if (!isLightboxOpen) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setIsLightboxOpen(false);
+      } else if (e.key === 'ArrowLeft') {
+        if (productImages.length > 1) {
+          const prevIdx = (currentImageIndex - 1 + productImages.length) % productImages.length;
+          setDisplayImage(productImages[prevIdx]);
+        }
+      } else if (e.key === 'ArrowRight') {
+        if (productImages.length > 1) {
+          const nextIdx = (currentImageIndex + 1) % productImages.length;
+          setDisplayImage(productImages[nextIdx]);
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isLightboxOpen, productImages, currentImageIndex]);
+
+  const handleImageMouseMove = (e) => {
+    const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
+    const x = Math.max(0, Math.min(100, ((e.clientX - left) / width) * 100));
+    const y = Math.max(0, Math.min(100, ((e.clientY - top) / height) * 100));
+    setZoomOrigin({ x, y });
+    setIsHoverZooming(true);
+  };
+
+  const handleImageMouseLeave = () => {
+    setIsHoverZooming(false);
   };
 
   if (loading) return <Loader fullScreen />;
@@ -251,19 +293,47 @@ const ProductDetails = () => {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <div className={styles.mainImageContainer}>
+          <div 
+            className={styles.mainImageContainer}
+            onClick={() => setIsLightboxOpen(true)}
+            onMouseMove={handleImageMouseMove}
+            onMouseLeave={handleImageMouseLeave}
+            title={language === 'bn' ? 'ক্লিক করে সম্পূর্ণ ছবি বড় করে দেখুন' : 'Click to inspect full photo in high resolution'}
+          >
+            {/* Ambient subtle underlay */}
+            <div 
+              className={styles.ambientBackdrop} 
+              style={{ backgroundImage: `url(${activeImageSrc})` }} 
+            />
+
+            {/* 100% Full View Product Photo (Zero Cropping) */}
             <img 
-              src={displayImage || product.image} 
+              src={activeImageSrc} 
               alt={`${localizeTitle(product.name)} - View ${currentImageIndex + 1}`} 
               className={styles.mainImage} 
+              style={isHoverZooming ? {
+                transformOrigin: `${zoomOrigin.x}% ${zoomOrigin.y}%`,
+                transform: 'scale(1.4)'
+              } : {}}
             />
+
+            {/* Zoom Icon Button */}
+            <button 
+              type="button" 
+              className={styles.zoomTriggerBtn} 
+              onClick={(e) => { e.stopPropagation(); setIsLightboxOpen(true); }}
+              title={language === 'bn' ? 'সম্পূর্ণ ছবি ফুলস্ক্রিন দেখুন' : 'View Fullscreen'}
+              aria-label="Fullscreen photo"
+            >
+              <Maximize2 size={16} />
+            </button>
             
             {productImages.length > 1 && (
               <>
                 <button 
                   type="button" 
                   className={`${styles.navBtn} ${styles.prevBtn}`} 
-                  onClick={handlePrevImage} 
+                  onClick={(e) => { e.stopPropagation(); handlePrevImage(); }} 
                   aria-label="Previous photo"
                 >
                   <ChevronLeft size={22} />
@@ -271,7 +341,7 @@ const ProductDetails = () => {
                 <button 
                   type="button" 
                   className={`${styles.navBtn} ${styles.nextBtn}`} 
-                  onClick={handleNextImage} 
+                  onClick={(e) => { e.stopPropagation(); handleNextImage(); }} 
                   aria-label="Next photo"
                 >
                   <ChevronRight size={22} />
@@ -287,7 +357,7 @@ const ProductDetails = () => {
           {productImages.length > 1 && (
             <div className={styles.thumbnailList}>
               {productImages.map((imgUrl, index) => {
-                const isActive = (displayImage ? displayImage === imgUrl : index === 0);
+                const isActive = (activeImageSrc === imgUrl);
                 return (
                   <button
                     type="button"
@@ -594,6 +664,77 @@ const ProductDetails = () => {
         onClose={() => setIsSizeGuideOpen(false)} 
         defaultCategory={product.category} 
       />
+
+      {/* Fullscreen High-Resolution Lightbox Modal */}
+      <AnimatePresence>
+        {isLightboxOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className={styles.lightboxOverlay}
+            onClick={() => setIsLightboxOpen(false)}
+          >
+            <button
+              type="button"
+              className={styles.lightboxCloseBtn}
+              onClick={() => setIsLightboxOpen(false)}
+              aria-label="Close fullscreen view"
+            >
+              <X size={26} />
+            </button>
+
+            <div 
+              className={styles.lightboxContent}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <img 
+                src={activeImageSrc} 
+                alt={`${localizeTitle(product.name)} - Fullscreen`} 
+                className={styles.lightboxImage} 
+              />
+
+              {productImages.length > 1 && (
+                <>
+                  <button 
+                    type="button" 
+                    className={`${styles.lightboxNavBtn} ${styles.lightboxPrevBtn}`} 
+                    onClick={handlePrevImage} 
+                    aria-label="Previous photo"
+                  >
+                    <ChevronLeft size={30} />
+                  </button>
+                  <button 
+                    type="button" 
+                    className={`${styles.lightboxNavBtn} ${styles.lightboxNextBtn}`} 
+                    onClick={handleNextImage} 
+                    aria-label="Next photo"
+                  >
+                    <ChevronRight size={30} />
+                  </button>
+                  <div className={styles.lightboxCounter}>
+                    {currentImageIndex + 1} / {productImages.length}
+                  </div>
+
+                  <div className={styles.lightboxThumbnails}>
+                    {productImages.map((img, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        className={`${styles.lightboxThumbBtn} ${activeImageSrc === img ? styles.lightboxThumbActive : ''}`}
+                        onClick={() => setDisplayImage(img)}
+                      >
+                        <img src={img} alt={`Thumb ${idx + 1}`} />
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
     </>
   );
